@@ -1,0 +1,32 @@
+.wrapper {
+    display: grid;
+    grid-template-columns: 100px 100px 100px;
+    grid-template-rows: 100px 100px 100px;
+    grid-template-areas:
+            "header header header"
+            "tabs stats events"
+            "tabs stats events"
+            "stats stats events";
+}
+
+.wrapper > div {
+    border: 1px solid green;
+}
+
+.header {
+    grid-area: header;
+}
+
+.tabs {
+    grid-area: tabs;
+    background: #ffffff;
+}
+
+.events {
+    grid-area: events;
+}
+
+.stats {
+    background: #54a3ff;
+    grid-area: stats;
+}

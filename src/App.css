@@ -1,38 +1,147 @@
-.App {
-  text-align: center;
+.controls {
+  display: flex;
+  justify-content: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.dropdown {
+  margin: 16px !important;
+  padding: 8px;
+  width: 115px !important;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.params-container {
+  display: flex;
+  flex-wrap: wrap;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.param-container {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
 }
 
-.App-link {
-  color: #61dafb;
+.param-container button {
+  width: 240px;
+  margin: 8px;
+  text-transform: none;
+  font-size: 12px;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.nestedListEvents{
+  position: relative;
+  left: -44em;
+  top: 5em;
+}
+
+/*=================================================*/
+/*testing: display grid*/
+
+/*todo: this guy is adjusting the width of a grid item = gets a width transition*/
+/*https://stackoverflow.com/questions/19848697/css-grid-where-one-column-shrinks-to-fit-content-the-other-fills-the-remaning-s*/
+
+.defaultGrid {
+  display: grid;
+  /*grid-template-columns: 40em 70em 20em;*/
+  grid-template-rows: 20em 20em 20em;
+  /*grid-template-rows: 4em;*/
+  grid-template-areas:
+          "tabs stats events"
+          "tabs tiles events"
+          "tabs tiles events";
+}
+
+.friendsGrid {
+  display: grid;
+  /*grid-template-columns: 40em 70em 20em;*/
+  grid-template-rows: 20em 20em 20em;
+  grid-template-areas:
+          "tabs stats events"
+          "tiles tiles events"
+          "tiles tiles events";
+}
+
+.wrapper > div {
+  border: 1px solid green;
+}
+
+.header {
+  grid-area: header;
+  background: pink;
+}
+
+.tiles {
+  grid-area: tiles;
+  background: gray;
+}
+
+.tabs {
+  grid-area: tabs;
+  background: red;
+  transition: width 1s ease-out;
+}
+.stats {
+  width:70em;
+  background: #54a3ff;
+  grid-area: stats;
+}
+
+.events {
+  grid-area: events;
+  background: purple
+}
+
+
+
+/*=================================================*/
+/*testing: resizable panes*/
+
+.Resizer {
+  /*background: #000;*/
+  /*opacity: 0.2;*/
+  z-index: 1;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  -moz-background-clip: padding;
+  -webkit-background-clip: padding;
+  background-clip: padding-box;
+}
+
+.Resizer:hover {
+  -webkit-transition: all 2s ease;
+  transition: all 2s ease;
+}
+
+.Resizer.horizontal {
+  height: 11px;
+  margin: -5px 0;
+  border-top: 5px solid rgba(255, 255, 255, 0);
+  border-bottom: 5px solid rgba(255, 255, 255, 0);
+  cursor: row-resize;
+  width: 100%;
+}
+
+.Resizer.horizontal:hover {
+  border-top: 5px solid rgba(0, 0, 0, 0.5);
+  border-bottom: 5px solid rgba(0, 0, 0, 0.5);
+}
+
+.Resizer.vertical {
+  width: 11px;
+  margin: 0 -5px;
+  border-left: 5px solid rgba(255, 255, 255, 0);
+  border-right: 5px solid rgba(255, 255, 255, 0);
+  cursor: col-resize;
+}
+
+.Resizer.vertical:hover {
+  border-left: 5px solid rgba(0, 0, 0, 0.5);
+  border-right: 5px solid rgba(0, 0, 0, 0.5);
+}
+.Resizer.disabled {
+  cursor: not-allowed;
+}
+.Resizer.disabled:hover {
+  border-color: transparent;
 }

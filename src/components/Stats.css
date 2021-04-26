@@ -1,0 +1,11 @@
+.difUser{
+    stroke:var(--pointHighlightUser)
+}
+.difGuest{
+    stroke:var(--pointHighlightGuest)
+}
+.shared{
+    stroke:var(--pointHighlightShared)
+}
+
+

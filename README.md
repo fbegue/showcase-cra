@@ -1,3 +1,21 @@
+# notes
+
+- going to need to address 'allow ternary'
+https://eslint.org/docs/rules/no-unused-expressions
+
+## features
+- add "Your Top Tracks" to My Profile
+
+## issues
+- useProduceData (in Stats) is getting called before guest is created?
+- spotify player URI firing for some reason
+
+## dumb shit
+
+- For material-ui-pickers v3 use v1.x version of @date-io adapters.
+
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

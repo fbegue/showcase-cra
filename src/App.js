@@ -1,25 +1,317 @@
-import logo from './logo.svg';
-import './App.css';
+import React, {useState, useEffect, useContext} from 'react';
+import RedirectPage from './RedirectPage';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+//todo: wtf is this shit?
+// import 'brace/mode/json';
+// import 'brace/theme/monokai';
+
+import Player,{} from './components/Player'
+import Profile from './components/Profile'
+import Tabify from './Tabify'
+import EventsList from './EventsList'
+import Stats from "./components/Stats";
+
+import Store, {Context} from './storage/Store'
+import withApolloProvider from './storage/withApolloProvider';
+import api from "./api/api";
+import {Control, FriendsControl, GridControl} from './index'
+import { GLOBAL_UI_VAR } from './storage/withApolloProvider';
+import {useQuery,useReactiveVar} from "@apollo/react-hooks";
+
+import SplitPane from "react-split-pane";
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
+
+import { withStyles } from '@material-ui/core/styles';
+import { createMuiTheme } from '@material-ui/core/styles';
+// import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
+import { ThemeProvider as MuiThemeProvider } from '@material-ui/core/styles';
+import 'fontsource-roboto';
+import './App.css'
+import logo from './assets/sound_found.png'
+import MatTableTreeTest from "./components/MatTableTreeTest";
+import {Tab} from "react-tabify";
+import ContextStats from "./components/ContextStats";
+
+// import SpotifyWebApi from 'spotify-web-api-js';
+// const spotifyApi = new SpotifyWebApi();
+
+const styles = theme => ({
+    root: {
+        display: 'flex',
+        flexWrap: 'wrap'
+    },
+    appBar: {
+
+    },
+    toolbar: theme.mixins.toolbar,
+    contentAndToolbar: {
+        flex: 3,
+        minWidth: 320,
+        boxSizing: 'border-box'
+    },
+    content: {
+        padding: 1,
+        height: 'calc(100vh - 64px)',
+        boxSizing: 'border-box',
+    },
+    storeInspectors: {
+        height: '70%',
+        display: 'flex',
+        justifyContent: 'space-between',
+        overflowX: 'auto'
+    },
+    storeInspector: {
+        flex: 1,
+        margin: 8,
+        boxSizing: 'border-box'
+    },
+    storeInspectorHeader: {
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        background: '#252620',
+        color: 'rgba(255, 255, 255, .8)',
+        height: 48
+    },
+    todoDetail: {
+        height: 170
+    }
+});
+
+class Delayed extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {hidden : true};
+    }
+
+    componentDidMount() {
+        setTimeout(() => {
+            this.setState({hidden: false});
+        }, this.props.waitBeforeShow);
+    }
+
+    render() {
+        return this.state.hidden ? '' : this.props.children;
+    }
 }
 
-export default App;
+
+function App(props) {
+
+    const { classes } = props;
+    let [filter, setFilter] = useState('active');
+    let control = Control.useContainer()
+    let gridControl = GridControl.useContainer()
+    let friendscontrol = FriendsControl.useContainer()
+
+    const globalUI = useReactiveVar(GLOBAL_UI_VAR);
+    console.log("APP | globalUI ",globalUI);
+
+    useEffect(() => {
+        var newTime = null;
+        const interval = setInterval(() => {
+            //todo: yeaaaaaaahh
+            //so basically: first time interval check = use stored value
+            //as soon as we expire for the first time, we switch to using
+            //the now forever updated newTime
+
+            var diff = 0;
+
+            if(!(newTime)){
+                // console.log('Checking expiryTime...',globalUI.expiryTime);
+                diff = Math.abs(new Date() - new Date(globalUI.expiryTime));
+            }else{
+                // console.log('Checking newTime...',newTime);
+                diff = Math.abs(new Date() - new Date(newTime));
+            }
+
+            //testing: every 20s
+            // var threshold = 3580*1000;
+            //when there is 15s left
+            var threshold = 15*1000;
+            //console.log({diff});
+
+            if(diff < threshold){
+                console.log("token is about to expire. refreshing...");
+                api.refreshAuth(globalUI.refresh_token)
+                    .then(r =>{
+                        //console.log("refreshAuth result",r)
+
+                        //only need to refresh the access_token value
+                        console.log("previous GLOBAL_UI_VAR",globalUI);
+                        const params = JSON.parse(localStorage.getItem('params'));
+                        localStorage.setItem('params', JSON.stringify({access_token:r.access_token,refresh_token:params.refresh_token,user:params.user}));
+                        const expiryTime = new Date(new Date().getTime() + 3600 * 1000);
+                        localStorage.setItem('expiryTime', expiryTime.toISOString());
+
+                        //todo: state set here causes rerender, but this time it will pass w/ new expiryTime
+                        //this seems like a bad pattern - not sure I'm even guarantee'd sync state set here
+                        //in fact as soon as this is set, we trigger rerender (console.log comes after)
+                        GLOBAL_UI_VAR({...globalUI,expiryTime:expiryTime, access_token:r.access_token})
+                        newTime = expiryTime;
+                        console.log("refreshAuth finished");
+                    }).catch(e =>{console.error(e)})
+            }else{
+                // console.log("APP | threshold check passed",diff);
+            }
+        }, 5000);
+        return () => clearInterval(interval);
+    }, []);
+
+
+    //todo: no idea why every variant is getting uppercased
+    //https://stackoverflow.com/questions/25158435/paper-button-always-as-upper-case
+    //https://material-ui.com/components/typography/
+    //configing theme
+    //https://material-ui.com/customization/typography/
+
+    const muiTheme = createMuiTheme({
+        typography: {
+            fontFamily: [
+                // '-apple-system',
+                // 'BlinkMacSystemFont',
+                // '"Segoe UI"',
+                'Roboto',
+                '"Helvetica Neue"',
+                'Arial',
+                'sans-serif',
+                // '"Apple Color Emoji"',
+                // '"Segoe UI Emoji"',
+                // '"Segoe UI Symbol"',
+            ].join(','),
+            subtitle2:{  textTransform: 'none',},
+            body1:{  textTransform: 'none'},
+            subtitle1:{  textTransform: 'none'}
+        },
+        overrides: {
+            MuiPaper: {
+                root: {
+                    textTransform:'none'
+                }
+            },
+            MuiCardContent:{
+                root: {
+                    padding:"6px",
+                    //not sure how to go about overriding a last-child condition
+                    paddingBottom:"0px !important"
+                }
+            },
+        }
+    });
+
+    //testing:
+    // const [gridClass, setGridClass] = useState('defaultGrid');
+    // <button onClick={() =>{setGridClass(gridClass === 'defaultGrid' ? 'friendsGrid':'defaultGrid')}}>grid</button>
+    return (
+        <MuiThemeProvider theme={muiTheme}>
+            <Store>
+
+                {/*<TestComp/>*/}
+                <BrowserRouter>
+                    <div className="main">
+                        <Switch>
+                            {/*<Route path="/" component={Home} exact={true} />*/}
+                            <Route path="/redirect" component={RedirectPage} />
+                            {/*<Route path="/dashboard" component={Dashboard} />*/}
+                            {/*<Route component={NotFoundPage} />*/}
+                        </Switch>
+                    </div>
+                </BrowserRouter>
+                <div>
+                    <div  style={{position: "sticky",top: "-16px", padding:"1em 1em 0em 1em", borderBottom: "1px solid black", zIndex: "20",display:'flex',background:"#f0f0f0"}}>
+                        <div><img style={{height:"4em"}} src={logo}/> </div>
+
+                        <div style={{marginRight:"1em"}}>
+                            <Profile/>
+
+                        </div>
+                        {/*<input value={code} onChange={(event) =>{setCode(event.target.value)}}  />*/}
+                        {/*<button onClick={() =>{getAuth(code)}}>fake auth </button>*/}
+
+                        {/*<div ref={containerRef} className={classnames(params)}>yeah don't work here either</div>*/}
+
+                        {/*todo: broke this player when I set GLOBAL_UI_VAR in refreshAuth*/}
+                        {/*tried to make it wait, but doesn't seem to matter. the tracing says
+                    that this is caused by my GLOBAL_UI_VAR set but I can't make sense of it... */}
+
+                        {/*{globalUI.access_token  &&*/}
+                        {/*<div style={playerStyle}>*/}
+                        {/*    <Player token={globalUI.access_token} id={control.id} play={control.play}/></div>*/}
+                        {/*}*/}
+
+                        {/*todo: forcing delay until I can figure it out*/}
+                        <Delayed waitBeforeShow={2000}>
+                            {globalUI.access_token  &&
+                            <div style={control.play ? {opacity:1,flexGrow:2}: {opacity:.4,flexGrow:2}}>
+                                <Player token={globalUI.access_token} id={control.id} play={control.play}/>
+                            </div>
+                            }
+                        </Delayed>
+
+                    </div>
+                    <div className={gridControl.gridClass}>
+                        {/*style={{width:"40em",height:"30em"}}*/}
+                        <div className="tabs" style={{width:gridControl.gridClass === 'defaultGrid' ? "40em":"20em"}}>
+                            {globalUI.access_token &&
+                            <Tabify></Tabify>
+                            }
+                        </div>
+                        {/*style={{width:"70em"}}*/}
+                        <div className="stats" >
+                            <Stats/>
+                        </div>
+                        <div className="tiles" >
+                            <ContextStats/>
+                        </div>
+                        <div className="events">
+                            <EventsList data={[]} />
+                        </div>
+                    </div>
+
+                    {/*testing: flex version*/}
+                    {/*<div className={classes.root} style={{display:"flex",flexDirection:"row",flexWrap: "nowrap"}}>*/}
+                    {/*    <div style={{width:"40em",height:"30em"}}>*/}
+                    {/*        {globalUI.access_token &&*/}
+                    {/*        <Tabify></Tabify>*/}
+                    {/*        }*/}
+                    {/*    </div>*/}
+                    {/*    <div style={{width:"70em"}}>*/}
+                    {/*        <Stats/>*/}
+                    {/*    </div>*/}
+                    {/*    <div>*/}
+                    {/*        <EventsList data={[]} />*/}
+                    {/*    </div>*/}
+                    {/*</div>*/}
+
+                    {/*testing: panes implementation*/}
+                    {/*<div className={"Resizer"}>*/}
+                    {/*    <SplitPane split="vertical" defaultSize={paner.pane["tabs"]}>*/}
+                    {/*        /!*note: for overflow to work, you need a height restriction of some type *!/*/}
+                    {/*        /!*todo: fixed height on over flow (more about the Social component then here, exactly)*!/*/}
+                    {/*        <div >*/}
+                    {/*            {globalUI.access_token &&*/}
+                    {/*        <Tabify></Tabify>*/}
+                    {/*            // <MatTableTreeTest/>*/}
+                    {/*        }*/}
+                    {/*        </div>*/}
+                    {/*            <SplitPane  defaultSize={paner.pane["stats"]}   split="vertical">*/}
+                    {/*                <div style={{ border: "1px solid green",height:"20em" }}>*/}
+
+                    {/*                 <Stats/>*/}
+
+                    {/*                </div>*/}
+                    {/*                <div style={{ border: "1px solid blue" }}>*/}
+                    {/*                    <EventsList data={[]} />*/}
+                    {/*                </div>*/}
+                    {/*            </SplitPane>*/}
+                    {/*    </SplitPane>*/}
+                    {/*</div>*/}
+                </div>
+            </Store>
+        </MuiThemeProvider>
+    );
+}
+
+export default withStyles(styles)(withApolloProvider(App));

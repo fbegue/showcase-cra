@@ -1,0 +1,42 @@
+.MuiListItem-divider-123{
+  border-bottom:none !important;
+}
+
+.MuiListItemText-inset-130:first-child{
+  padding-left:0em !important;
+}
+
+/*.nestedCustom {*/
+  /*margin-left:5em !important;*/
+/*}*/
+
+.menuHeader {
+  paddingLeft: "30px"
+}
+.list {
+  min-width:30em;
+}
+
+.chip{
+  margin: .1em;
+}
+
+.play-events{
+  top: 6px;
+  position: relative;
+  padding-right:.5em;
+}
+.play-events:hover{
+cursor:pointer;
+}
+
+.bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-size: cover;
+  background-position: center;
+  will-change: opacity;
+}
