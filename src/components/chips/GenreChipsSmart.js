@@ -2,7 +2,7 @@
 import React, {useState} from "react";
 import Chip from "@material-ui/core/Chip";
 import { makeStyles } from '@material-ui/core/styles';
-import {familyColors, familyNormal, familyStyles, genreFam_map} from './families';
+import {familyColors, familyNormal, familyStyles, genreFam_map} from '../../families';
 import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
 
 //help understanding the override system
@@ -15,8 +15,9 @@ const useStyles = makeStyles(familyStyles);
 
 
 //note: not really sure how I fixed the 'can't use hook unless its in an functional component' thing but whatevs
-export default function ChipsArray(props) {
+export default function GenreChipsSmart(props) {
 
+	console.log("ChipsArray",props);
 	//var classes = {root:"root",chip:"chip"}
 	const classes = useStyles();
 	//console.log("$classes",classes);

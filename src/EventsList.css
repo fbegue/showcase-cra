@@ -40,3 +40,15 @@ cursor:pointer;
   background-position: center;
   will-change: opacity;
 }
+
+.songkickExt {
+  margin-left: auto;
+  opacity: .5;
+  transition: opacity .5s ease-out;
+  -moz-transition: opacity .5s ease-out;
+  -webkit-transition: opacity .5s ease-out;
+  -o-transition: opacity .5s ease-out;
+}
+.songkickExt:hover {
+  opacity: 1;
+}

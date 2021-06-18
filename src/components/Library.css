@@ -1,0 +1,63 @@
+
+/*todo: add box shadow back w/ appropriate dimentions?
+    or not? idk*/
+.libraryRow div {
+    /*testing: */
+    /*z-index: 1;*/
+    /*box-shadow: 0px 10px 50px -10px rgba(0, 0, 0, 0.2);*/
+    transition: transform 330ms ease-in-out;
+    /*transition: opacity 0.5s ease-out;*/
+    /*-moz-transition: opacity 0.5s ease-out;*/
+    /*-webkit-transition: opacity 0.5s ease-out;*/
+    /*-o-transition: opacity 0.5s ease-out;*/
+}
+.libraryRow div div:hover,.libraryRow div div:focus {
+    z-index: 2;
+    /*box-shadow: 0 0.5em 0.5em -0.4em black;*/
+    transform: translateY(-1em);
+}
+
+.detailsFade{
+    content: "";
+    position: absolute;
+    top: 15px;
+    right: 0px;
+    bottom: 0px;
+    left: 15px;
+    width: 150px;
+    height: 150px;
+    background-color: rgba(255,255,255,.25);
+    z-index:4
+    /*note: make darker*/
+    /*background-color: rgba(0,0,0,0.25);*/
+}
+
+
+.detailsFade:hover{
+    content: "";
+    position: absolute;
+    top: 15px;
+    right: 0px;
+    bottom: 0px;
+    left: 15px;
+    background-color: initial;
+    transition: background-color .5s ease;
+    z-index:4
+    /*background-color: rgba(0,0,0,0.25);*/
+
+}
+
+
+
+/*.libraryRow .libraryTile {*/
+/*    opacity: 0.5;*/
+/*    z-index: 1;*/
+/*    transition: opacity 0.5s ease-out;*/
+/*    -moz-transition: opacity 0.5s ease-out;*/
+/*    -webkit-transition: opacity 0.5s ease-out;*/
+/*    -o-transition: opacity 0.5s ease-out;*/
+/*}*/
+/*.libraryRow .libraryTile:hover {*/
+/*    opacity: 1;*/
+/*    z-index: 2;*/
+/*}*/

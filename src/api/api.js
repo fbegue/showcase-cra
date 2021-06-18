@@ -253,6 +253,26 @@ var getUserPlaylistFriends =  function(req){
             })
     })
 }
+
+var fetchSpotifyUsers =  function(req){
+    return new Promise(function(done, fail) {
+
+        fetch('http://localhost:8888/fetchSpotifyUsers', {
+            method: 'POST', // *GET, POST, PUT, DELETE, etc.
+            mode: 'cors', // no-cors, *cors, same-origin
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(req)
+        }).then(res => res.json())
+            .then(function(res){
+                //console.log("retrieved: ",res);
+                done(res)
+            })
+    })
+}
+
+
 //event methods
 
 var fetchEvents =  function(req){
@@ -477,6 +497,7 @@ export default {
     getTopArtists,
     fetchStaticUser,
     getUserPlaylistFriends,
+    fetchSpotifyUsers,
     getAuth,
     refreshAuth,
     createPlaylist,

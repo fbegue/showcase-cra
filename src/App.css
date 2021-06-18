@@ -35,30 +35,46 @@
 }
 
 /*=================================================*/
-/*testing: display grid*/
-
-/*todo: this guy is adjusting the width of a grid item = gets a width transition*/
+/*todo: transition is laggy - could be a state/rendering issue tho?*/
+/*testing: adjusting width gives transition as long as you don't specify grid-template-column widths*/
+/*adjusting style.width of grid item = gets a width transition*/
 /*https://stackoverflow.com/questions/19848697/css-grid-where-one-column-shrinks-to-fit-content-the-other-fills-the-remaning-s*/
+
+
 
 .defaultGrid {
   display: grid;
-  /*grid-template-columns: 40em 70em 20em;*/
-  grid-template-rows: 20em 20em 20em;
+background-color:#8080803b;
+  grid-template-rows: 25em 20em 20em;
   /*grid-template-rows: 4em;*/
+
+  /*note: old auto-width*/
+  /*grid-template-columns: 30em minmax(50em, 60em) minmax(20em,30em);*/
+
+  /*grid-template-columns: repeat(auto-fit, minmax([100em, 1fr));*/
+  /*grid-template-columns: 30em 70em 20em;*/
+  /*grid-template-columns:1fr 1fr 1fr;*/
+
   grid-template-areas:
           "tabs stats events"
-          "tabs tiles events"
-          "tabs tiles events";
+          "tiles tiles events"
+          "tiles tiles events";
 }
 
 .friendsGrid {
   display: grid;
   /*grid-template-columns: 40em 70em 20em;*/
-  grid-template-rows: 20em 20em 20em;
+  grid-template-columns: 40em minmax(45em, 50em) minmax(20em,30em);
+  /*grid-template-rows: 25em 20em 20em;*/
+  grid-template-rows: 25em auto  auto;
   grid-template-areas:
-          "tabs stats events"
-          "tiles tiles events"
-          "tiles tiles events";
+    "tabs stats events"
+    "tabs tiles events"
+    "tabs tiles events";
+  /*grid-template-areas:*/
+  /*        "tabs stats events"*/
+  /*        "tiles tiles events"*/
+  /*        "tiles tiles events";*/
 }
 
 .wrapper > div {
@@ -77,18 +93,21 @@
 
 .tabs {
   grid-area: tabs;
-  background: red;
+  /*background: red;*/
   transition: width 1s ease-out;
+
 }
 .stats {
-  width:70em;
+  /*width:70em;*/
   background: #54a3ff;
   grid-area: stats;
+  padding:5px
+  /*height:20em*/
 }
 
 .events {
   grid-area: events;
-  background: purple
+  /*background: purple*/
 }
 
 

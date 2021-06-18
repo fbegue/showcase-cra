@@ -6,7 +6,11 @@ import React, {useContext, useEffect, useState,useRef,forwardRef } from 'react';
 //specifically it uses glamorous which has been ditched for emotion as a theme provider
 //not sure if I could rip that dependency out myself and just make this my thing or not...
 
-import { Tab, Tabs } from "react-tabify";
+// import { Tab, Tabs } from "react-tabify";
+import Tabs from "@material-ui/core/Tabs";
+import Tab from "@material-ui/core/Tab";
+import AppBar from "@material-ui/core/AppBar";
+
 import MaterialTable from "material-table";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
@@ -17,19 +21,24 @@ import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
 import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
 import {Context} from "./storage/Store";
 import api from "./api/api.js"
-import ChipsArray from "./ChipsArray";
+// import ChipsArray from "./components/utility/ChipsArray";
 import util from "./util/util";
 import tables from "./storage/tables";
 import _ from "lodash";
-import {Control, FriendsControl, GridControl, StatControl} from "./index";
+import {Control, FriendsControl, GridControl, StatControl,TabControl} from "./index";
 import DiscreteSlider from "./Slider";
 import { GLOBAL_UI_VAR } from './storage/withApolloProvider';
 import {useQuery,useReactiveVar} from "@apollo/react-hooks";
 //testing:
-  import Home from './components/Home';
- import Social from "./components/Social";
- import MatTableTreeTest from './components/MatTableTreeTest'
-
+import Home from './components/Home';
+import TabPanel from './components/utility/CustomTabPanel'
+import Social from "./components/Social";
+import MatTableTreeTest from './components/MatTableTreeTest'
+import Box from "@material-ui/core/Box";
+import Typography from "@material-ui/core/Typography";
+import { makeStyles } from "@material-ui/core/styles";
+import InfoPanel from "./components/InfoPanel";
+import './Tabify.css'
 
 // const styles = {
 // 	fontFamily: "sans-serif",
@@ -79,15 +88,21 @@ function getChips(genres){
 };
 
 
+const useStyles = makeStyles((theme) => ({
+	root: {
+		flexGrow: 1,
+		backgroundColor: "grey"
 
+	}
+}));
 
 export default function Tabify() {
+
+	const classes = useStyles();
 
 	//todo: move this somewhere else higher up
 	//todo: rename this instance to 'global state'
 	const [globalState, globalDispatch] = useContext(Context);
-
-
 
 	//const params = JSON.parse(localStorage.getItem('params'));
 	//console.log("$params",params);
@@ -131,23 +146,29 @@ export default function Tabify() {
 		userProms.push(api.getMyFollowedArtists(req))
 		userProms.push(api.getTopArtists(req))
 		userProms.push(api.getRecentlyPlayedTracks(req))
-		userProms.push(api.getUserPlaylistFriends(req))
+		userProms.push(api.fetchSpotifyUsers(req))
 		userProms.push(api.getSavedTracks(req))
 		userProms.push(api.getMySavedAlbums(req))
 		Promise.all(userProms)
 			.then(r =>{
 
 				//all these artist's have 'sources' so they all end up in here together
-				var pay = [];pay = pay.concat(r[0]);pay= pay.concat(r[1]);
-				//pay= pay.concat(r[2]['artists'])
+				//note: to keep init payload signatures consistent, I reconstruct it below
+				//note: stats:
+				//followedArtists: 			{stats:null}
+				//getTopArtists : 			none
+				//getRecentlyPlayedTracks:	none
+				//getSavedTracks:			{stats:{},tracks:[]}
+				//getSavedAlbums:			{stats:{},tracks:[]}
+				var artistsPay = [];
+				artistsPay = artistsPay.concat(r[0].artists);artistsPay= artistsPay.concat(r[1]);
+				globalDispatch({type: 'init', payload:{artists:artistsPay,stats:null},user: globalUI.user,context:'artists'});
 
-				globalDispatch({type: 'init', payload:pay,user: globalUI.user,context:'artists'});
 				globalDispatch({type: 'init', payload:r[2],user: globalUI.user,context:'tracks'});
 				globalDispatch({type: 'init', payload:r[3],user: globalUI.user,context:'spotifyusers'});
-				//note: these two includes stats
 				globalDispatch({type: 'init', payload:r[4],user: globalUI.user,context:'tracks'});
 				globalDispatch({type: 'init', payload:r[5],user: globalUI.user,context:'albums'});
-
+				control.setDataLoaded(true)
 			},err =>{
 				console.log(err);
 			})
@@ -175,7 +196,7 @@ export default function Tabify() {
 
 	useEffect(() => {
 		if(globalState.events.length === 0){
-			//console.log("ONE TIME EVENT FETCH");
+			console.log("ONE TIME EVENT FETCH");
 			api.fetchEvents({metros:control.metro})
 				.then(r =>{
 					globalDispatch({type: 'update_events', payload: r,context:'events', control:control});
@@ -258,65 +279,68 @@ export default function Tabify() {
 		max = 99999999;
 		return Math.floor(Math.random() * Math.floor(max));
 	}
-	var prepPlay = function(playob,mode){
 
+	//todo: not sure exactly what this was for
+	//but disabled for now b/c i'm trying to cleanup my chip utilities
 
-		var chips = [];
-
-		switch(mode) {
-			case 'families':
-				//for every artist in the playlist, get the family freq on them w/ familyFreq.
-				//use makeRank to produce an array of families that represents the weight of artists' genres' families over the playlist
-				//now take the chips that best represent the playlist
-
-				//todo: repeated code (Pie.js also needs this rank to determine node content)
-				//@ else if(a.artists)
-
-				//take top 5
-				var rank = util.makeRank(playob.artists,playob.artistFreq,"familyAgg");
-
-
-				for(var x =0;x < rank.length ; x++){
-					chips.push({id:getRandomInt(),name:Object.keys(rank[x])[0]})
-				}
-				break;
-			case 'artists':
-				//separate chips for top artists
-
-				var artists = [];
-				var artistsSorted = [];
-				//console.log("$prepPlay",playob);
-				Object.keys(playob.artistFreq).forEach(k =>{
-					//todo: should be faster lookup on actual db
-					tables["artists"].forEach(a =>{
-						k === a.id ?  artists.push({id:a.id,name:a.name,freq:playob.artistFreq[k],familyAgg:a.familyAgg}):{};
-					})
-				})
-				artistsSorted = _.sortBy(artists, function (r) {return r.freq}).reverse()
-				//debugger;
-				//take top 3
-				//console.log("$artists",artistsSorted);
-				for(var x =0;x < 3 && x < artistsSorted.length  ; x++){
-					chips.push({id:getRandomInt(),name:artistsSorted[x].name,familyAgg:artistsSorted[x].familyAgg})
-				}
-				break;
-			case'genres':
-				//todo: chips for top 5 unique genres
-				//not sure exactly how to represent this...really I want to like
-				//click and expand on th family names? top genre's doesn't really make any sense
-				//displayed if disconnected from families?
-
-				var rank = util.makeRank2(playob.artists,playob.artistFreq);
-				for(var x =0;x < 3 && x < rank.length  ; x++){
-					chips.push({id:getRandomInt(),name:Object.keys(rank[x])[0]})
-				}
-				break;
-			default:
-			// code block
-		}
-
-		return 	<ChipsArray chipData={chips}/>
-	}
+	// var prepPlay = function(playob,mode){
+	//
+	// 	var chips = [];
+	//
+	// 	switch(mode) {
+	// 		case 'families':
+	// 			//for every artist in the playlist, get the family freq on them w/ familyFreq.
+	// 			//use makeRank to produce an array of families that represents the weight of artists' genres' families over the playlist
+	// 			//now take the chips that best represent the playlist
+	//
+	// 			//todo: repeated code (Pie.js also needs this rank to determine node content)
+	// 			//@ else if(a.artists)
+	//
+	// 			//take top 5
+	// 			var rank = util.makeRank(playob.artists,playob.artistFreq,"familyAgg");
+	//
+	//
+	// 			for(var x =0;x < rank.length ; x++){
+	// 				chips.push({id:getRandomInt(),name:Object.keys(rank[x])[0]})
+	// 			}
+	// 			break;
+	// 		case 'artists':
+	// 			//separate chips for top artists
+	//
+	// 			var artists = [];
+	// 			var artistsSorted = [];
+	// 			//console.log("$prepPlay",playob);
+	// 			Object.keys(playob.artistFreq).forEach(k =>{
+	// 				//todo: should be faster lookup on actual db
+	// 				tables["artists"].forEach(a =>{
+	// 					k === a.id ?  artists.push({id:a.id,name:a.name,freq:playob.artistFreq[k],familyAgg:a.familyAgg}):{};
+	// 				})
+	// 			})
+	// 			artistsSorted = _.sortBy(artists, function (r) {return r.freq}).reverse()
+	// 			//debugger;
+	// 			//take top 3
+	// 			//console.log("$artists",artistsSorted);
+	// 			for(var x =0;x < 3 && x < artistsSorted.length  ; x++){
+	// 				chips.push({id:getRandomInt(),name:artistsSorted[x].name,familyAgg:artistsSorted[x].familyAgg})
+	// 			}
+	// 			break;
+	// 		case'genres':
+	// 			//todo: chips for top 5 unique genres
+	// 			//not sure exactly how to represent this...really I want to like
+	// 			//click and expand on th family names? top genre's doesn't really make any sense
+	// 			//displayed if disconnected from families?
+	//
+	// 			var rank = util.makeRank2(playob.artists,playob.artistFreq);
+	// 			for(var x =0;x < 3 && x < rank.length  ; x++){
+	// 				chips.push({id:getRandomInt(),name:Object.keys(rank[x])[0]})
+	// 			}
+	// 			break;
+	// 		default:
+	// 		// code block
+	// 	}
+	//
+	// 	return 	<ChipsArray chipData={chips}/>
+	// }
 
 
 	//terms
@@ -339,32 +363,19 @@ export default function Tabify() {
 	//----------------------------------------------------------------------------
 	let statcontrol = StatControl.useContainer();
 	let gridControl = GridControl.useContainer()
+	let tabcontrol = TabControl.useContainer()
 
-	const tabMap = {library:{
-			0:"artists_saved",
-			1:"playlists",
-			2:"tracks_saved"
-		},profile:{
-			0:"home",
-			1:"tracks_recent",
-			2:"artists_top"
-		},friends:{0:"friends",1:"user1"}}
-		//todo: mapped user1 to home for now
-	const tabContextMap = {artists_saved:"artists",artists_top:"artists",playlists:"playlists",home:"home",tracks_recent:"tracks",friends:"friends",user1:"user1",tracks_saved:"tracks"};
-	const secMap ={0:"profile",1:"library",2:"friends"}
-	const [tabs, setActiveTab] = useState({library:0,profile:0,friends:0});
 	//testing: set default tab on page load
-	const [section, setActiveSection] = useState(1);
+	// const [section, setActiveSection] = useState(0);
+	//  const [tab, setActiveTab] = useState(0);
+	// const [section, setActiveSection] = useState(2);
 
-	function handleTabSelect(section,key){
-		console.log("handleTabSelect",section);
-		console.log(key);
-		setActiveTab({...tabs,[section]:key})
-		statcontrol.setStats({name:tabMap[section][key]})
 
-		//testing: default values (also in init state in index.js)
+	function handleSectionSelect(event,sectionkey){
+		console.log("handleSectionSelect",sectionkey);
+		tabcontrol.setActiveSection(sectionkey)
 
-		if(section === 'friends'){
+		if(sectionkey === 2){
 			gridControl.setGridClass('friendsGrid')
 			// console.log("pane shift: friends");
 			// paner.setPane(paner.paneSettings['friends'])
@@ -374,32 +385,64 @@ export default function Tabify() {
 			// paner.setPane(paner.paneSettings['default'])
 		}
 
-		//testing: can't use statcontrol.stats value immediately
-		//so I recreate the stats object I'd want to send...yeaaaaaah
-
-
-		//context: use the section index key and section to produce a tabContextMap key
-		//plug into tabContextMap to determine what context to send thru based on that selection
-		var context = tabContextMap[tabMap[section][key]];
-		console.log("context",context);
-
-		//todo: wtf am I doing this for every single tab select?
-	// 	var skip = ['user1','friends']
-	// 	if(skip.indexOf(context) === -1){
-	// 		globalDispatch({type: 'update', payload: null,user: globalUI.user,context:context,
-	// 			controls:{statcontrol:statcontrol,control:control,friendscontrol:friendscontrol}})
-	// 			//stats:{stats: {name:tabMap[section][key]},mode:statcontrol.mode},control:control});
-	// 	}
-
-	 }
-
-	function handleSectionSelect(sectionkey){
 		//if the section changed, also trigger tab set (0 as default)
-		if(sectionkey !== section){
-			handleTabSelect(secMap[sectionkey],0)
+		if(sectionkey !== tabcontrol.section){
+			handleTabChange(null,0,sectionkey)
 		}
-		setActiveSection(sectionkey)
+
+
+
 	}
+
+	const handleTabChange = (event, tabindex) => {
+		console.log("handleTabChange",tabMap[tabcontrol.section][tabindex]);
+		//console.log(tabindex);
+		tabcontrol.setActiveTab(tabindex);
+		statcontrol.setStats({name:Object.keys(tabMap[tabcontrol.section][tabindex])[0]})
+
+	};
+
+	const tabMap = {
+		0:{
+			0:{"home":"Home"},
+			1:{"tracks_recent":"Recently Saved Tracks"},
+			2:{"artists_top":"Top Artists"}},
+		1:{
+			0:{"artists_saved":"Artists"},
+			1:{"playlists":"Playlists"},
+			2:{"tracks_saved":"Tracks"},
+			3:{"albums_saved":"Albums"}
+		},2:{
+			0:{"artists_friends":"Artists"},
+			1:{"playlists_friends":"Playlists"},
+			2:{"tracks_friends":"Tracks"},
+			3:{"albums_friends":"Albums"}
+		}}
+
+
+	// function handleTabSelect(event,tabkey,sectionkey){
+	// 	// console.log("handleTabSelect",tabkey);
+	// 	// console.log("section",section);
+	// 	// console.log("sectionkey",sectionkey);
+	// 	tabcontrol.setActiveTab(tabkey)
+	// 	//determine what the tabkey means based on what section we're in
+	// 	//note: when called from handleSectionSelect, we pass the value manually b/c it won't update in time
+	// 	statcontrol.setStats({name:tabMap[sectionkey || tabcontrol.section][tabkey]})
+	//
+	// 	//testing: disabling for now (stick to default = friendsGrid)
+	//
+	// 	//section === 'friends'
+	// 	if(sectionkey === 2){
+	// 		debugger;
+	// 		gridControl.setGridClass('friendsGrid')
+	// 		// console.log("pane shift: friends");
+	// 		// paner.setPane(paner.paneSettings['friends'])
+	// 	}else{
+	// 		gridControl.setGridClass('defaultGrid')
+	// 		// console.log("pane shift: default");
+	// 		// paner.setPane(paner.paneSettings['default'])
+	// 	}
+	// }
 
 	//-----------------------------
 
@@ -435,277 +478,80 @@ export default function Tabify() {
 
 
 
-	const [dynamic_tabs, setDynamic_tabs] = useState([{name:"default"}]);
-	const [userTab, setUserTab] = useState({name:"select a user!"});
+	// const [dynamic_tabs, setDynamic_tabs] = useState([{name:"default"}]);
+	// const [userTab, setUserTab] = useState({name:"select a user!"});
+
+	const getTabs = () =>{
+
+		//skip render for section = friends
+		var toRender = []
+		for (const [key, value] of Object.entries(tabMap[tabcontrol.section])) {toRender.push(value)}
+
+		//console.log("toRender",toRender);
+		//console.log(tabcontrol.section);
+
+		return (
+			<AppBar position="static">
+				<Tabs
+					// value={friendscontrol.selectedTabIndex}
+					value={tabcontrol.tab}
+					//todo:
+					onChange={(e,v) =>{handleTabChange(e,v)}}
+					className={classes.root}
+					aria-label="simple tabs example"
+				>
+					{toRender.map((tab,i) =>
+						<Tab
+							key={i} label={tab[Object.keys(tab)[0]]}
+						/>
+					)}
+					{/*<Tab*/}
+					{/*	label="Artists"*/}
+					{/*/>*/}
+					{/*<Tab*/}
+					{/*	label="Albums"*/}
+					{/*/>*/}
+				</Tabs>
+			</AppBar>
+		)
+	}
 
 	return(
 		// style={styles}
-		<div>
-			<Tabs activeKey={section} onSelect={handleSectionSelect} theme={theme} >
-				{/*todo: disabled for now (broke in multiple places)*/}
-				{/*<Tab label="Search">*/}
-				{/*	<Search></Search>*/}
-				{/*</Tab>*/}
-				<Tab label="My Profile">
-					<Tabs activeKey={tabs['profile']} onSelect={handleTabSelect.bind(null,'profile')}>
-						<Tab label="Home">
+		<div  >
+			<AppBar position="static">
+				<Tabs className={classes.root} value={tabcontrol.section} onChange={handleSectionSelect} >
+					{/*todo: disabled for now (broke in multiple places)*/}
+					{/*<Tab label="Search">*/}
+					{/*	<Search></Search>*/}
+					{/*</Tab>*/}
+					<Tab label="My Profile"/>
+					<Tab label="My Library"/>
+					<Tab label="My Friends"/>
 
-							<Home data={globalState[ globalUI.user.id + "_artists"].filter(i =>{return i.term})} />
-							{/*<div>HOME</div>*/}
-						</Tab>
-						<Tab label="Recently Played">
-							<MaterialTable
-								title=""
-								columns={[
-									{
-										field: 'album.images[0]',
-										title: '',
-										render: rowData => <img src={rowData.album.images[0].url} style={{width: 50, borderRadius: '50%'}}/>,
-										filtering:false,
-										//width:"5em"
-									},
-									{ title: 'Name', field: 'name', filtering:false,
-										render: rowData =>
-											<div>
-												<span><PlayCircleOutlineIcon
-													fontSize={'small'} onClick={() => handlePlay(rowData)}>
-												</PlayCircleOutlineIcon></span>
-												<span>{rowData.name}</span>
-												<div style={{fontSize:".9em",color:"#a4a4a4"}}>
-													by {rowData.artists.map((item,i) => (
-													<span  key={item.id}>
-													<span>{item.name}</span>
-														{rowData.artists.length - 1 > i && <span>,{'\u00A0'}</span>}
-												</span>
-												))}
-												</div>
-											</div>},
-									{
-										field: 'genres',
-										title: 'genres',
-										//ender: rowData => getChips(rowData.genres),
-										render: rowData => util.prepTracks(rowData),
-										filtering:false,
-										//width:"20em"
-									},
-
-								]}
-								data={globalState[ globalUI.user.id + "_tracks"]}
-								options={{...options,selection:!(statcontrol.mode)}}
-								icons={icons}
-								onSelectionChange={(rows) => handleSelectRecent(rows,'recent')}
-							/>
-						</Tab>
-						<Tab label="Your Top Artists">
-							{/*<div>{term.toString()}</div>*/}
-							<DiscreteSlider defaultValue={1} handleChange={(v) =>{setTerm(v)}}/>
-							<MaterialTable
-								title=""
-								columns={[
-									{
-										field: 'images[0]',
-										title: '',
-										render: rowData => <img src={rowData.images[0].url} style={{width: 50, borderRadius: '50%'}}/>,
-										filtering:false,
-										//width:"5em"
-									},
-									{ title: 'Name', field: 'name', filtering:false},
-									{
-										field: 'genres',
-										title: 'genres',
-										//ender: rowData => getChips(rowData.genres),
-										render: rowData => <ChipsArray chipData={rowData.genres}/>,
-										filtering:false,
-										//width:"20em"
-									},
-
-								]}
-								data={globalState[ globalUI.user.id + "_artists"].filter(i =>{return i.term === term})}
-								options={{...options,selection:!(statcontrol.mode)}}
-								onSelectionChange={(rows) => handleSelectSaved(rows,'top')}
-							/>
-
-						</Tab>
-					</Tabs>
-				</Tab>
-				<Tab label="My Library">
-					<Tabs activeKey={tabs['library']} onSelect={handleTabSelect.bind(null,'library')}>
-						<Tab label="Saved Artists">
-
-							<MaterialTable
-								title=""
-								columns={[
-									{
-										field: 'name',
-										title: '',
-										render: rowData =>
-											<div>
-												<img src={rowData.images[0].url} style={{width: 50, borderRadius: '50%'}}/>
-												<div>{rowData.name}</div>
-											</div>
-										// sorting:false,
-										// width:"10em"
-									},
-									{
-										field: 'genres',
-										title: 'genres',
-										//ender: rowData => getChips(rowData.genres),
-										render: rowData => {return <div style={{display:"flex",flexDirection:"column",flexWrap:"nowrap"}}>
-											<div><ChipsArray limit={true} chipData={rowData.genres}/></div>
-										<div>active: {rowData['release_range'].earliest.release_date} - {rowData['release_range'].latest.release_date}</div>
-										</div>},
-										filtering:false,
-										//width:"20em"
-									},
-
-								]}
-								data={globalState[ globalUI.user.id + "_artists"].filter(i =>{return i.source === 'saved'})}
-								options={{...options,selection:!(statcontrol.mode)}}
-								onSelectionChange={(rows) => handleSelectSaved(rows,'saved')}
-							/>
-
-						</Tab>
-						<Tab label="Playlists" >
-							{/*note: customizing material table
-							- the default search works on text provided by the column's 'field' attribute
-							- thinking 'customFilterAndSearch' can be used to setup searches for custom rendered columns
-							  https://github.com/mbrn/material-table/issues/67
-
-							*/}
-							<MaterialTable
-								icons={icons}
-								title=""
-								columns={[
-									{
-										field: 'name',
-										title: '',
-										render: rowData =>
-											<div>
-												<img src={rowData.images[0].url} style={{width: 50, borderRadius: '50%'}}/>
-												<div>{rowData.name}</div>
-												<div style={{fontSize:".7em",color:"#a4a4a4"}}>{rowData.owner.display_name}</div>
-											</div>,
-										// sorting:false,
-										// width:"10em"
-									},
-									//testing: not sure where to put this yet
-									//was thinking maybe under 'Top Genres' could have 'see families' which would expose
-									//how those genres map up into famlilies
-
-									// {
-									// 	field: 'families',
-									// 	title: 'families',
-									// 	//ender: rowData => getChips(rowData.genres),
-									// 	render: rowData => prepPlay(rowData,'families'),
-									// 	filtering:false,
-									// 	width:"20em"
-									// },
-									{
-										field: 'artists',
-										title: 'Top Artists',
-										render: rowData => prepPlay(rowData,'artists'),
-										// customFilterAndSearch: (value, rowData) => {
-										// 	//todo:
-										// },
-										sorting:false,
-										// width:"20em"
-									},
-									{
-										field: 'genres',
-										title: 'Top Genres',
-										//ender: rowData => getChips(rowData.genres),
-										render: rowData => prepPlay(rowData,'genres'),
-										sorting:false,
-										// width:"15em"
-									},
-									{
-										field: 'tracks.total',
-										title: 'Length',
-										//ender: rowData => getChips(rowData.genres),
-										render: rowData =>
-											<div>
-												{rowData.tracks.total}
-											</div>,
-										sorting:true,
-										customSort: (a, b) => a.tracks.total - b.tracks.total,
-										// width:"15em"
-									},
-								]}
-								data={globalState[ globalUI.user.id + "_playlists"]}
-								options={{...options,selection:!(statcontrol.mode)}}
-								onSelectionChange={(rows) => handleSelectPlaylist(rows)}
-							/>
-						</Tab>
-						<Tab label="Saved Tracks">
-							<MaterialTable
-								title=""
-								columns={[
-									{
-										field: 'name',
-										title: 'Name',
-										//ender: rowData => getChips(rowData.genres),
-										render: rowData => <div key={rowData.id} style={{display:"flex"}}>
-											<div>
-												<img height={70} src={rowData.album.images[0].url} />
-											</div>
-											<div>
-												<div>{rowData.name}</div>
-												<div style={{fontSize:".9em",color:"#a4a4a4"}}>
-													by {rowData.artists.map((artist,i) => (
-													<span  key={artist.id}>
-													<span>{artist.name}</span>
-														{rowData.artists.length - 1 > i && <span>,{'\u00A0'}</span>}
-												</span>
-												))}
-												</div>
-												{/*<div>{styleAddedAt(rowData.added_at)}</div>*/}
-											</div>
-										</div>,
-										filtering:false,
-										//width:"20em"
-									},
-									{
-										field: 'genres',
-										title: 'genres',
-										//ender: rowData => getChips(rowData.genres),
-										render: rowData => util.prepTracks(rowData),
-										filtering:false,
-										//width:"20em"
-									},
-
-								]}
-								data={globalState[ globalUI.user.id + "_tracks"].filter(i =>{return i.source === 'saved'})}
-								options={{...options,selection:!(statcontrol.mode)}}
-								onSelectionChange={(rows) => handleSelectSaved(rows,'saved')}
-							/>
-
-						</Tab>
-					</Tabs>
-				</Tab>
-				<Tab label="My Friends">
-					<Tabs activeKey={tabs['friends']} onSelect={handleTabSelect.bind(null,'friends')}>
-						<Tab label="Friends">
-							<Social/>
-							{/*<div>Social</div>*/}
-						</Tab>
-						{/*<Tab label={userTab.name}>{userTab.name} content!</Tab>*/}
-
-						{/*/!*testing: Cannot read property 'hide' of undefined*!/*/}
-						{/*{dynamic_tabs.map((tab) =>*/}
-						{/*	<Tab label={tab.name}>{tab.name} content!</Tab>*/}
-						{/*)}*/}
-					</Tabs>
-				</Tab>
-				<Tab label="Billboards">
-					<Tabs>
-						<Tab label="Subtab 2.1">
-							Tab 2 Content 1
-						</Tab>
-						<Tab label="Subtab 2.2">Tab 2 Content 2</Tab>
-						<Tab label="Subtab 2.3">Tab 2 Content 3</Tab>
-					</Tabs>
-				</Tab>
-			</Tabs>
+					{/*todo:*/}
+					{/*<Tab label="Billboards">*/}
+					{/*	<Tabs>*/}
+					{/*		<Tab label="Subtab 2.1">*/}
+					{/*			Tab 2 Content 1*/}
+					{/*		</Tab>*/}
+					{/*		<Tab label="Subtab 2.2">Tab 2 Content 2</Tab>*/}
+					{/*		<Tab label="Subtab 2.3">Tab 2 Content 3</Tab>*/}
+					{/*	</Tabs>*/}
+					{/*</Tab>*/}
+				</Tabs>
+			</AppBar>
+			<TabPanel   className={'tabs0'} value={tabcontrol.section} index={0}>
+				{getTabs()}
+				<InfoPanel/>
+			</TabPanel>
+			<TabPanel   className={'tabs1'} value={tabcontrol.section} index={1}>
+				{getTabs()}
+				<InfoPanel/>
+			</TabPanel>
+			<TabPanel value={tabcontrol.section} index={2}>
+				<Social/>
+			</TabPanel>
 		</div>
 	)
 }

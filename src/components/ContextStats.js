@@ -1,8 +1,8 @@
-import {FriendsControl, StatControl} from "../index";
+import {FriendsControl, GridControl, StatControl, TabControl} from "../index";
 import React, {useContext, useMemo,useEffect,useState} from "react";
 import {Context} from "../storage/Store";
 import {useReactiveVar} from "@apollo/react-hooks";
-import {GLOBAL_UI_VAR,TILES} from "../storage/withApolloProvider";
+import {CHIPFAMILIES, CHIPGENRES, GLOBAL_UI_VAR, TILES} from "../storage/withApolloProvider";
 import {a, useTransition} from "react-spring";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
@@ -11,10 +11,16 @@ import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import Box from "@material-ui/core/Box";
 import styles from './styles.module.css'
-import ChipsArray from "../ChipsArray";
 import {families as systemFamilies} from "../families";
 import uuid from 'react-uuid'
-import ChipFamilies from "./ChipFamilies";
+import CustomizedInputBase from "./utility/CustomizedInputBase";
+import Slider from '@material-ui/core/Slider';
+import './ContextStats.css'
+import _ from "lodash";
+
+import BubbleFamilyGenreChips from "./chips/BubbleFamilyGenreChips";
+import FilterGenreChips from "./chips/FilterGenreChips";
+
 
 function TabPanel(props) {
 	const { children, value, index, ...other } = props;
@@ -40,47 +46,17 @@ function ContextStats(props) {
 
 	let statcontrol = StatControl.useContainer();
 	let friendscontrol = FriendsControl.useContainer()
-	const [globalState, globalDispatch] = useContext(Context);
-	const globalUI = useReactiveVar(GLOBAL_UI_VAR);
+	let tabcontrol = TabControl.useContainer()
+	let gridControl = GridControl.useContainer();
 
 
-	function ListArtists(props){
-		return (
-			<div>
-				{props.artists.map((item,i) => (
-					<div>{item.artist.name}</div>
-				))}
-			</div>
-		)
-	}
+	// const [globalState, globalDispatch] = useContext(Context);
+	// const globalUI = useReactiveVar(GLOBAL_UI_VAR);
 
-	function ListTracks(props){
-		return (
-			<div>
-				{props.tracks.map((item,i) => (
-					<div>{item.name}</div>
-				))}
-			</div>
-		)
-	}
 
-	function ListGenres(props){
-		return (
-			<div>
-				{props.genres.map((item,i) => (
-					<div>{item.name}</div>
-				))}
-			</div>
-		)
-	}
 
-	//-----------------------------------------------
-	//note: just based on index values (no named map)
-	// const [selectedTabIndex, setTabIndex] = React.useState(1);
-	const handleChange = (event, newValue) => {
-		console.log("handleChange",newValue);
-		friendscontrol.setTabIndex(newValue);
-	};
+
+
 
 	const [filter, setFilter] = React.useState(null);
 	//const [sourceFilter, setSourceFilter] = React.useState(null);
@@ -97,105 +73,7 @@ function ContextStats(props) {
 	// 	};
 	// });
 
-	const [statCards, setStatCards] = React.useState([]);
-	useEffect(() => {
 
-		var _statCards = [];
-		console.log("$contextStats",statcontrol.stats.name);
-		switch(statcontrol.stats.name) {
-			case 'artists_saved':
-				_statCards.push({label: "test1", value: null})
-				_statCards.push({label: "test2", value: null})
-				_statCards.push({label: "test23", value: null})
-				break;
-			case 'playlists':
-				var source = globalState[globalUI.user.id + "_playlists_stats"];
-				_statCards.push({label: "Created", value: source.created, width: "120px"})
-				_statCards.push({label: "Followed", value: source.followed, width: "120px"})
-				_statCards.push({label: "Collaborating", value: source.collaborative, width: "120px"})
-				_statCards.push({label: "Recently Modified", value: source.recent.playlist_name, width: "240px"})
-				// items.push({label:"Most Active",value:null})
-				_statCards.push({label: "Oldest", value: source.oldest.playlist_name, width: "240px"})
-				break;
-			case 'tracks_saved':
-				var source = globalState[globalUI.user.id + "_tracks_stats"];
-				_statCards.push({
-					label: "Favorite Artists",
-					value: <ListArtists artists={source.artists_top} />,
-					width: "240px"
-				})
-				_statCards.push({label: "Recently Saved", value: <ListTracks tracks={source.recent} />, width: "240px"})
-				break;
-			case 'home':
-			case 'Home':
-			case 'user1':
-			case 'friends':
-				console.log('stats: ignoring ' + statcontrol.stats.name);
-				break;
-			default:
-				console.log('default', statcontrol.stats);
-				//todo: for whatever reason - removing this changes with of items above it
-				//related to graph display width issues - just need to lock it down
-				//
-				// var user = globalState[globalUI.user.id + "_artists"];
-				// var guest = globalState[statcontrol.stats.user.id + "_artists"] || [];
-				// // console.log(user);
-				// // console.log(guest);
-				//
-				// switch (friendscontrol.selectedTabIndex) {
-				// 	case 1:
-				// 		//artists
-				// 		user.forEach(a => {
-				// 			guest.forEach(ag => {
-				// 				if (a.id === ag.id) {
-				// 					// _common.push(a)
-				// 					ag.common = true;
-				// 				}
-				// 			})
-				// 		})
-				//
-				// 		break;
-				// 	default:
-				// 	// code block
-				// }
-				//
-				// //testing:
-				// if (filter === 'common') {
-				// 	guest = guest.filter(r => {
-				// 		return r.common
-				// 	});
-				// }
-				//
-				// //|| selectedTabIndex === 1
-				// if (friendscontrol.selectedTabIndex === 1) {
-				// 	if (friendscontrol.sourceFilter) {
-				// 		guest = guest.filter(r => {
-				// 			return r.source === friendscontrol.sourceFilter
-				// 		})
-				// 	} else {
-				// 		//if we're not choosing top/saved, we need to dedupe
-				// 		guest = _.uniqBy(guest, 'id')
-				// 	}
-				// }
-				break;
-		}
-
-		//user selection required: favorite playlists
-		//Favorite Artists (copy from above)
-		//todo: was trying to make quick comp here for display
-		// _items.push({label:"Top Artists",value:<ListArtists artists={source.artists_top}/>,width:"240px"})
-		// _items.push({label:"Common Saved Artists",value:_common.length,width:"120px"})
-
-
-		// _items.push({label:"Common Saved Tracks",value:source.followed,width:"120px"})
-		// //todo:  # of + link to table which auto-filters on
-		// _items.push({label:"Collaborative Playlists:",value:source.collaborative,width:"120px"})
-
-		setStatCards(_statCards)
-		return function cleanup() {
-			console.log("componentWillUnmount");
-		};
-	},[statcontrol.stats.name,friendscontrol.selectedTabIndex,filter]);
 
 	// var x = 0;
 	// if(statcontrol_prev === null){statcontrol_prev = statcontrol.stats.name;x++;}
@@ -217,9 +95,9 @@ function ContextStats(props) {
 	}
 
 	//const columns = useMedia([ '(min-width: 1500px)', '(min-width: 1400px)'], [ 4, 3], 2)
-	const columns = 6;
+	const columns = 7;
 	//note: this width divided by # of columns = the width of one item
-	const width = 900;
+	const width = 1000;
 
 	//note: replaced all references to data-height (designed to be unique values 300-500) with uHeight
 
@@ -227,7 +105,8 @@ function ContextStats(props) {
 	const uHeight = 260;
 
 	const tiles = useReactiveVar(TILES);
-	console.log("$tiles",tiles);
+	//console.log("$tiles",tiles);
+	console.log("componentDidRun | ContextStats",{tiles:tiles});
 	const [items, setItems] = useState(tiles);
 
 	//testing: is non-static data the issue?
@@ -248,22 +127,7 @@ function ContextStats(props) {
 	// 	}
 	// }
 
-	//testing: works a couple times, then infinite + same key issues
-	useEffect(() => {
-		const testFilter = (r) => {
-			//console.log("friendscontrol.compare",friendscontrol.compare);
-			switch (friendscontrol.compare) {
-				case 'shared':return r.shared
-				case 'guest':
-				case 'user':
-					return r.owner === friendscontrol.compare
-				case 'all':return true
-			}
-		}
-		setItems(tiles.filter(testFilter))
-	    //todo: put tiles here to capture on-load set
-		//but DOES print a extra sus $tiles....
-	}, [friendscontrol.compare,tiles])
+
 
 	const [heights, gridItems] = useMemo(() => {
 		let heights = new Array(columns).fill(0) // Each column gets a height starting with zero
@@ -294,6 +158,137 @@ function ContextStats(props) {
 		chips.push({id:uuid(),"name":f,"family_id":null,"family_name":f})
 	})
 	//var sample = [{"id":8,"name":"r&b","family_id":5,"family_name":"r&b"},{"id":1118,"name":"chicago rap","family_id":4,"family_name":"hip hop"},{"id":23,"name":"rap","family_id":4,"family_name":"hip hop"},{"id":50,"name":"neo soul","family_id":5,"family_name":"r&b"},{"id":162,"name":"underground hip hop","family_id":4,"family_name":"hip hop"},{"id":6,"name":"hip hop","family_id":4,"family_name":"hip hop"},{"id":643,"name":"alternative r&b","family_id":5,"family_name":"r&b"}]
+	const [query, setQuery] = React.useState("");
+
+	//todo: had noted but no longer experiencing....?
+	//testing: works a couple times, then infinite + same key issues
+	useEffect(() => {
+		var _t = null;
+		const friendscontrolCompareFilter = (r) => {
+			//console.log("friendscontrol.compare",friendscontrol.compare);
+			switch (friendscontrol.compare) {
+				case 'shared':return r.shared
+				case 'guest':
+				case 'user':
+					return r.owner === friendscontrol.compare
+				case 'all':return true
+			}
+		}
+		//todo: tracks => search result includes album, artist name
+		//todo: albums => search result includes artist name
+		var queryFilter = (t) =>{
+
+			if(query === ""){return true}else{
+				//console.log("$$user",t);
+				//console.log("$q",query);
+				var pat = "^" + query.toLowerCase();
+				var re = new RegExp(pat,"g");
+				// var toTest = "display_name";
+				//
+				// switch (t.type) {
+				// 	case 'track': toTest = 'name';break;
+				// }
+				//debugger;
+				return (t['name'] && re.test(t['name'].toLowerCase()));
+			}
+		}
+
+		var famGenreFilter = (t) =>{
+
+
+			//family always overrides genre
+			if(friendscontrol.families.length > 0){
+				return friendscontrol.families.indexOf(t.familyAgg) !== -1
+			}else if(friendscontrol.genres.length > 0){
+				debugger;
+				var shared = _.intersectionBy(friendscontrol.genres, t.genres, 'id');
+				return shared > 0
+			}else{
+				return true
+			}
+		}
+
+		_t = tiles.filter(friendscontrolCompareFilter)
+		_t = _t.filter(queryFilter)
+		_t = _t.filter(famGenreFilter)
+		setItems(_t)
+		//todo: put tiles here to capture on-load set
+		//but DOES print a extra sus $tiles....
+	}, [friendscontrol.compare,tiles,query,friendscontrol.families,friendscontrol.genres])
+
+
+	const handleFormChange = (event) =>{
+		setQuery(event.target.value);
+	}
+	const clearForm = () =>{
+		setQuery("");
+	}
+
+	useEffect(() => {
+		clearForm()
+	},[tabcontrol.section]);
+
+	//-----------------------------------------------
+
+	//todo: duplicated in Tabify
+	const handleTabChange = (event, tabindex) => {
+		console.log("handleTabChange",tabMap[tabcontrol.section][tabindex]);
+		tabcontrol.setActiveTab(tabindex);
+		statcontrol.setStats({name:Object.keys(tabMap[tabcontrol.section][tabindex])[0]})
+	};
+
+	const tabMap = {
+		0:{
+			0:{"home":"Home"},
+			1:{"tracks_recent":"Recently Saved Tracks"},
+			2:{"artists_top":"Top Artists"}},
+		1:{
+			0:{"artists_saved":"Artists"},
+			1:{"playlists":"Playlists"},
+			2:{"tracks_saved":"Tracks"},
+			3:{"albums_saved":"Albums"}
+		},2:{
+			0:{"artists_friends":"Artists"},
+			1:{"playlists_friends":"!#Playlists#!"},
+			2:{"tracks_friends":"Tracks"},
+			3:{"albums_friends":"Albums"}
+		}}
+
+	//todo: was collapsing tabify and this guy into tabcontrol
+	//1) seems odd that all the tab control isn't just one component, therefore
+	//I'm abstracting the tab business
+	//2) would ideally be the time I get rid of confusing stat control double duty with tab control
+	const getTabs = () =>{
+
+		//skip render for section = friends
+		var toRender = []
+		for (const [key, value] of Object.entries(tabMap[tabcontrol.section])) {toRender.push(value)}
+
+		return (
+			<Tabs
+				// value={friendscontrol.selectedTabIndex}
+				value={tabcontrol.tab}
+				onChange={(e,v) =>{handleTabChange(e,v)}}
+				aria-label="simple tabs example"
+			>
+				{toRender.map((tab,i) =>
+					<Tab
+						key={i} label={tab[Object.keys(tab)[0]]}
+					/>
+				)}
+				{/*<Tab*/}
+				{/*	label="Artists"*/}
+				{/*/>*/}
+				{/*<Tab*/}
+				{/*	label="Albums"*/}
+				{/*/>*/}
+			</Tabs>
+		)
+	}
+
+	//-----------------------------------------------
+	 //const chipFamilies = useReactiveVar(CHIPFAMILIES);
+	// const chipGenres = useReactiveVar(CHIPGENRES);
 
 	return(
 		<div>
@@ -308,68 +303,89 @@ function ContextStats(props) {
 			{/*so I just changed it to 35em LOL - basing this off the 60em on the tabify ... or was that not making any difference?*/}
 			{/*real question comes in with the panes - currently doing any window shrinking @ 35em flexes it sends it to the bottom*/}
 
-			{statCards.length > 0 &&
-			<div style={{display:"flex", flexWrap:"wrap",width:"480px"}}>
-				{statCards.map((item,i) => (
-					<div style={{width:item.width, padding:"5px"}}>
-						<Card>
-							<CardContent>
-								<Typography variant="subtitle1" component={'span'} >{item.label}:{'\u00A0'}</Typography>
-								{/*todo: color should be typo color prop set in MUI theme*/}
-								<Typography variant="subtitle1" component={'span'} ><span style={{color:'#3f51b5'}}>{item.value}</span></Typography>
-							</CardContent>
-						</Card>
-					</div>
-				))}
-			</div>}
 
-			{statcontrol.stats.name === 'friends' &&
-			<div>
-				<Tabs
-					value={friendscontrol.selectedTabIndex}
-					onChange={handleChange}
-					aria-label="simple tabs example"
-				>
-					<Tab
-						// onMouseOver={(event) => event.target.click()}
-						label="Playlists"
-					/>
-					<Tab
-						label="Artists"
-					/>
-					<Tab
-						label="Albums"
-					/>
-					<Tab
-						label="Songs"
-					/>
-				</Tabs>
-				<TabPanel value={friendscontrol.selectedTabIndex} index={0}>
-					Item One
-				</TabPanel>
-				<TabPanel value={friendscontrol.selectedTabIndex} index={1}>
-					{/*Item two*/}
-					{/*<button onClick={() =>{setShared()}}>setShared</button>*/}
-				</TabPanel>
-				<TabPanel value={friendscontrol.selectedTabIndex} index={2}>
-					Item Three
-				</TabPanel>
-				<TabPanel value={friendscontrol.selectedTabIndex} index={3}>
-					Item Four
-				</TabPanel>
-			</div>
-			}
 
-			<div className={styles.list} style={{ height: Math.max(...heights) }}>
-				{transitions((style, item) => (
-					<a.div style={style}>
-						<div>
-							<img height={120} src={item.images[0] && item.images[0].url}/>
-							<div style={{padding:"2px",background:"rgb(128 128 128 / .7)",position:"relative",top:"-43px",color:"white",height:"20px"}}>{item.name}</div>
+			{/*todo: unfuck this (remove tables and switch everything to friendsGrid */}
+			{/*{statcontrol.stats.name === 'friends' &&*/}
+			<div style={{display:"flex"}}>
+
+					<div className={'filterItems'} style={{display:"flex",flexDirection:"column"}}>
+						<div >
+							<CustomizedInputBase value={query} placeholder={'filter'} onChange={handleFormChange} clearForm={() =>{clearForm()}}/>
 						</div>
-					</a.div>
-				))}
+						<div style={{display:"flex",flexDirection:"column",width:"20em",background:"darkgrey"}}>
+							<div>Release Range
+								<Slider
+									value={100}
+									marks={[
+										{
+											value: 0,
+											label: '1970',
+										},
+										{
+											value: 100,
+											label: '2021',
+										}]}
+									// onChange={handleChange}
+									valueLabelDisplay="auto"
+									aria-labelledby="range-slider"
+								/>
+							</div>
+						</div>
+						<div style={{width:"1em"}}>
+							{/*testing: re-using BubbleFamily from above - it'll just never show genres?*/}
+							<BubbleFamilyGenreChips families={friendscontrol.families} genreArtist={friendscontrol.genres} flexDirection={'column'}/>
+							<FilterGenreChips genres={friendscontrol.genres}/>
+							<button>some</button> <button>sortof</button> <button>filters</button>
+						</div>
+					</div>
+
+					<div>
+						{/*<div style={{width:"20em",background:"darkgrey"}}>hmm</div>*/}
+						{tabcontrol.section === 2 &&
+						<div style={{"marginLeft":"13em","border":"#e2e2e2 1px solid","borderRadius":"5px"}}>
+
+							{getTabs()}
+							{/*testing: just using the look of these tabs - the panel switching to change content is replaced with reactive tiles*/}
+							{/*<TabPanel value={friendscontrol.selectedTabIndex} index={0}>*/}
+							{/*	Item One*/}
+							{/*</TabPanel>*/}
+							{/*<TabPanel style={{paddingTop:"0px !important"}} value={friendscontrol.selectedTabIndex} index={1}>*/}
+							{/*	/!*Item two*!/*/}
+							{/*	/!*<button onClick={() =>{setShared()}}>setShared</button>*!/*/}
+							{/*</TabPanel>*/}
+							{/*<TabPanel value={friendscontrol.selectedTabIndex} index={2}>*/}
+							{/*	Item Three*/}
+							{/*</TabPanel>*/}
+							{/*<TabPanel value={friendscontrol.selectedTabIndex} index={3}>*/}
+							{/*	Item Four*/}
+							{/*</TabPanel>*/}
+						</div>
+						}
+						{/*todo: make width shift transition*/}
+						<div className={styles.list} style={{ height: Math.max(...heights),width:gridControl.gridClass === 'defaultGrid' ? '64em':'57em' }}>
+							{transitions((style, item) => (
+								<a.div style={style}>
+									{item.type === "track" &&
+									<div>
+										<img height={120} src={item.album.images[0] && item.album.images[0].url}/>
+										<div style={{padding:"2px",background:"rgb(128 128 128 / .7)",position:"relative",top:"-43px",color:"white",height:"20px"}}>{item.name}</div>
+									</div>
+									}
+									{item.type !== "track" &&
+									<div>
+										<img height={120} src={item.images[0] && item.images[0].url}/>
+										<div style={{padding:"2px",background:"rgb(128 128 128 / .7)",position:"relative",top:"-43px",color:"white",height:"20px"}}>{item.name}</div>
+									</div>
+									}
+
+								</a.div>
+							))}
+						</div>
+					</div>
 			</div>
+			{/*}*/}
+
 
 			{/*{props.genres.length > 0 &&*/}
 			{/*<div>*/}

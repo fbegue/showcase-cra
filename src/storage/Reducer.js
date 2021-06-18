@@ -443,9 +443,8 @@ const Reducer = (state, action) => {
 			console.log('action', action);
 
 			if(action.context === 'artists'){
-
 				//register with global artists
-				tables[action.context] = tables[action.context].concat(action.payload);
+				tables[action.context] = tables[action.context].concat(action.payload.artists);
 
 				//register for user
 				//todo: set up id only relations for user
@@ -458,7 +457,7 @@ const Reducer = (state, action) => {
 				// console.log("$",tables);
 				// console.log("$",action.user.id);
 				// console.log("$",tables["users"][action.user.id]);
-				tables["users"][action.user.id][action.context] = tables["users"][action.user.id][action.context].concat(action.payload)
+				tables["users"][action.user.id][action.context] = tables["users"][action.user.id][action.context].concat(action.payload.artists)
 
 				var key = action.user.id + '_' + action.context;
 				console.log("stated",key);
@@ -550,7 +549,7 @@ const Reducer = (state, action) => {
 
 				//todo: keeping this as a tuple for now
 				//tables[action.context] = tables[action.context].concat(action.payload);
-				tables[action.context] = action.payload.all_users;
+				tables[action.context] = action.payload;
 
 				console.log("stated",action.context);
 				return {

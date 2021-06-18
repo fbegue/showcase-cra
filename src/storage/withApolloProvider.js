@@ -47,6 +47,9 @@ sources_subset.forEach(s =>{
 export const NODES_STATE_VAR = makeVar({agg:[],saved:[]});
 export const GLOBAL_UI_VAR = makeVar({access_token:false,refresh_token:false,expiryTime:null,user:null});
 export const TILES = makeVar([]);
+export const STATS = makeVar({});
+export const CHIPFAMILIES = makeVar([]);
+export const CHIPGENRES = makeVar([]);
 export const EVENTS_VAR = makeVar([]);
 export const NODES_VAR = makeVar(nodes);
 

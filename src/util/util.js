@@ -1,13 +1,13 @@
 /* eslint-disable no-unused-expressions */
 import _ from "lodash";
-import ChipsArray from "../ChipsArray";
+// import ChipsArray from "../components/utility/ChipsArray";
 import React, {useContext,useState,useEffect} from "react";
 import tables from "../storage/tables";
 import {families as systemFamilies, familyColors} from "../families";
 import {Highlighter, StatControl,FriendsControl,Control} from "../index";
 import {Context} from "../storage/Store";
 import {useReactiveVar} from "@apollo/react-hooks";
-import {GLOBAL_UI_VAR,TILES,EVENTS_VAR,NODES_VAR} from "../storage/withApolloProvider";
+import {GLOBAL_UI_VAR,TILES,EVENTS_VAR,STATS,CHIPFAMILIES,CHIPGENRES} from "../storage/withApolloProvider";
 const uuid = require('react-uuid')
 
 //this is going to be harder b/c we already setup familyAgg ...somewhere? whereTF did I set that up
@@ -124,14 +124,17 @@ function makeRank(array,artistFreq){
 
 //----------------------------------------
 
-
+/*note: chooses data based on:
+* - statcontrol.stats.name (current tab)
+* 	- has extra tab step for friends
+* - statcontrol.mode (custom/context) */
 function chooseData(statcontrol,friendscontrol,globalState,globalUI){
 
 	var data_user = [];
 	var data_guest = [];
 
-	console.log("chooseData",statcontrol.stats.name);
-	console.log("guest:",friendscontrol.guest.id);
+	//console.log("chooseData",statcontrol.stats.name);
+	//console.log("guest:",friendscontrol.guest.id);
 
 	//todo: duplicate code in reducer
 	var contextFilter = function(key,rec) {
@@ -172,19 +175,20 @@ function chooseData(statcontrol,friendscontrol,globalState,globalUI){
 		case "tracks_saved":
 			data_user = globalState[globalUI.user.id + "_tracks"].filter(contextFilter.bind(null,'saved'))
 			break;
-		case "friends":
-			var key = null
-
-			//todo: add more keys
-			switch(friendscontrol.selectedTabIndex) {
-				case 1:
-					//artists
-					key = '_artists'
-					break;
-				case 3:
-					//artists
-					key = '_tracks'
-					break;
+		case "artists_friends":
+		case "playlists_friends":
+		case "tracks_friends":
+		case "albums_friends":
+			var key = null;
+			switch(statcontrol.stats.name) {
+				case "artists_friends":
+					key = '_artists';break;
+				case "playlists_friends":
+					key = '_playlists';break;
+				case "albums_friends":
+					key = '_albums';break;
+				case "tracks_friends":
+					key = '_tracks';break;
 				default:
 				// code block
 			}
@@ -205,11 +209,65 @@ function chooseData(statcontrol,friendscontrol,globalState,globalUI){
 				data_guest = globalState[friendscontrol.guest.id + key].filter(contextFilter.bind(null,friendscontrol.sourceFilter))
 			}
 
+
+			console.log("friendscontrol.families",friendscontrol.families);
+			console.log("friendscontrol.genres",friendscontrol.genres);
+
+			var famCtrlFilter = function(r){
+				var some = false;
+				if(r.type === 'artist'){
+					if (friendscontrol.families.indexOf(r.familyAgg) !== -1) {some = true;}
+				}
+				//playlist, track
+				else{
+					for(var x = 0; x < r.artists.length; x++){
+						if (friendscontrol.families.indexOf( r.artists[x].familyAgg) !== -1) {some = true;break;}
+					}
+				}
+				return some
+			}
+			var genreCtrlFilter = function(r){
+				if(r.type === 'artist'){
+					var some = false;
+					for(var y = 0; y < r.genres.length; y++){
+						if (friendscontrol.genres.indexOf(r.genres[y].name) !== -1) {
+							some = true;break;
+						}
+					}
+				}
+				//playlist, tracks
+				else{
+					//check selected genres against any artist of the playlist or track
+					for(var x = 0; x < r.artists.length; x++){
+						for(var y = 0; y < r.artists[x].genres.length; y++){
+							if (friendscontrol.genres.indexOf(r.artists[x].genres[y].name) !== -1) {
+								some = true;break;
+							}
+						}
+						//break out of artists loop if one of their genre's passed
+						if(some){break}
+					}
+				}
+				return some
+			}
+
+			if(friendscontrol.families.length > 0){
+				data_user = data_user.filter(famCtrlFilter)
+				data_guest  = data_guest.filter(famCtrlFilter)
+			}
+			if(friendscontrol.genres.length > 0){
+				data_user = data_user.filter(genreCtrlFilter)
+				data_guest  = data_guest.filter(genreCtrlFilter)
+			}
 			break;
+
 		default:
 			console.warn("skipped stat re-render for: " + statcontrol.stats.name)
 			break;
 	}
+
+
+
 	return {data_user,data_guest}
 }
 
@@ -250,7 +308,7 @@ function getFriendsMaps(data_user,data_guest){
 			 *      ...
 			 *  }
 			 * */
-			if(d.type === 'track'){
+			if(d.type === 'track' || d.type === 'album'){
 				d.artists.forEach(a =>{
 					if(a.familyAgg && a.familyAgg !== null){
 						if (!map[a.familyAgg]) {
@@ -261,32 +319,21 @@ function getFriendsMaps(data_user,data_guest){
 							else{map[a.familyAgg].artists[a.name] = [a]}
 						}
 					}
-					//todo: restore
-					// //testing: only genres from highlighted family
-					// if(highlighter.hoverState[0] === a.familyAgg){
-					// 	_genres = _genres.concat(a.genres)
-					// }
-
 				});
 
 			}
-
 				//todo: familyAgg is good enough signifier here to determine 'artist' type?
 			//artists
 			else if(d.familyAgg && d.familyAgg !== null){
 
-				//testing:
-				//compare maps of each person for each family
-				//compare the total # of artists for each family for each user:
-				//- if both USER and GUEST have a decent number, that's an interesting genre for them to talk about
-				//- if neither do - it's not
-				//- and then something something math
-
 				//note: will always be arrays of length 1
+
+				//if the family doesn't exist, create it with one artist
 				if (!map[d.familyAgg]) {
-					map[d.familyAgg] = {artists:{}}
+					map[d.familyAgg] = {artists:{[d.name]:[d]}}
 				} else {
-					//map[d.familyAgg].artists.push(a)
+					//if the artist is defined, push one
+					//otherwise do the 1 artist init as above
 					if(map[d.familyAgg].artists[d.name]){map[d.familyAgg].artists[d.name].push(d)}
 					else{map[d.familyAgg].artists[d.name] = [d] }
 				}
@@ -384,15 +431,19 @@ function useProduceData(){
 	const [pieData, setPieData] = useState([]);
 	const [genres, setGenres] = useState([]);
 	const [bubbleData, setBubbleData] = useState([]);
+	const [friendStats, setFriendStats] = useState([]);
 	const [vennData, setVennData] = useState([]);
 	//const [tiles, setTiles] = useState([]);
 
 
+	var stats = [];
 	useEffect(() => {
 
 		var tempPieData = [];
-		console.log("useEffect",statcontrol.stats.name);
-		console.log("$friendscontrol",friendscontrol.guest);
+
+
+		console.log("useProduceData",statcontrol.stats.name);
+		//console.log("guest",friendscontrol.guest);
 		friendscontrol.guest.id ? console.log("guest:",friendscontrol.guest.id):{};
 		//console.log("tables",tables);
 
@@ -413,10 +464,6 @@ function useProduceData(){
 		let {map_user,map_guest} = getFriendsMaps(data_user,data_guest)
 
 		console.log("map_user",map_user);
-		if(statcontrol.stats.name === "playlists"){
-			debugger;
-		}
-
 		console.log("map_guest",map_guest);
 		//todo: could (initally) hide certain series w/ series property: visible
 		//by default, toggleable by clicking on legend item
@@ -432,12 +479,14 @@ function useProduceData(){
 
 		var _tiles = [];
 
-		//note: directly modifies tempPieData,bubbleData
+		//----------------------------------------------------------------------
+		//note: helper functions directly modifies tempPieData,bubbleData
+		//do to laziness, I split how I'm handling the processing for single versus friends comparison
+		//where friends are always processing combination arrays while single is always the maps we produced earlier
+
+		/** producePieData
+		 *  @desc read the maps produced above to output pieData respresenting # of artists in each family */
 		var producePieData = function(maporarr,key,owner,){
-			//set pie data: here you can see the pie chart ignoring the actual occurence value of the artists,
-			//and is instead just proportioning slices based on # of artists in the family
-
-
 
 			var map = {};
 			var arr = null;
@@ -448,7 +497,7 @@ function useProduceData(){
 				})
 
 				Object.keys(map).forEach(fam =>{
-					tempPieData.push({x:fam,y:map[fam].length})
+					tempPieData.push({name:fam,y:map[fam].length})
 				})
 
 			}else{
@@ -456,7 +505,7 @@ function useProduceData(){
 				//console.log('map',map);
 				Object.keys(map).forEach(fam =>{
 
-					tempPieData.push({x:fam,y:Object.keys(map[fam][key]).length})
+					tempPieData.push({name:fam,y:Object.keys(map[fam][key]).length})
 
 					// if(owner && owner !== 'all'){
 					// 	//any family w/ no entries
@@ -472,14 +521,14 @@ function useProduceData(){
 			}
 
 			//copy/adapted from below
-			tempPieData = tempPieData.filter(r =>{
-				if(friendscontrol.families.length === 0 || friendscontrol.families[0] === 'all'){
-					return true;
-				}
-				else{
-					return friendscontrol.families.indexOf(r.x) !== -1
-				}
-			})
+			// tempPieData = tempPieData.filter(r =>{
+			// 	if(friendscontrol.families.length === 0 || friendscontrol.families[0] === 'all'){
+			// 		return true;
+			// 	}
+			// 	else{
+			// 		return friendscontrol.families.indexOf(r.x) !== -1
+			// 	}
+			// })
 
 		}
 
@@ -512,6 +561,14 @@ function useProduceData(){
 			});
 		}
 
+
+		/** produceBubbleDataFriendsArtists
+		 *  notice that I only produce bubble data for artists EVER
+		 *  i.e. even for tracks/albums bubbledata is simply an abstraction of the available artists
+		 * */
+		//album[artist][0][familyagg]
+		//track[artist][0][familyagg]
+		//if(a.type === 'track' || a.type === 'album'){}
 		var produceBubbleDataFriendsArtists = function(arr){
 			function getClassName(a){
 				if(a.shared){return 'shared'}
@@ -520,7 +577,10 @@ function useProduceData(){
 				else{return null}
 			}
 			arr.forEach(a =>{
+
+
 				var series = _.find(bubbleData, function(o) { return o.name === a.familyAgg });
+
 				series.data.push({name:a.name, value:scale[0],
 					color:familyColors[a.familyAgg],owner:a.owner,className:getClassName(a)
 				})
@@ -528,19 +588,65 @@ function useProduceData(){
 		}
 
 
-		//create arrays for each user's map
+
+		//----------------------------------------------------------------------
+
+		//note: setup ... various objects to filter on later
+		//the big idea here is to create the correct overarching datasets and create
+		//tiles, bubbles and pie data from contexts, and then apply filters later.
+		//in the case of friends, we apply the friendscontrols right now to further reduce
+		//the set we're filtering on later
+
+		//todo: feels like this should be combined with switch below
+		//but not sure if object type switch are shared like data producers - if so then combine
+
 		var au = null;var ag = null;
-		if(statcontrol.stats.name === "playlists"){
-			console.log("skip");
-		}else{
-			let {artists_user,artists_guest} = getFriendsArtists(map_user,map_guest)
-			au = artists_user;ag = artists_guest
+
+		switch (statcontrol.stats.name) {
+			case "artists_top":
+			case "artists_recent":
+			case "artists_saved":
+			case "artists_friends":
+				//all artists require map => array producer
+				var {artists_user,artists_guest} = getFriendsArtists(map_user,map_guest)
+				au = artists_user;ag = artists_guest;
+				break;
+			case "albums_saved":
+			case "tracks_recent":
+			case "tracks_saved":
+				//this is just the raw track/album data for the user
+				au = data_user; ag = data_guest;break;
+			case "playlists":
+				//this is just the raw playlist data for the user
+				au = data_user; ag = data_guest;break;
+			//todo: broken
+			case "playlists_friends":
+			case "tracks_friends":
+			case "albums_friends":
+			default:
+				var {artists_user,artists_guest} = getFriendsArtists(map_user,map_guest)
+				au = artists_user;ag = artists_guest;
+				break;
 		}
 
-
+		console.log("set up data targets:");
 		console.log("user",au);
 		console.log("guest",ag);
+
+		//note: use maps to produce pie and bubble data
+		//for friends, change the input to these produce functions based on friendscontrol.compare
+
+		//todo: looks like we have bubble for artists/playlists and then friends has it's own permutation of artists
+		//#1) combine friends artists/playlists
+		//#2) expand playlists to do friends as well
+		//debugger;
+
+		// const tileFilter = (tile) =>{
+		// 	debugger;
+		// 	console.log(tile);
+		// }
 		switch(statcontrol.stats.name) {
+			case "albums_saved":
 			case "artists_top":
 			case "artists_recent":
 			case "artists_saved":
@@ -548,6 +654,7 @@ function useProduceData(){
 			case "tracks_saved":
 				producePieData(map_user,'artists')
 				produceBubbleDataArtists(map_user)
+				// _tiles = au.filter(tileFilter)
 				_tiles = au
 				break;
 			case "playlists":
@@ -556,29 +663,38 @@ function useProduceData(){
 				produceBubbleDataPlaylists(map_user)
 				_tiles = data_user
 				break;
-			case "friends":
+			case "artists_friends":
+			case "playlists_friends":
+			case "tracks_friends":
+			case "albums_friends":
 
+				//note: processed friendscontrol.selectedTabIndex above, so assume correct object types are here
 				//testing: complete wipe = lose cool animation when changing filters?
 				//or is there none anyways? proper test
 
 				bubbleData.forEach(series =>{series.data = []})
-				_tiles = [];
+
+				//todo: tiles are always setup above for friends?
+				//_tiles = [];
+
 
 				console.log("friendscontrol.compare",friendscontrol.compare);
 
-				//this switch was only concerned with providing tiles for different friends compare options
+				//based on friendscontrol.compare settings, provide bubble producer with sensible array to process
 				switch (friendscontrol.compare) {
 					case 'all':
 						var uniqAll = _.uniqBy(au.concat(ag),'id')
 						produceBubbleDataFriendsArtists(uniqAll)
-						producePieData(map_guest,'artists','all')
-						_tiles = uniqAll
-						//_tiles = [];
-						// tiles.forEach(a =>{
-						// 	uniqAll.forEach(ae =>{
-						// 		if(){}
-						// 	})
-						// })
+						tempPieData = [];
+
+						// debugger;
+						// if(data_user[0].type === ('album' || 'track')){
+						if(data_user[0].type === 'album' || data_user[0].type === 'track'){
+
+							//testing: for tracks/albums we need to specify a different tile setup
+							_tiles = _.uniqBy(data_user.concat(data_guest),'id')
+						}else{_tiles = uniqAll}
+						//producePieData(map_guest,'artists','all')
 						break;
 					//	todo:
 					case 'diff':
@@ -587,10 +703,13 @@ function useProduceData(){
 					case 'shared':
 						var _shared = _.uniqBy(au.concat(ag),'id').filter(r =>{return r.shared})
 						produceBubbleDataFriendsArtists(_shared)
-						producePieData(_shared,'artists','shared')
-						//testing:
-						_tiles = _shared
-						//_tiles = _tiles.slice(0,_tiles.length -2)
+						tempPieData = [];
+						//producePieData(_shared,'artists','shared')
+						if(_shared[0].type === ('album' || 'track')){
+							//testing: for tracks/albums we need to specify a different tile setup
+							_tiles = _.uniqBy(data_user.concat(data_guest),'id')
+						}else{_tiles = _shared}
+
 						break;
 					case 'user':
 						produceBubbleDataFriendsArtists(au)
@@ -620,17 +739,23 @@ function useProduceData(){
 				break;
 		}
 
+		//-------------------------------------------------------------------------------
+		//note: series of different filters to apply produced pie, bubble and tile data
 
-		bubbleData = bubbleData.filter(r =>{return !(r.data.length === 0)})
-		//console.log("f",friendscontrol.families);
-		bubbleData = bubbleData.filter(r =>{
-			if(friendscontrol.families.length === 0 || friendscontrol.families[0] === 'all'){
-				return true;
-			}
-			else{
-				return friendscontrol.families.indexOf(r.name) !== -1
-			}
-		})
+		// bubbleData = bubbleData.filter(r =>{return !(r.data.length === 0)})
+		// //console.log("f",friendscontrol.families);
+		// bubbleData = bubbleData.filter(r =>{
+		// 	if(friendscontrol.families.length === 0){
+		// 		return true;
+		// 	}
+		// 	else{
+		// 		return friendscontrol.families.indexOf(r.name) !== -1
+		// 	}
+		// })
+
+
+		//todo: dynamic family/genre chips
+		//families is easy b/c I can just loop thru the bubbledata results
 
 		//venn
 		var series_sample = [
@@ -658,158 +783,25 @@ function useProduceData(){
 		//console.log("tempPieData",tempPieData);
 		setPieData(tempPieData);
 		setGenres(_genres)
-		//console.log("bubbleData",bubbleData);
+
+		//todo: expand on concept
+
+		var _stats = {};
+		var max = null
+
+		bubbleData.forEach(s =>{
+			max === null ? max = s:{};
+			s.data.length > max.data.length ? max = s:{}
+		})
+		//console.log("$max",max);
+		_stats.max = max;
+		STATS(_stats);
+		// setFriendStats(_stats)
 		setBubbleData(bubbleData);
 		setVennData(series_sample);
 
 
 		//------------------------------------------------------------------------
-
-		var a1 = {
-			"external_urls": {
-				"spotify": "https://open.spotify.com/artist/0fA0VVWsXO9YnASrzqfmYu"
-			},
-			"followers": {
-				"href": null,
-				"total": 4737416
-			},
-			"genres": [
-				{
-					"id": 23,
-					"name": "rap",
-					"family_id": 4,
-					"family_name": "hip hop"
-				},
-				{
-					"id": 1275,
-					"name": "ohio hip hop",
-					"family_id": 4,
-					"family_name": "hip hop"
-				},
-				{
-					"id": 6,
-					"name": "hip hop",
-					"family_id": 4,
-					"family_name": "hip hop"
-				}
-			],
-			"href": "https://api.spotify.com/v1/artists/0fA0VVWsXO9YnASrzqfmYu",
-			"id": "testtesttest0fA0V",
-			"images": [
-				{
-					"height": 640,
-					"url": "https://i.scdn.co/image/4cb57ae1ef87546455db9cf65ba414c311ff459a",
-					"width": 640
-				},
-				{
-					"height": 320,
-					"url": "https://i.scdn.co/image/805d1c319fe812f65f680b039a480dcc8c2bdd84",
-					"width": 320
-				},
-				{
-					"height": 160,
-					"url": "https://i.scdn.co/image/550bfaa6e0d866c4fa96ba59e3de1d4df6ac5dbc",
-					"width": 160
-				}
-			],
-			"name": "Ttest Cudi",
-			"popularity": 87,
-			"type": "artist",
-			"uri": "spotify:artist:0fA0VVWsXO9YnASrzqfmYu",
-			"familyAgg": "hip hop",
-			"source": "saved",
-			"owner": "user"
-		};
-		var a2 = {
-			"external_urls": {
-				"spotify": "https://open.spotify.com/artist/4SOtk3HtPYKqxnVuxNBMti"
-			},
-			"href": "https://api.spotify.com/v1/artists/4SOtk3HtPYKqxnVuxNBMti",
-			"id": "4SOtk3HtPYKqxnVuxNBMti",
-			"name": "Donovan Woods",
-			"type": "artist",
-			"uri": "spotify:artist:4SOtk3HtPYKqxnVuxNBMti",
-			"genres": [
-				{
-					"id": 1126,
-					"name": "deep new americana",
-					"family_id": null,
-					"family_name": null
-				},
-				{
-					"id": 49,
-					"name": "indie folk",
-					"family_id": 15,
-					"family_name": "folk"
-				},
-				{
-					"id": 1178,
-					"name": "neo mellow",
-					"family_id": null,
-					"family_name": null
-				},
-				{
-					"id": 1417,
-					"name": "indiecoustica",
-					"family_id": null,
-					"family_name": null
-				},
-				{
-					"id": 68,
-					"name": "stomp and holler",
-					"family_id": 15,
-					"family_name": "folk"
-				},
-				{
-					"id": 189,
-					"name": "canadian indie",
-					"family_id": 12,
-					"family_name": "world"
-				},
-				{
-					"id": 141,
-					"name": "acoustic pop",
-					"family_id": 1,
-					"family_name": "pop"
-				},
-				{
-					"id": 1445,
-					"name": "canadian singer-songwriter",
-					"family_id": null,
-					"family_name": null
-				},
-				{
-					"id": 1373,
-					"name": "indie anthem-folk",
-					"family_id": null,
-					"family_name": null
-				},
-				{
-					"id": 1137,
-					"name": "new americana",
-					"family_id": null,
-					"family_name": null
-				}
-			],
-			"images": [
-				{
-					"height": 640,
-					"url": "https://i.scdn.co/image/008d482bacc20706b3aff014456c40a5afcff2a7",
-					"width": 640
-				},
-				{
-					"height": 320,
-					"url": "https://i.scdn.co/image/bbcb801f90c638e48fda013afeac7aa7ae2d5509",
-					"width": 320
-				},
-				{
-					"height": 160,
-					"url": "https://i.scdn.co/image/5c6f48c5e30882f2fe83a72bf2b85345358f258f",
-					"width": 160
-				}
-			],
-			"familyAgg": "folk"
-		}
 
 		//testing: small amount of tiles
 		//todo: so I can go between user and guest w/ this reduced set
@@ -880,8 +872,7 @@ function useProduceData(){
 
 	},[
 		statcontrol.stats.name,statcontrol.mode,
-		//friendscontrol.compare
-		friendscontrol.families,
+		friendscontrol.compare,friendscontrol.families,friendscontrol.genres,
 		friendscontrol.selectedTabIndex,friendscontrol.sourceFilter]);
 
 	//todo: add back highlighter
@@ -892,20 +883,21 @@ function useProduceData(){
 
 
 	//console.log("returns",{bubble:bubbleData,pie:pieData,genres:genres});
-	return {bubbleData:bubbleData,pieData:pieData,genres:genres,vennData:vennData}
+	return {bubbleData:bubbleData,pieData:pieData,genres:genres,vennData:vennData,friendStats:friendStats}
 }
 
 function useProduceEvents(){
-
-	console.log("$useProduceEvents");
 
 	let control = Control.useContainer();
 	let statcontrol = StatControl.useContainer();
 	//let highlighter = Highlighter.useContainer();
 	let friendscontrol = FriendsControl.useContainer()
 	const globalUI = useReactiveVar(GLOBAL_UI_VAR);
+
 	const [globalState, globalDispatch] = useContext(Context);
-	const events = useReactiveVar(EVENTS_VAR);
+	//const events = useReactiveVar(EVENTS_VAR);
+	console.log("$useProduceEvents",control.dataLoaded);
+
 	//const nodes = useReactiveVar(NODES_VAR);
 
 	//todo: context versus custom: these all trigger events recalc in CONTEXT mode but not in CUSTOM
@@ -928,14 +920,18 @@ function useProduceEvents(){
 				//todo: filter on this later
 				var cids = control.metro.map( i => i.id);
 
+				//note: chooose data based on tab
 				let  {data_user,data_guest} = chooseData(statcontrol,friendscontrol,globalState,globalUI)
 				//console.log("$$data_user",data_user);
+				//console.log("$$data_guest",data_guest);
 
 				//todo: skipping friends related stuff rn
 				//console.log("$$data_guest",data_guest);
 
 				var dataset = null;
 
+				//note: if single user, skip
+				// with valid guest_data from chooseData, use friendscontrol.compare to create dataset
 				if(data_guest.length === 0){
 					dataset = data_user
 					console.log("$$dataset is just data_user");
@@ -943,7 +939,7 @@ function useProduceEvents(){
 					let {map_user,map_guest} = getFriendsMaps(data_user,data_guest)
 					let {artists_user,artists_guest} = getFriendsArtists(map_user,map_guest)
 
-					//testing: copied from above, just w/out setting bubbles,pie and tiles
+					//todo: copied from above, just w/out setting bubbles,pie and tiles
 					switch (friendscontrol.compare) {
 						case 'all':
 							dataset = _.uniqBy(artists_user.concat(artists_guest),'id')
@@ -965,32 +961,66 @@ function useProduceEvents(){
 					console.log("$$dataset set for friends",dataset);
 				}
 
-				//extrapolate families/genres based on supplied data type
-				var families = [];
+
+				var familyArtist = {};
+				var genreArtist  = {};
+				//id of every primary artist's related_artist, mapped to the primary
+				var relatedArtist = {};
+				var allArtist = {};
+
+				const processRelated = (a) =>{
+					if(a.related_artists){
+						a.related_artists.forEach(ra =>{
+							relatedArtist[ra.id] ? relatedArtist[ra.id].push(a):relatedArtist[ra.id]  = [a]
+						})
+					}
+					else{
+						// console.log("no related",a)
+					}
+				}
+
+
+
+				//note: create maps for easier events filtering later
 				dataset.forEach(r =>{
-					//artists or tracks
-					if(r.familyAgg){
-						families.indexOf(r.familyAgg) === -1 ? families.push(r.familyAgg):{};
-						//playlists
-					}else if(r.artists){
+					if(r.type === 'artist'){
+						familyArtist[r.familyAgg] ? familyArtist[r.familyAgg].push(r):familyArtist[r.familyAgg] = [r]
+						r.genres.forEach(g =>{
+							genreArtist[g.name] ? genreArtist[g.name].push(r):genreArtist[g.name] = [r]
+						})
+						//allArtist[r] ? allArtist[r] = r:allArtist[r]
+						allArtist[r.id] = r
+						//processRelated(r)
+					}else if(r.type === 'playlist' || r.type === 'track'){
 						//todo: we're not doing any weighting on the artist's ratio of tracks here
 						//so just one song from one genre from one family get in
-
 						r.artists.forEach(a =>{
-							families.indexOf(a.familyAgg) === -1 ? families.push(a.familyAgg):{};
+							familyArtist[a.familyAgg] ? familyArtist[a.familyAgg].push(r):familyArtist[a.familyAgg] = [r]
+
+							//todo: someone is coming back without genres:[] when it has none
+							if(!a.genres){console.warn("problem artist record:",a)}
+							else{
+								a.genres.forEach(g =>{
+									genreArtist[g.name] ? genreArtist[g.name].push(r):genreArtist[g.name] = [r]
+								})
+							}
+							//processRelated(r)
+							allArtist[r.id] = r
 						})
 					}
 				});
-				families = families.filter(e => e !== null)
 
-				if(friendscontrol.families.length === 0 || friendscontrol.families[0] === 'all'){
-					//console.log("$$families",families);
-				}else{
-					families = friendscontrol.families
-					//console.log("$$families overruled by friendscontrol",families);
-				}
 
+				console.log("$$set new chip families/genres");
+				console.log("CHIPFAMILIES",Object.keys(familyArtist));
+				console.log("CHIPGENRES",genreArtist);
+				// console.log(relatedArtist);
+				CHIPFAMILIES(Object.keys(familyArtist))
+				CHIPGENRES(genreArtist)
+
+				//debugger;
 				//filter out by date/metro and sort by date
+
 
 				function byDate(e){
 					return (new Date(e.start.datetime) >= control.startDate) && (control.endDate ? (new Date(e.start.datetime) <= control.endDate):true)
@@ -1003,34 +1033,163 @@ function useProduceEvents(){
 				//noticed when testin large cleveland pull - if my date range was real small it would start to duplicate event entries?
 				events = _.sortedUniqBy(events,e =>{return e.id})
 
-				//todo: implement control.genreSens,control.artistSens, filters
+				//---------------------------------------------------------------------------------
+				//note: series of different filters to apply to events set
 
-				if(families.length > 0){
-					//for every event, if any of the performances has a familyAgg
-					//that is within our filtered set, keep the event
+				//note: for speed, mark the performances with all possible filtered categories
+				//then later, based on control values, actually apply the filter
+
+				events.forEach(e =>{
+					e.friends = [];
+					for(var x = 0; x < e.performance.length;x++){
+						var a = e.performance[x].artist;
+
+						//if my input dataset set had a artist defined for a genre
+						//record it and - if asked to later - use that to filter for exactGenreMatch
+						a.genre_match = [];
+						a.genres.forEach(g =>{
+							genreArtist[g.name] ?  a.genre_match = a.genre_match.concat(genreArtist[g.name]):{};
+						})
+						a.related_match = [];
+						// if(relatedArtist[a.id]){
+						relatedArtist[a.id] ? a.related_match.push(relatedArtist[a.id][0]):{};
+						// }
+						// relatedArtist[a.id] ? a.related_match.push(a):{};
+
+						allArtist[a.id] ? a.exact_match = allArtist[a.id]:{};
+						//familyArtist[a.familyAgg]
+
+						//testing: good of n^ as any to insert guest avatars in
+						//todo: different objects besides artists
+
+						globalUI.user.related_users.filter(r =>{return r.friend}).forEach(f =>{
+							if(globalState[f.id + '_artists']){
+								globalState[f.id + '_artists'].forEach(fa =>{
+									fa.id === a.id ? e.friends.push(f):{}
+								})
+							}
+						})
+					}
+				})
+
+
+				// console.log("friendscontrol.families",friendscontrol.families);
+				// console.log("friendscontrol.genres",friendscontrol.genres);
+				//console.log("control.genreSens",control.genreSens);
+				//console.log("control.artistSens",control.artistSens);
+
+				//todo: DISABLED
+				//there may be a condition above that prevents this record from being included, but when related artists is activated,
+				//add it back in / prevent it from being pulled out
+				//testing: actually going to be difficult to find a related w/out the genre right?
+				//so think only way to really test this is to turn OFF any genres stuff, then include this one?
+				//but the use case there is just: ONLY show me concerts from related artists? that's strange isn't it?
+
+				// var includesRelated = events.filter(e =>{
+				// 	var some = false;
+				// 	for(var x = 0; x < e.performance.length;x++) {
+				// 		var a = e.performance[x].artist;
+				// 		if (a.related_match.length > 0) {
+				// 			a.useRelatedArtistMatch = true;
+				// 			some = true;
+				// 			break;
+				// 		}
+				// 	}
+				// 	return some
+				// })
+				// console.log("$includesRelated",includesRelated);
+
+				//note: control.genresens
+				//instead of acting like this is 1/3 similar options, just going to disable the genreSens control completely
+				//when we've selected a genre OR FAMILY to filter on
+
+				if(friendscontrol.genres.length > 0){
+					console.log("$$friendscontrol.genres overrides genreSens",friendscontrol.genres);
 					events = events.filter(e =>{
 						var some = false;
-						for(var x = 0; x < e.performance.length;x++){
-							//console.log("e",e.performance[x].artist.familyAgg);
-							if(families.indexOf(e.performance[x].artist.familyAgg) !== -1){
+						for(var x = 0; x < e.performance.length;x++) {
+							var a = e.performance[x].artist;
+							for (var y = 0; y < a.genres.length; y++) {
+								if (friendscontrol.genres.indexOf(a.genres[y].name) !== -1) {
+									console.log(a.genres[y].name);
+									a.useSelectedGenreMatch = true;
+									some = true;
+									break;
+								}
+							}
+							if (some === true) {break;}
+						}
+						// if(some === true){debugger}
+						return some;
+					})
+				}else if(friendscontrol.families.length > 0){
+					console.log("$$friendscontrol.families overrides genreSens",friendscontrol.families);
+					events = events.filter(e =>{
+						var some = false;
+						for(var x = 0; x < e.performance.length;x++) {
+							var a = e.performance[x].artist;
+							if (friendscontrol.families.indexOf(a.familyAgg) !== -1) {
+								a.useSelectedFamilyMatch = true;
 								some = true;
 								break;
 							}
+							if (some === true) {break;}
 						}
+						//if(some === true){debugger}
 						return some;
 					})
 				}else{
-					//console.log("$$no families to filter on!");
+					events = events.filter(e =>{
+						var some = false;
+						for(var x = 0; x < e.performance.length;x++) {
+							var a = e.performance[x].artist;
+
+							if(control.genreSens === 'exact'){
+								if(a.genre_match.length > 0){
+									a.useExactGenreMatch = true;
+									some = true;break;
+								}
+							}else if(control.genreSens === 'related'){
+								//if the familyAgg of any of the performances has been alluded to in familyArtist, we keep it
+								if(Object.keys(familyArtist).indexOf(a.familyAgg) !== -1){
+									a.useRelatedGenreMatch = true;
+									some = true;break;
+								}
+							}
+						}
+						return some
+					})
 				}
 
+
+				//note: control.artistSens
+				events = events.filter(e =>{
+					var some = false;
+					for(var x = 0; x < e.performance.length;x++) {
+						var a = e.performance[x].artist;
+
+						if(control.artistSens === 'exact'){
+							if(a.exact_match){
+								a.useExactArtistMatch = true;
+								some = true;break;
+							}
+						}else{return true}
+					}
+					return some
+				})
+
+				//---------------------------------------------------------------------------------
+
+				//debugger;
 				//console.log("$$events",jstr(events));
+				console.log("$$events",events);
 				EVENTS_VAR(events)
 
-			}//else
+			}//else in context mode
 		},
 		[statcontrol.stats.name,statcontrol.mode,
-			friendscontrol.compare,friendscontrol.families,friendscontrol.selectedTabIndex,friendscontrol.sourceFilter,
-			control.metro,control.startDate,control.endDate,control.genreSens,control.artistSens,
+			friendscontrol.compare,friendscontrol.families,friendscontrol.genres,friendscontrol.selectedTabIndex,friendscontrol.sourceFilter,
+			control.metro,control.startDate,control.endDate,control.genreSens,control.artistSens,control.dataLoaded,
 			tables['events']
 		]
 	)
@@ -1085,17 +1244,17 @@ function familyFreq(a){
 	return ret;
 }
 
-function prepTracks(rowData){
-	//console.log("$prepTracks",rowData);
-	var genres = [];
-	rowData.artists.forEach(a =>{
-		genres = genres.concat(a.genres)
-	});
-	genres = _.uniqBy(genres, function(n) {return n.id;});
-	//return <div></div>
-	return(<ChipsArray chipData={genres}/>)
-}
+// function prepTracks(rowData){
+// 	//console.log("$prepTracks",rowData);
+// 	var genres = [];
+// 	rowData.artists.forEach(a =>{
+// 		genres = genres.concat(a.genres)
+// 	});
+// 	genres = _.uniqBy(genres, function(n) {return n.id;});
+// 	//return <div></div>
+// 	return(<ChipsArray chipData={genres}/>)
+// }
 
 export default {
-	familyFreq,makeRank,makeRank2,prepTracks,useProduceData,useProduceEvents
+	familyFreq,makeRank,makeRank2,useProduceData,useProduceEvents
 }

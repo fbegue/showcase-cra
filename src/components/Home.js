@@ -5,7 +5,7 @@ import DiscreteSlider from "../Slider";
 import useMedia from './Masonry/useMedia'
 //import useMeasure from './Masonry/useMeasure'
 import data from './Masonry/data'
-import './Masonry/styles.css'
+// import './Masonry/styles.css'
 import { DateTime } from "luxon";
 
 import {Tab} from "react-tabify";
@@ -190,7 +190,7 @@ function Main(props) {
 							</div>
 						))}
 					</div>
-					<DiscreteSlider defaultValue={2}  handleChange={handleSliderChange}/>
+					{/*<DiscreteSlider defaultValue={2}  handleChange={handleSliderChange}/>*/}
 				</div>
 				<div>
 					{/*todo: replace w/ update*/}

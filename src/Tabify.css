@@ -1,0 +1,23 @@
+
+/*todo: there's something special about classname = tabs?*/
+/*while trying to seperately customize tab widths, couldn't change this tabs to subtabs, tried to make direct descendents rule or something idk*/
+/*probably not the way to go about it*/
+
+
+.tabs0 .MuiContainer-root {
+    padding:0px !important;
+}
+.tabs0 .MuiTab-root {
+    min-width:144px !important
+}
+
+.tabs1 .MuiContainer-root {
+    padding:0px !important;
+}
+.tabs1 .MuiTab-root {
+    min-width:124px !important
+}
+
+.MuiAppBar-colorPrimary {
+    background-color:grey
+}

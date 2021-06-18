@@ -5,6 +5,8 @@ import { DateTime } from "luxon";
 import List from '@material-ui/core/List'
 import ListItem from '@material-ui/core/ListItem'
 import ListItemText from '@material-ui/core/ListItemText'
+import Tooltip from '@material-ui/core/Tooltip'
+
 import Collapse from '@material-ui/core/Collapse'
 import ExpandLess from '@material-ui/icons/ExpandLess'
 import ExpandMore from '@material-ui/icons/ExpandMore'
@@ -16,7 +18,6 @@ import CloseIcon from '@material-ui/icons/Close';
 import Chip from '@material-ui/core/Chip';
 import Paper from '@material-ui/core/Paper';
 import MusicNoteIcon from '@material-ui/icons/MusicNote';
-import ChipsArray from "./ChipsArray";
 import { makeStyles } from '@material-ui/core/styles';
 import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
 import PlaylistAddIcon from "@material-ui/icons/PlaylistAdd";
@@ -27,12 +28,17 @@ import SliderEvents2 from './components/Sliders/Slider-Events2'
 import {Context} from "./storage/Store";
 import {familyStyles } from './families';
 import spotifyLogo from './assets/spotify_logo_large.png'
+import songkick_badge_pink from './assets/songkick_badge_pink.png'
 import api from "./api/api";
 import {useReactiveVar} from "@apollo/react-hooks";
 import {GLOBAL_UI_VAR,EVENTS_VAR} from "./storage/withApolloProvider";
 import { StatControl,Control} from "./index";
 import Map from './components/Map';
-
+import EventImageFader from "./components/EventImageFader";
+import OpenInNewIcon from '@material-ui/icons/OpenInNew';
+// import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemAvatar from '@material-ui/core/ListItemAvatar';
+import GenreChipsDumb from './components/chips/GenreChipsDumb.js'
 function ChipsArray_dep(props) {
 	//const classes = useStyles();
 	//todo: implement useStyles
@@ -117,79 +123,6 @@ function EventsList() {
 		return false;
 	};
 
-	//todo: yeah this needed work anyways
-	// function ArtistImageFader(props){
-	//
-	// 	// var urls =  [
-	// 	// 	"http://images.sk-static.com/images/media/profile_images/artists/2406548/huge_avatar",
-	// 	// 	"http://images.sk-static.com/images/media/profile_images/artists/85293/huge_avatar",
-	// 	// 	"http://images.sk-static.com/images/media/profile_images/artists/177426/huge_avatar"
-	// 	// ]
-	// 	var urls = [];
-	// 	for(var x = 0; x < props.item.performance.length;x++){
-    //     var id = props.item.performance[x].artist.artistSongkick_id || props.item.performance[x].artist.id
-	// 		if(id){urls.push("http://images.sk-static.com/images/media/profile_images/artists/" + id  + "/huge_avatar")}
-	// 	}
-	//
-	// 	//todo: prevent white-only default images from returning
-	// 	//basically need to check if the img returned is all white by inspecting pixel colors :(
-	// 	//https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/getImageData
-	// 	//issue now is CORS - could maybe get around this somehow but seems like the source server needs
-	// 	//to allow this, not just me setting headers
-	// 	//https://stackoverflow.com/questions/22097747/how-to-fix-getimagedata-error-the-canvas-has-been-tainted-by-cross-origin-data
-	//
-	// 	//example white image / valid image
-	// 	//http://images.sk-static.com/images/media/profile_images/artists/9392084/huge_avatar
-	// 	//http://images.sk-static.com/images/media/profile_images/artists/93920/huge_avatar
-	//
-	// 	//currently this is returning all 0s which I assume is just b/c it couldn't access anything
-	//
-	// 	// if(props.item.id ===39600437){
-	// 	// 	//console.log("urls",urls);
-	// 	// 	var img = document.createElement('img');img.src = urls[1] + '?' + new Date().getTime();img.id ='9999';
-	// 	// 	//img.setAttribute('crossOrigin', '');
-	// 	// 	img.crossOrigin = "Anonymous";
-	// 	// 	//var img = document.getElementById('9999');
-	// 	// 	var canvas = document.createElement('canvas');
-	// 	// 	canvas.width = img.width;
-	// 	// 	canvas.height = img.height;
-	// 	// 	canvas.getContext('2d').drawImage(img, 0, 0, img.width, img.height);
-	// 	// 	var pixelData = canvas.getContext('2d').getImageData(1, 1, 1, 1).data;
-	// 	// 	console.log("pixelData",pixelData);
-	// 	// }
-	//
-	//
-	// 	// canvas.width = img.width;
-	// 	// canvas.height = img.height;
-	// 	// canvas.getContext('2d').drawImage(img, 0, 0, img.width, img.height);
-	//
-	// 	if(urls.length > 1){
-	// 	const [index, set] = useState(0)
-	// 	const transitions = useTransition(urls[index], item => item, {
-	// 		from: { opacity: 0 },
-	// 		enter: { opacity: 1 },
-	// 		leave: { opacity: 0 },
-	// 		config: config.molasses,
-	// 	})
-	// 	useEffect(() => void setInterval(() => set(state => (state + 1) % urls.length), Math.floor(Math.random() * (5000 -  + 1) + 2000)), [])
-	// 	 // if(props.item.id === 39280906){
-	// 		//console.log("$urls",urls);
-	//
-	// 		return transitions.map(({ item, props, key }) => (
-	// 			<animated.div
-	// 				key={key}
-	// 				class="bg"
-	// 				style={{ ...props, backgroundImage: `url(${item})`,height:"5em",width:"5em" }}
-	// 			/>
-	//
-	// 		))
-	// 	}
-	// 	// }
-	// 	 return <div class="bg" style={{ ...props, backgroundImage: `url(${urls[0]})`,height:"5em",width:"5em" }}/>
-	//
-	//
-	// };
-
 	function showPlay(sub){
 
 		//console.log("$showPlay",sub);
@@ -218,6 +151,7 @@ function EventsList() {
 	useEffect(() => {
 		setName(makeName())
 	}, [control.metro,control.startDate,control.endDate]);
+
 
 	// useEffect(() => {
 	// 		console.log("UPDATING ON SENS SELECT",{control});
@@ -291,8 +225,13 @@ function EventsList() {
 					</form>
 				</div>
 				<div>
-					<SliderEvents defaultValue={0} handleChange={(v) =>{control.setArtistSens(v)}}/>
-					<SliderEvents2 defaultValue={1} handleChange={(v) =>{control.setGenreSens(v)}}/>
+					{/*todo: what a mess
+					1) this needs to be memo'd to stop rerenders caused by handleChange results, but can't find any working examples
+					2) really made a fuckery of the mapping here*/}
+					artistSens {control.artistSens}
+					genreSens {control.genreSens}
+					<SliderEvents map={control.mapArtist} defaultValue={control.rmapArtist[control.artistSens]} handleChange={(v) =>{control.setArtistSens(v)}}/>
+					<SliderEvents2 map={control.map} defaultValue={control.rmap[control.genreSens]} handleChange={(v) =>{control.setGenreSens(v)}}/>
 				</div>
 			</div>
 		)
@@ -353,11 +292,30 @@ function EventsList() {
 		}
 
 	}
-	//
+
+	const whyMatch = (event) =>{
+		//console.log("whyMatch",event);
+		return 'idk'
+	}
+
+	const formatEventName = (subOption) =>{
+		var ret =subOption.displayName.toString().replace(/at.*/,"");
+		if(ret.length > 50){
+			ret = ret.slice(0,50) + " ..."
+		}
+		return ret;
+	}
 
 	// if the menu item doesn't have any child, this method simply returns a clickable menu
 	// item that redirects to any location and if there is no child this method uses recursion to go until
 	// the last level of children and then returns the item by the first condition.
+
+	const openSongkickExt  = (event) =>{
+		window.open(event.uri, '_blank');
+	}
+
+	const [openNew, setOpenNew] = useState({});
+
 	function handler(children,key) {
 
 		// var moment = function(dt,format){
@@ -377,10 +335,12 @@ function EventsList() {
 		return children.map(subOption => {
 			if (!subOption.childrenKey) {
 				return (
+					// <div key={subOption.id} >{subOption.id}</div>
 					<div key={subOption.id}>
 						<ListItemText
 							style={{marginLeft:"2em"}}
 							inset
+							disableTypography
 							primary={ showPlay(subOption)}
 							secondary={
 								<React.Fragment>
@@ -388,10 +348,10 @@ function EventsList() {
 									{/*<div style={{display:"flex"}}>*/}
 									{/*	<div>*/}
 									{/*	</div>*/}
-									{/*	<div>*/}
-									<div>{subOption.id}</div>
-									<ChipsArray familyAgg={subOption.artist.familyAgg} chipData={subOption.artist.genres}>
-									</ChipsArray>
+									{/*	<div>*/}									{/*<div>{subOption.id}</div>*/}
+
+									<GenreChipsDumb familyAgg={subOption.artist.familyAgg} chipData={subOption.artist.genres}>
+									</GenreChipsDumb>
 									{/*	</div>*/}
 									{/*</div>*/}
 
@@ -404,29 +364,107 @@ function EventsList() {
 				);
 			}
 			return (
-				<div key={subOption.id} className={getFamilyClass(subOption)}>
-					<ListItem   button onClick={() => handleClick(subOption.id)}>
-						{unHolyDrill(subOption) && <img src={spotifyLogo} style={{"position":"absolute","left":"52px","top":"2px",zIndex:"100",height:"1em",width:"1em"}} />}
+				<div className={getFamilyClass(subOption)}>
+					{/*<div>ListItem  key={subOption.id}  </div>*/}
+					<ListItem  key={subOption.id}  button onClick={() => handleClick(subOption.id)}>
+						<div style={{marginRight:"5em",marginBottom:"4em"}}>
+							{unHolyDrill(subOption) && <img src={spotifyLogo} style={{"position":"absolute","left":"62px","top":"2px",zIndex:"10",height:"1em",width:"1em"}} />}
+							<EventImageFader item={subOption}/>
+						</div>
 						<ListItemText
-							inset
-							primary={ subOption.displayName.toString().replace(/at.*/,"")}
+							// inset
+							disableTypography
+							primary={ formatEventName(subOption)}
 							secondary={
 								<React.Fragment>
-									{/*<div style={{height:"5em",width:"5em" }}>ArtistImageFader</div>*/}
-									{/*<ArtistImageFader item={subOption}/>*/}
 									<Typography
 										component={'span'}
 										variant="body2"
 										color="textPrimary"
 									>
 
-										{/*https://moment.github.io/luxon/docs/manual/formatting.html*/}
-										{DateTime.fromISO(subOption.start.datetime).toFormat('LLL d')},{'\u00A0'}
-										{DateTime.fromISO(subOption.start.datetime).toFormat('t')}{'\u00A0'}
+										<div style={{display:"flex",justifyContent:"space-between"}}>
+											<div>
+												<div>
+													{/*https://moment.github.io/luxon/docs/manual/formatting.html*/}
+													{DateTime.fromISO(subOption.start.datetime).toFormat('LLL d')},{'\u00A0'}
+													{DateTime.fromISO(subOption.start.datetime).toFormat('t')}{'\u00A0'}
+												</div>
 
-										<span> {subOption.venue.displayName} -
-											<span style={{display:"inline-block"}}>{subOption.location.city.toString().replace(", US","")}</span>
-										</span>
+												<div> {subOption.venue.displayName} -
+													<span style={{display:"inline-block"}}>{subOption.location.city.toString().replace(", US","")}</span>
+												</div>
+											</div>
+
+											{/*todo: space between isn't working like I think it should here
+											so just put the margin here for now*/}
+											{subOption.friends && subOption.friends.length > 0 &&
+											<div style={{display:"flex",justifyContent:"flex-start",marginLeft:"2em"}}>
+												{subOption.friends.map((f,i) =>
+													<div key={i}>
+														<Tooltip title="likes this artist">
+															<img src={f.images[0].url}
+																 style={{width: "50px",borderRadius: "50%"}}/>
+														</Tooltip>
+
+													</div>
+												)}
+											</div>
+											}
+
+
+											<div onClick={() =>{openSongkickExt(subOption)}}
+												 onMouseEnter={() =>{setOpenNew({...openNew,[subOption.id]:!openNew[subOption.id]})}}
+												 onMouseOut={() =>{setOpenNew({})}} className={'songkickExt'}>
+												<img src={songkick_badge_pink} style={{height:"3em",width:"3em"}} />
+												{openNew[subOption.id] && <OpenInNewIcon
+													style={{"fontSize":"1rem","position":"absolute","right":"50px","top":"30px","visibility":openNew[subOption.id] ?'visible':"hidden"}} fontSize={'inherit'}/>}
+											</div>
+
+											<div style={{width:"1em"}}>{'\u00A0'}</div>
+
+
+										</div>
+
+
+										{/*testing: user avatars under songkick linkout*/}
+										{/*<div style={{display:"flex",justifyContent:"space-between"}}>*/}
+										{/*	<div>*/}
+										{/*		<div>*/}
+										{/*			/!*https://moment.github.io/luxon/docs/manual/formatting.html*!/*/}
+										{/*			{DateTime.fromISO(subOption.start.datetime).toFormat('LLL d')},{'\u00A0'}*/}
+										{/*			{DateTime.fromISO(subOption.start.datetime).toFormat('t')}{'\u00A0'}*/}
+										{/*		</div>*/}
+
+										{/*		<div> {subOption.venue.displayName} -*/}
+										{/*			<span style={{display:"inline-block"}}>{subOption.location.city.toString().replace(", US","")}</span>*/}
+										{/*		</div>*/}
+										{/*	</div>*/}
+
+										{/*	<div style={{display:"flex",flexDirection:"column"}}>*/}
+										{/*		<div onClick={() =>{openSongkickExt(subOption)}}*/}
+										{/*			 onMouseEnter={() =>{setOpenNew({...openNew,[subOption.id]:!openNew[subOption.id]})}}*/}
+										{/*			 onMouseOut={() =>{setOpenNew({})}} className={'songkickExt'}>*/}
+										{/*			<img src={songkick_badge_pink} style={{height:"3em",width:"3em"}} />*/}
+										{/*			{openNew[subOption.id] && <OpenInNewIcon*/}
+										{/*				style={{"fontSize":"1rem","position":"absolute","right":"50px","top":"30px","visibility":openNew[subOption.id] ?'visible':"hidden"}} fontSize={'inherit'}/>}*/}
+										{/*		</div>*/}
+										{/*		<div style={{display:"flex",justifyContent:"flex-start"}}>*/}
+										{/*			<div><img src="https://scontent.fmaa10-1.fna.fbcdn.net/v/t1.6435-1/p320x320/44591294_1856692227700100_9156849281271857152_n.jpg?_nc_cat=107&amp;ccb=1-3&amp;_nc_sid=0c64ff&amp;_nc_ohc=fhTFjKhIs4UAX8NP7RA&amp;_nc_ht=scontent.fmaa10-1.fna&amp;tp=6&amp;oh=4a350b25a2558a55755f396503445282&amp;oe=60E0867D"*/}
+										{/*					  style={{width: "50px",borderRadius: "50%"}}/>*/}
+										{/*			</div>*/}
+										{/*			<div><img src="https://scontent.fmaa10-1.fna.fbcdn.net/v/t1.6435-1/p320x320/44591294_1856692227700100_9156849281271857152_n.jpg?_nc_cat=107&amp;ccb=1-3&amp;_nc_sid=0c64ff&amp;_nc_ohc=fhTFjKhIs4UAX8NP7RA&amp;_nc_ht=scontent.fmaa10-1.fna&amp;tp=6&amp;oh=4a350b25a2558a55755f396503445282&amp;oe=60E0867D"*/}
+										{/*					  style={{width: "50px",borderRadius: "50%"}}/>*/}
+										{/*			</div>*/}
+										{/*		</div>*/}
+										{/*		<div style={{width:"1em"}}>{'\u00A0'}</div>*/}
+										{/*	</div>*/}
+
+										{/*</div>*/}
+
+
+
+										{/*<span> | {whyMatch(subOption)}</span>*/}
 									</Typography>
 
 								</React.Fragment>
@@ -434,7 +472,7 @@ function EventsList() {
 						/>
 						{state[subOption.name] ? <ExpandLess /> : <ExpandMore />}
 					</ListItem>
-					<Collapse in={state[subOption.id]} timeout="auto" unmountOnExit>
+					<Collapse key={'single-item-collapse' + subOption.id} in={state[subOption.id]} timeout="auto" unmountOnExit>
 						{handler( subOption[subOption.childrenKey],subOption.childrenKey, ) }
 					</Collapse>
 				</div>
@@ -471,7 +509,6 @@ function EventsList() {
 			{/*</div>*/}
 
 			<div>
-
 				<List>
 					{/*<ListItem button divider key={'stats'} style={{zIndex:10}} onClick={handleClickConfig3}>*/}
 					{/*	Analysis*/}

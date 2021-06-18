@@ -28,7 +28,9 @@ function Main(props) {
 	//todo: even just pulling from params - somehow setting GLOBAL_UI_VAR crashes this????
 	const params = JSON.parse(localStorage.getItem('params'));
 
-	return(params?
+	//console.log("$player",params);
+
+	return(params && props.id ?
 		<SpotifyPlayer token={params.access_token} uris={['spotify:track:' + props.id]} callback={callback} play={props.play} />
 		:<div></div>)
 	//return(<div></div>)

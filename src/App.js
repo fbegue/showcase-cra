@@ -31,7 +31,7 @@ import logo from './assets/sound_found.png'
 import MatTableTreeTest from "./components/MatTableTreeTest";
 import {Tab} from "react-tabify";
 import ContextStats from "./components/ContextStats";
-
+import ControlTest from "./components/ControlTest";
 // import SpotifyWebApi from 'spotify-web-api-js';
 // const spotifyApi = new SpotifyWebApi();
 
@@ -227,6 +227,7 @@ function App(props) {
                             <Profile/>
 
                         </div>
+                        <div><ControlTest/></div>
                         {/*<input value={code} onChange={(event) =>{setCode(event.target.value)}}  />*/}
                         {/*<button onClick={() =>{getAuth(code)}}>fake auth </button>*/}
 
@@ -251,18 +252,21 @@ function App(props) {
                         </Delayed>
 
                     </div>
-                    <div className={gridControl.gridClass}>
+                    {/* className={gridControl.gridClass}*/}
+                    <div className={'defaultGrid'}>
                         {/*style={{width:"40em",height:"30em"}}*/}
-                        <div className="tabs" style={{width:gridControl.gridClass === 'defaultGrid' ? "40em":"20em"}}>
+                        {/*style={{width:gridControl.gridClass === 'defaultGrid' ? "30em":"20em"}}*/}
+                        <div className="tabs" style={{width:gridControl.gridClass === 'defaultGrid' ? "44em":"30em"}} >
                             {globalUI.access_token &&
                             <Tabify></Tabify>
                             }
                         </div>
                         {/*style={{width:"70em"}}*/}
-                        <div className="stats" >
-                            <Stats/>
+                        <div className="stats" style={{minWidth:"40em"}} >
+                           <Stats/>
                         </div>
                         <div className="tiles" >
+                            {/*testing:*/}
                             <ContextStats/>
                         </div>
                         <div className="events">

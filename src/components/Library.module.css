@@ -1,0 +1,56 @@
+.list {
+  position: relative;
+  width: 65vw;
+  max-width: 100%;
+/*note: without an explicit height on the list, whole component won't take up room properly*/
+/*  couldn't put it here tho? lol def something fragile here..*/
+  height: 100%;
+/*  height: 10em;*/
+  margin: 0 auto;
+}
+
+.card {
+  position: absolute;
+  will-change: transform, height, opacity;
+  /*width: 100%;*/
+}
+
+.cell {
+  position: relative;
+  background-size: cover;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  text-transform: uppercase;
+  font-size: 10px;
+  line-height: 10px;
+  padding: 15px;
+}
+
+.details {
+  position: relative;
+  bottom: 0px;
+  left: 0px;
+  /*testing: needed actual height/width for background-image to work */
+  width: 150px;
+  height: 150px;
+  /*width: 100%;*/
+  /*height: 100%;*/
+  border-radius: 5px;
+  box-shadow: 0px 10px 25px -10px rgba(0, 0, 0, 0.2);
+}
+
+
+
+/*testing: can't exactly change which one is being faded from here
+guess you could try and use css-vars ...*/
+
+/*.details::before {*/
+/*  content: "";*/
+/*  position: absolute;*/
+/*  top: 0px;*/
+/*  right: 0px;*/
+/*  bottom: 0px;*/
+/*  left: 0px;*/
+/*  background-color: rgba(0,0,0,0.25);*/
+/*}*/

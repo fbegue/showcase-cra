@@ -54,11 +54,17 @@ function useControl(initialState = 0) {
 
     }
 
-    let [genreSens, setGenreSens] = useState('families');
-    let [artistSens, setArtistSens] = useState('artists');
-
-
-    return { play,id, togglePlay, setId,metro,selectMetro,startDate,endDate,setStartDate,setEndDate,genreSens, setGenreSens,artistSens, setArtistSens}
+    let [genreSens, setGenreSens] = useState('related');
+    let [artistSens, setArtistSens] = useState('off');
+    let [dataLoaded, setDataLoaded] = useState(false);
+    let map = {0:"selected",1:"exact",2:"related"}
+    let rmap = {"selected":0,"exact":1,"related":2}
+    let mapArtist = {0:"exact",1:"off",2:"related"}
+    let rmapArtist = {"exact":0,"off":1,"related":2}
+    return { play,id, togglePlay, setId,metro,selectMetro,
+        startDate,endDate,setStartDate,setEndDate,
+        genreSens,setGenreSens, artistSens, setArtistSens,map,rmap,mapArtist,rmapArtist,
+        dataLoaded,setDataLoaded}
 }
 
 
@@ -77,14 +83,15 @@ let Highlighter  = createContainer(useHighlighter);
 var paneSettings = {default:{tabs:"30em",stats:"60em"},friends:{tabs:"20em",stats:"70em"}}
 function usePane(initialState = 0) {
     // let [pane, setPane] = useState(paneSettings['default'] );
-     let [pane, setPane] = useState(paneSettings['friends'] );
+    let [pane, setPane] = useState(paneSettings['friends'] );
 
     return { pane,setPane,paneSettings}
 }
 let PaneControl  = createContainer(usePane);
 
 function useGrid(initialState = 0) {
-    const [gridClass, setGridClass] = useState('defaultGrid');
+     const [gridClass, setGridClass] = useState('defaultGrid');
+    // const [gridClass, setGridClass] = useState('friendsGrid');
     return { gridClass,setGridClass}
 }
 let GridControl  = createContainer(useGrid);
@@ -92,13 +99,27 @@ let GridControl  = createContainer(useGrid);
 
 function useStats(initialState = 0) {
     //note: stats is really tracking active tab...
+
+    //testing: change default page
+    //todo: needs to set artists_saved on login - not page load = triggers util to soon
+    // let [stats, setStats] = useState({name:"Home"});
+    //  let [stats, setStats] = useState({name:"artists_saved"});
     let [stats, setStats] = useState({name:"Home"});
     //the default true is context
     const [mode, setMode] = useState(true);
-    return { stats,setStats,mode,setMode }
+    //the default true is pie
+    const [chart, setChart] = useState(true);
+    return { stats,setStats,mode,setMode,chart,setChart }
 }
 let StatControl  = createContainer(useStats);
 
+function useTabs(initialState = 0) {
+    // const [section, setActiveSection] = useState(1);
+    const [section, setActiveSection] = useState(2);
+    const [tab, setActiveTab] = useState(0);
+    return { tab,setActiveTab,section,setActiveSection }
+}
+let TabControl  = createContainer(useTabs);
 
 function useFriends(initialState = 0) {
     //testing:
@@ -110,10 +131,14 @@ function useFriends(initialState = 0) {
     let [guest, setGuest] = useState({id:123028477,name:"Dan"});
     //user,guest,shared,all
     let [compare, setCompare] = useState('all');
-    let [families, setFamilies] = useState(['all']);
+    let [families, setFamilies] = useState([]);
+    let [genres, setGenres] = useState([]);
     let [selectedTabIndex, setTabIndex] = React.useState(1);
     let [sourceFilter, setSourceFilter] = React.useState('both');
-    return { guest,setGuest,compare,setCompare,families, setFamilies,selectedTabIndex,setTabIndex,sourceFilter,setSourceFilter}
+
+
+    return { guest,setGuest,compare,setCompare,families, setFamilies,genres,setGenres,
+        selectedTabIndex,setTabIndex,sourceFilter,setSourceFilter}
 }
 
 let FriendsControl  = createContainer(useFriends);
@@ -121,22 +146,24 @@ let FriendsControl  = createContainer(useFriends);
 
 const rootElement = document.getElementById("root");
 ReactDOM.render(
-        <Control.Provider>
-            <Highlighter.Provider>
-                <StatControl.Provider>
-                    <FriendsControl.Provider>
-                        <GridControl.Provider>
-                        <App />
-                        </GridControl.Provider>
-                    </FriendsControl.Provider>
-                </StatControl.Provider>
-            </Highlighter.Provider>
-        </Control.Provider>,
+    <Control.Provider>
+        <Highlighter.Provider>
+            <StatControl.Provider>
+                <FriendsControl.Provider>
+                    <GridControl.Provider>
+                        <TabControl.Provider>
+                            <App />
+                        </TabControl.Provider>
+                    </GridControl.Provider>
+                </FriendsControl.Provider>
+            </StatControl.Provider>
+        </Highlighter.Provider>
+    </Control.Provider>,
     rootElement
 );
 
 export{
-    Control,Highlighter,StatControl,FriendsControl,PaneControl,GridControl
+    Control,Highlighter,StatControl,FriendsControl,PaneControl,GridControl,TabControl
 }
 
 //=====================================================

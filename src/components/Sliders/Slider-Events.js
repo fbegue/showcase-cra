@@ -38,23 +38,28 @@ export default function DiscreteSlider(props) {
 		{
 			value: 1,
 			label: <Tooltip  enterTouchDelay={0} placement="top" title={''}>
+				<span>Off</span>
+			</Tooltip>
+		},
+		{
+			value: 2,
+			label: <Tooltip  enterTouchDelay={0} placement="top" title={''}>
 				<span>Related Artists</span>
 			</Tooltip>
 		}
 	];
 
-	const map = {0:"artists",1:"related"}
+
 	const classes = useStyles();
 	return (
 		<div className={classes.root}>
 			<Slider
-				// defaultValue={1}
 				defaultValue={props.defaultValue}
 				min={0}
-				max={1}
+				max={2}
 				marks={marks}
 				// ValueLabelComponent={ValueLabelComponent}
-				onChange={(e,v) =>{props.handleChange(map[v])}}
+				onChange={(e,v) =>{props.handleChange(props.map[v])}}
 			/>
 		</div>
 	);

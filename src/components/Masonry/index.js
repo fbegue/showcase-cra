@@ -5,7 +5,7 @@ import shuffle from 'lodash/shuffle'
 import useMeasure from './useMeasure'
 import useMedia from './useMedia'
 import data from './data'
-import './styles.css'
+//import './styles.css'
 
 function App() {
   // Hook1: Tie media queries to the number of columns

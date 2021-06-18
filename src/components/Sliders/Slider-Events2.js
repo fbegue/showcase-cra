@@ -22,29 +22,33 @@ export default function DiscreteSlider(props) {
 		{
 			value: 0,
 			label: <Tooltip  enterTouchDelay={0} placement="top" title={''}>
-				<span>Exact Genres</span>
+				<span>Selected</span>
 			</Tooltip>
 		},
 		{
 			value: 1,
 			label: <Tooltip  enterTouchDelay={0} placement="top" title={''}>
-				<span>Related Genres</span>
+				<span>Exact</span>
+			</Tooltip>
+		},
+		{
+			value: 2,
+			label: <Tooltip  enterTouchDelay={0} placement="top" title={''}>
+				<span>Related</span>
 			</Tooltip>
 		}
 	];
 
-	const map = {0:"genres",1:"families"}
 	const classes = useStyles();
 	return (
 		<div className={classes.root}>
 			<Slider
-				// defaultValue={1}
 				defaultValue={props.defaultValue}
 				min={0}
-				max={1}
+				max={2}
 				marks={marks}
 				// ValueLabelComponent={ValueLabelComponent}
-				onChange={(e,v) =>{props.handleChange(map[v])}}
+				onChange={(e,v) =>{props.handleChange(props.map[v])}}
 			/>
 		</div>
 	);

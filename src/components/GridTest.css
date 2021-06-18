@@ -23,10 +23,11 @@
 }
 
 .events {
+    background: green;
     grid-area: events;
 }
 
 .stats {
-    background: #54a3ff;
+    background: green;
     grid-area: stats;
 }
