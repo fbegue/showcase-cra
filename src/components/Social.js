@@ -100,6 +100,7 @@ function Social(props) {
 			})
 	}
 	useEffect(()=>{
+		//testing:
 		setStatic();
 	},[])
 
@@ -288,7 +289,8 @@ function Social(props) {
 					<BackdropParent defaultContent={
 
 						<div style={{display:"flex",flexDirection:"row"}}>
-							<div style={{display:"flex", flexWrap:"wrap",width:"480px"}}>
+							{/*	//	todo: why was this 480px? it covers stats panel beside it*/}
+							<div style={{display:"flex", flexWrap:"wrap",width:"13em"}}>
 								<FriendsDisplay onClick={selectUser} users={globalState['spotifyusers'].filter(myFriendsFilter)}/>
 							</div>
 						</div>

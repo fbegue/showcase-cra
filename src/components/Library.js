@@ -470,7 +470,7 @@ function Library() {
 	const showInitState = {0:false,1:false,2:false,3:false,4:false}
 	const [show, setShow] = useState(showInitState);
 	const showInfo = (index,mode) =>{
-		console.log("showInfo");
+		//console.log("showInfo");
 		var _s = JSON.parse(JSON.stringify(showInitState))
 		_s[index] = mode
 		setShow(_s)
@@ -488,6 +488,7 @@ function Library() {
 					//marginTop:index+"em"
 					<animated.div className={styles.card} style={{...style}} >
 						<div className={styles.cell} >
+							{/*todo: what was this showInfo? just me testin stuff?*/}
 							<div className={'detailsFade'} onMouseEnter={() =>{showInfo(index,true)}} onMouseLeave={() =>{showInfo(index,false)}}/>
 							<div className={styles.details}
 								 style={{ backgroundImage: `url(${item.images[0].url})`, backgroundSize: "cover",

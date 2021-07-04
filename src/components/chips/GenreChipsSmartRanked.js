@@ -127,52 +127,41 @@ export default function GenreChipsSmart(props) {
 
 	//---------------------------------------------------------------------
 
-	const [chipData, setChipData] = React.useState(props.chipData);
-	//console.log("$chip",props.chipData);
-
-	//note: didn't think this would work in place b/c of state? hmph
-	chipData.sort( (e1,e2) =>{
-		var ret = 0;
-		e2.family_name === props.familyAgg ? ret=1:ret= -1;
-		return ret;
-	})
+	//const [chipData, setChipData] = React.useState(props.chipData);
+	console.log("$chip",props.chipData);
 
 	//console.log(classes.colorPrimary);
 	//console.log(typeof chipData[0].name);
 
 	//leaving as example on how to interact with later
-	const handleDelete = chipToDelete => () => {
-		setChipData(chips => chips.filter(chip => chip.key !== chipToDelete.key));
-	};
+	// const handleDelete = chipToDelete => () => {
+	// 	setChipData(chips => chips.filter(chip => chip.key !== chipToDelete.key));
+	// };
 
+	//note: limit # of chips to show
+	var toMap = props.chipData ? props.chipData.slice(0,5):[]
+	console.log("$toMap",toMap);
 
-
-	//testing: limit # of show genre chips
-	var toMap = chipData;
-	if(props.limit){
-		toMap = chipData.slice(0,3)
-	}
 	return (
-
 		//maxWidth:"40em"
 		<div style={{"display":"flex","flexDirection":"row","flexWrap":"wrap"}}>
 			{toMap.map(data =>
 					<Chip
 						clickable={true}
-						key={data.id}
+						key={data.genre.id}
 						// icon={icon}
-						label={data.name}
+						label={data.genre.name + " (" + data.occurred.toString() + ")"}
 						onClick={handleClick}
-						value={data.name}
+						value={data}
 						className={classes.chip}
 						color="primary"
-						variant={getVariant(data)}
+						variant={getVariant(data.genre)}
 						classes={{
 							//root: classes.root,
 							//todo: non-genred events catch
 							// colorPrimary:data.name?getClass(data):'default'
-							colorPrimary:getClass(data),
-							outlinedPrimary:getClass(data),
+							colorPrimary:getClass(data.genre),
+							outlinedPrimary:getClass(data.genre),
 							//note: again really not fucking understanding this lol
 							//colorPrimary:classes.colorPrimary
 							//colorPrimary:getColor()

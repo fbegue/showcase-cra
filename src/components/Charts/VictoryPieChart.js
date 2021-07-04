@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {VictoryLabel, VictoryPie,VictoryContainer} from "victory";
 import {familyColors} from "../../families";
 import { Highlighter} from "../../index";
@@ -7,6 +7,11 @@ function VictoryPieChart(props) {
 
 	const [families, selectFamilies] = useState([]);
 	let highlighter = Highlighter.useContainer();
+
+	useEffect(() => {
+		console.log("$! VictoryPieChart | componentDidMount");
+	});
+
 
 	// const getLabel = (datum) =>{
 	// 	return datum.x

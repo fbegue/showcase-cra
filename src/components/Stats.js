@@ -8,10 +8,12 @@ import PieChartIcon from "@material-ui/icons/PieChart";
 import CloudIcon from "@material-ui/icons/Cloud";
 import Divider from '@material-ui/core/Divider';
 import {families as systemFamilies,familyColors} from '../families'
-import {Control, FriendsControl, Highlighter, StatControl,GridControl} from "../index";
+import {Control, FriendsControl, TabControl, StatControl,GridControl} from "../index";
 import util from "../util/util";
 import PieGenreChips from "./chips/PieGenreChips";
 import PieChart from "./Charts/PieChart";
+import VictoryPieChart from "./Charts/VictoryPieChart";
+import TestComp from "./TestComp"
 
 //todo: update spring list implementation
 // import GenresDisplayVertical from "./GenresDisplayVertical";
@@ -123,7 +125,7 @@ function Stats(props) {
 	let friendscontrol = FriendsControl.useContainer()
 	let gridControl = GridControl.useContainer();
 
-	//let control = Control.useContainer();
+
 	const chipFamilies = useReactiveVar(CHIPFAMILIES);
 	const chipGenres = useReactiveVar(CHIPGENRES);
 
@@ -195,6 +197,12 @@ function Stats(props) {
 
 	const {bubbleData,pieData,genres} = util.useProduceData()
 
+
+	//console.log("Stats | pieData update",pieData);
+	//testing:
+	//pieData.forEach((d ,i)=>{d.id=i++})
+
+
 	//testing:
 	util.useProduceEvents()
 	//const bubbleData = [];const pieData = [];const genres = []
@@ -207,87 +215,20 @@ function Stats(props) {
 
 
 
+	//------------------------------------------------------
 
-	let bubbleOptions = {
-		//pixels or percentage for height (no em)
-		//also have the option of just letting it constrain to a container element
-		//todo: make dynamic based on content?
-		//ehh I guess everything is pretty interesting lol...
-		chart:{
-			height:300,
-			width:700
-		},
-		tooltip: {
-			useHTML: true,
-			pointFormat: '<b>{point.name}:</b> {point.value}'
-		},
-		legend:{
-			//layout (horizonal, vert, proximate)
-			//itemHoverStyle
-			//symbols
-			//use HTML
-			floating:true,
-			enabled:false
-		},
-		plotOptions: {
-			packedbubble: {
-				minSize: "20%",
-				maxSize: "100%",
-				zMin: 0,
-				zMax: 100,
-				layoutAlgorithm: {
-					gravitationalConstant: 0.05,
-					splitSeries: true,
-					seriesInteraction: false,
-					dragBetweenSeries: true,
-					parentNodeLimit: true
-				},
-				dataLabels: {
-					enabled: true,
-					format: "{point.name}",
-					filter: {
-						property: "y",
-						operator: ">",
-						value: 250
-					},
-					style: {
-						color: "black",
-						textOutline: "none",
-						fontWeight: "normal"
-					}
-				}
-			}
-		},
-		// series:props.data,
-		credits: {
-			enabled: false
-		},
-		// series: [
-		// 	{
-		// 		type: "packedbubble",
-		// 		data: [{name:"1",value:1},{name:"2",value:2}]
-		// 	},
-		// 	{
-		// 		type: "packedbubble",
-		// 		color:"blue",
-		// 		data: [{name:"1",value:1,color:"lightblue"},{name:"2",value:2}]
-		// 	}
-		// ]
-	};
 	let bubbleOptionsGuest = {
+		title:{text:""},
+		loading:{showDuration:100,hideDuration:100},
 		chart:{
 			height:300,
-			width:600
+			width:600,
 		},
 		tooltip: {
 			useHTML: true,
 			pointFormat: '<b>{point.name}:</b> {point.value}'
 		},
 		legend:{
-			//layout (horizonal, vert, proximate)
-			//itemHoverStyle
-			//symbols
-			//use HTML
 			floating:true,
 			enabled:false
 		},
@@ -303,8 +244,16 @@ function Stats(props) {
 					gravitationalConstant: 0.05,
 					splitSeries: true,
 					seriesInteraction: false,
-					dragBetweenSeries: true,
-					parentNodeLimit: true
+					dragBetweenSeries: false,
+					parentNodeLimit: true,
+					//note: disables force simulation (so all animation)
+					//somehow disabling is more taxing on the system then not??
+					enableSimulation:true
+				},
+				animationLimit:1,
+				animation: {
+					duration: 1,
+					defer:1000000000
 				},
 				dataLabels: {
 					enabled: true,
@@ -320,9 +269,9 @@ function Stats(props) {
 						fontWeight: "normal"
 					}
 				}
-			}
+			},
+			series:{animation:false}
 		},
-		// series:props.data,
 		credits: {
 			enabled: false
 		},
@@ -343,6 +292,22 @@ function Stats(props) {
 		console.log("$globalstate",globalState);
 		console.log("$globalUI",globalUI);
 	}
+
+	let tabcontrol = TabControl.useContainer();
+
+	//testing:
+	const { data:bubbleData2} = util.useTestBubbles()
+	//console.log("Stats | bubbleData2",bubbleData2);
+
+	function setbubble(){
+		console.log("setbubble");
+		const rndInt = Math.floor(Math.random() * 99999) + 1
+		tabcontrol.setData('data' + rndInt)
+	}
+
+
+	//------------------------------------------------------
+
 
 	//todo: move this somewhere where I have access to all of them?
 	//can't remember exactly how just observing the values affects it re-mounting on change
@@ -384,6 +349,11 @@ function Stats(props) {
 
 
 
+	const getPointSum = (data) =>{
+		var t=0;
+		data.forEach(s =>{t = t + s.data.length})
+		return t
+	}
 	return(
 
 		<div style={{position:"relative"}}>
@@ -392,6 +362,7 @@ function Stats(props) {
 				<button  onClick={() =>{statcontrol.setMode(!statcontrol.mode)}}>{statcontrol.mode ===  true? 'Context':'Custom'}
 				</button>
 				<button onClick={checkState}>checkState</button>
+				<button onClick={setbubble}>setbubble</button>
 				{/*<button onClick={checkProviders}>checkProviders</button>*/}
 				{/*<button  onClick={() =>{friendscontrol.setCompare(!friendscontrol.compare)}}>{friendscontrol.compare ===  true? 'Both':'Difference'}</button>*/}
 				<RedoIcon fontSize={'small'}/>
@@ -403,85 +374,89 @@ function Stats(props) {
 			<div style={{display:"flex"}} >
 				{/*<div style={{flexGrow:"1"}}></div>*/}
 				{/*style={{display:"flex",flexDirection:"column"}} */}
-						{/*style={{top: "-4em",position: "relative",height: "21em",zIndex:1}}*/}
-						<div >
-							{/*options={{legend:legend}}*/}
-							<div style={{display:"flex"}} className={gridControl.gridClass === 'friendsGrid' ? 'fadeIn':'fadeOut'}>
-								{/*{statcontrol.stats.name === 'friends' &&*/}
-								<div style={{padding:"5px"}}> <BubbleFamilyGenreChips families={chipFamilies} genreArtist={chipGenres} flexDirection={'column'}/></div>
-								<div>
-									<BubbleChart  options={{...bubbleOptionsGuest,series:bubbleData}}/>
-								</div>
-
-								<div style={{zIndex:2,padding:"5px"}}>
-									<div style={{display:"flex"}}>
-										{/*<VennChart data={vennData}/>*/}
-										<div>
-											<FormControl component="fieldset">
-												{/*<FormLabel component="legend">Gender</FormLabel>*/}
-												<RadioGroup  name="radio1" value={friendscontrol.compare} onChange={handleChange}>
-													<FormControlLabel value="all" control={<Radio />} label="All" />
-													<FormControlLabel value="shared" control={<Radio />} label="Shared" />
-													<FormControlLabel value="user" control={<Radio />} label="User" />
-													<FormControlLabel value="guest" control={<Radio />} label="Guest" />
-												</RadioGroup>
-											</FormControl>
-
-											<Divider />
-											{/*note: sourceFilter doesn't make sense unless we're tracks,artists*/}
-											{/*todo: although it would be cool to do playlists = [followed,created]*/}
-											{(friendscontrol.selectedTabIndex === 1 || friendscontrol.selectedTabIndex === 1) &&
-											<FormControl component="fieldset">
-												<RadioGroup  name="radio1" value={friendscontrol.sourceFilter} onChange={handleChange2}>
-													<FormControlLabel value="both" control={<Radio />} label="Both" />
-													<FormControlLabel value="saved" control={<Radio />} label="Saved" />
-													<FormControlLabel value="top" control={<Radio />} label="Top" />
-												</RadioGroup>
-											</FormControl>
-											}
-
-										</div>
-										{/*<div>*/}
-										{/*	<Select*/}
-										{/*		multiple*/}
-										{/*		native*/}
-										{/*		value={friendscontrol.families}*/}
-										{/*		onChange={handleChangeMultiple}*/}
-										{/*		inputProps={{*/}
-										{/*			id: 'select-multiple-native',*/}
-										{/*		}}*/}
-										{/*	>*/}
-										{/*		<option key={'all'} value={'all'}>all</option>*/}
-										{/*		{systemFamilies.map((name) => (*/}
-										{/*			<option key={name} value={name}>{name}</option>*/}
-										{/*		))}*/}
-
-										{/*	</Select>*/}
-										{/*</div>*/}
-
-									</div>
-								</div>
-								{/*testing: disabled solo user bubble chart*/}
-								{/*{statcontrol.stats.name !== 'friends' &&*/}
-								{/*<BubbleChart  options={{...bubbleOptions,series:bubbleData}}/>*/}
-								{/*}*/}
-							</div>
-							<div className={gridControl.gridClass === 'defaultGrid' ? 'fadeIn':'fadeOut'}>
-								<PieChart  data={{series: {name: 'Genres', colorByPoint: true, data:pieData}}} />
-								<PieGenreChips families={chipFamilies} genreArtist={chipGenres}/>
-							</div>
+				{/*style={{top: "-4em",position: "relative",height: "21em",zIndex:1}}*/}
+				<div >
+					{/*options={{legend:legend}}*/}
+					<div style={{display:"flex"}} className={gridControl.gridClass === 'friendsGrid' ? 'fadeIn':'fadeOut'}>
+						{/*{statcontrol.stats.name === 'friends' &&*/}
+						{/*todo: stop infopanel from hogging this space*/}
+						<div style={{padding:"5px",zIndex:"5"}}>
+							<BubbleFamilyGenreChips families={chipFamilies} genres={chipGenres} flexDirection={'column'}/>
+						<div>{getPointSum(bubbleData)}</div></div>
+						<div>
+							<BubbleChart  options={{...bubbleOptionsGuest,series:bubbleData}}/>
 						</div>
 
-						{/*<div><TestTiles /></div>*/}
+						<div style={{zIndex:2,padding:"5px"}}>
+							<div style={{display:"flex"}}>
+								{/*<VennChart data={vennData}/>*/}
+								<div>
+									<FormControl component="fieldset">
+										{/*<FormLabel component="legend">Gender</FormLabel>*/}
+										<RadioGroup  name="radio1" value={friendscontrol.compare} onChange={handleChange}>
+											<FormControlLabel value="all" control={<Radio />} label="All" />
+											<FormControlLabel value="shared" control={<Radio />} label="Shared" />
+											<FormControlLabel value="user" control={<Radio />} label="User" />
+											<FormControlLabel value="guest" control={<Radio />} label="Guest" />
+										</RadioGroup>
+									</FormControl>
+
+									<Divider />
+									{/*note: sourceFilter doesn't make sense unless we're tracks,artists*/}
+									{/*todo: although it would be cool to do playlists = [followed,created]*/}
+									{(friendscontrol.selectedTabIndex === 1 || friendscontrol.selectedTabIndex === 1) &&
+									<FormControl component="fieldset">
+										<RadioGroup  name="radio1" value={friendscontrol.sourceFilter} onChange={handleChange2}>
+											<FormControlLabel value="both" control={<Radio />} label="Both" />
+											<FormControlLabel value="saved" control={<Radio />} label="Saved" />
+											<FormControlLabel value="top" control={<Radio />} label="Top" />
+										</RadioGroup>
+									</FormControl>
+									}
+
+								</div>
+								{/*<div>*/}
+								{/*	<Select*/}
+								{/*		multiple*/}
+								{/*		native*/}
+								{/*		value={friendscontrol.families}*/}
+								{/*		onChange={handleChangeMultiple}*/}
+								{/*		inputProps={{*/}
+								{/*			id: 'select-multiple-native',*/}
+								{/*		}}*/}
+								{/*	>*/}
+								{/*		<option key={'all'} value={'all'}>all</option>*/}
+								{/*		{systemFamilies.map((name) => (*/}
+								{/*			<option key={name} value={name}>{name}</option>*/}
+								{/*		))}*/}
+
+								{/*	</Select>*/}
+								{/*</div>*/}
+
+							</div>
+						</div>
+						{/*testing: disabled solo user bubble chart*/}
+						{/*{statcontrol.stats.name !== 'friends' &&*/}
+						{/*<BubbleChart  options={{...bubbleOptions,series:bubbleData}}/>*/}
+						{/*}*/}
+					</div>
+					<div className={gridControl.gridClass === 'defaultGrid' ? 'fadeIn':'fadeOut'} style={{"display":"flex","overflowY":"scroll","height":"24em"}}>
+						<div><PieChart data={{series: {name: 'Genres', colorByPoint: true, data:pieData, animation: {duration: 2000}}}} />
+						</div>
+						<div><PieGenreChips families={chipFamilies} genres={chipGenres}/> </div>
+					</div>
+				</div>
+
+				{/*<div><TestTiles /></div>*/}
 
 
 
-					{/*testing: disable node display, genres*/}
-					{/*<div style={{right:"5em",position: "relative"}}><NodeDisplay/> </div>*/}
-					{/*<div style={{right:"5em",position: "relative"}}>*/}
-					{/*	/!*<GenresDisplayVertical genres={genres}/> *!/*/}
-					{/*<div>GenresDisplayVertical</div>*/}
-					{/*</div>*/}
+				{/*testing: disable node display, genres*/}
+				{/*<div style={{right:"5em",position: "relative"}}><NodeDisplay/> </div>*/}
+				{/*<div style={{right:"5em",position: "relative"}}>*/}
+				{/*	/!*<GenresDisplayVertical genres={genres}/> *!/*/}
+				{/*<div>GenresDisplayVertical</div>*/}
+				{/*</div>*/}
 			</div>
 		</div>
 	)

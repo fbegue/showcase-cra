@@ -243,20 +243,23 @@ function App(props) {
                         {/*}*/}
 
                         {/*todo: forcing delay until I can figure it out*/}
-                        <Delayed waitBeforeShow={2000}>
+
+                        {/*<Delayed waitBeforeShow={2000}>*/}
                             {globalUI.access_token  &&
                             <div style={control.play ? {opacity:1,flexGrow:2}: {opacity:.4,flexGrow:2}}>
                                 <Player token={globalUI.access_token} id={control.id} play={control.play}/>
                             </div>
                             }
-                        </Delayed>
+                        {/*</Delayed>*/}
 
                     </div>
                     {/* className={gridControl.gridClass}*/}
                     <div className={'defaultGrid'}>
-                        {/*style={{width:"40em",height:"30em"}}*/}
-                        {/*style={{width:gridControl.gridClass === 'defaultGrid' ? "30em":"20em"}}*/}
-                        <div className="tabs" style={{width:gridControl.gridClass === 'defaultGrid' ? "44em":"30em"}} >
+
+                        {/*testing: messed up width of tabs and stats, so disabled this transition for now */}
+                        {/*- is this gridClass changing here affecting responsive collapsing?*/}
+                        {/*<div className="tabs" style={{width:gridControl.gridClass === 'defaultGrid' ? "44em":"35em"}} >*/}
+                        <div className="tabs">
                             {globalUI.access_token &&
                             <Tabify></Tabify>
                             }
@@ -269,7 +272,7 @@ function App(props) {
                             {/*testing:*/}
                             <ContextStats/>
                         </div>
-                        <div className="events">
+                        <div className="events" style={{minWidth:"30em"}}>
                             <EventsList data={[]} />
                         </div>
                     </div>

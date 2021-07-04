@@ -25,7 +25,7 @@ function PieGenreChips(props) {
 	let friendscontrol = FriendsControl.useContainer()
 	let control = Control.useContainer()
 
-	console.log("PieFamilies",props);
+	//console.log("PieFamilies",props);
 
 	const makeStyle = (fam,which) =>{
 
@@ -69,15 +69,20 @@ function PieGenreChips(props) {
 
 	//todo: have to reconstuct genre artist here
 	// because the complex genreArtist object produced by genreArtist does NOT include fully qualified genres
-	for (var k in props.genreArtist){
-		var famOfArtistFromGenre = props.genreArtist[k][0].familyAgg;
-		if(toMap.indexOf(famOfArtistFromGenre) !== -1 && friendscontrol.families.indexOf(famOfArtistFromGenre) !== -1 ){_genres.push({name:k,family:famOfArtistFromGenre})}
-	}
+	// for (var k in props.genreArtist){
+	// 	var famOfArtistFromGenre = props.genreArtist[k][0].familyAgg;
+	// 	if(toMap.indexOf(famOfArtistFromGenre) !== -1 && friendscontrol.families.indexOf(famOfArtistFromGenre) !== -1 ){_genres.push({name:k,family:famOfArtistFromGenre})}
+	// }
 
-	console.log("_genres",_genres);
+	props.genres.forEach(g =>{
+		if(toMap.indexOf(g.family_name) !== -1 && friendscontrol.families.indexOf(g.family_name) !== -1 ){_genres.push(g)}
+	})
+
+
+	//console.log("_genres",_genres);
 	var initGColorState = {};
 	_genres.forEach(gOb =>{
-		map2[gOb.name] = {default: makeStyle(gOb.family,'default'),clicked:makeStyle(gOb.family,'clicked') }
+		map2[gOb.name] = {default: makeStyle(gOb.family_name,'default'),clicked:makeStyle(gOb.family_name,'clicked') }
 	})
 	_genres.forEach(gOb =>{
 		initGColorState[gOb.name] = map2[gOb.name]['default']
@@ -130,11 +135,12 @@ function PieGenreChips(props) {
 	const handleGClick = (gOb) => {
 
 		console.log(handleGClick);
-		if(!(friendscontrol.genres.includes(gOb.name))){
-			setGColor({ ...gcolor, [gOb.name]: map[gOb.family]["clicked"] });
-			friendscontrol.setGenres((prevState => {return [...prevState,gOb.name] }));
+		//testing: includes works?
+		if(!(friendscontrol.genres.includes(gOb))){
+			setGColor({ ...gcolor, [gOb.name]: map[gOb.family_name]["clicked"] });
+			friendscontrol.setGenres((prevState => {return [...prevState,gOb] }));
 		}else{
-			setGColor({ ...gcolor, [gOb.name]: map[gOb.family]["default"] });
+			setGColor({ ...gcolor, [gOb.name]: map[gOb.family_name]["default"] });
 			//var newval  = prevState.filter(r =>{return r !== gOb.name});
 			friendscontrol.setGenres((prevState => {return prevState.filter(r =>{return r !== gOb.name}) }));
 		}

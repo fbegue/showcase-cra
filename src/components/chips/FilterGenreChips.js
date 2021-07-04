@@ -25,7 +25,7 @@ function FilterGenreChips(props) {
 	let friendscontrol = FriendsControl.useContainer()
 	let control = Control.useContainer()
 
-	console.log("PieFamilies",props);
+	console.log("FilterGenreChips",props);
 
 	const makeStyle = (fam,which) =>{
 
@@ -79,7 +79,7 @@ function FilterGenreChips(props) {
 	//console.log("_genres",_genres);
 	var initGColorState = {};
 	props.genres.forEach(gOb =>{
-		map2[gOb.name] = {default: makeStyle(gOb.family,'default'),clicked:makeStyle(gOb.family,'clicked') }
+		map2[gOb.name] = {default: makeStyle(gOb.family_name,'default'),clicked:makeStyle(gOb.family_name,'clicked') }
 	})
 	props.genres.forEach(gOb =>{
 		initGColorState[gOb.name] = map2[gOb.name]['default']
@@ -133,10 +133,10 @@ function FilterGenreChips(props) {
 
 		console.log(handleGClick);
 		if(!(friendscontrol.genres.includes(gOb.name))){
-			setGColor({ ...gcolor, [gOb.name]: map[gOb.family]["clicked"] });
+			setGColor({ ...gcolor, [gOb.name]: map[gOb.family_name]["clicked"] });
 			friendscontrol.setGenres((prevState => {return [...prevState,gOb.name] }));
 		}else{
-			setGColor({ ...gcolor, [gOb.name]: map[gOb.family]["default"] });
+			setGColor({ ...gcolor, [gOb.name]: map[gOb.family_name]["default"] });
 			//var newval  = prevState.filter(r =>{return r !== gOb.name});
 			friendscontrol.setGenres((prevState => {return prevState.filter(r =>{return r !== gOb.name}) }));
 		}

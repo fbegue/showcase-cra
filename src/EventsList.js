@@ -20,6 +20,7 @@ import Paper from '@material-ui/core/Paper';
 import MusicNoteIcon from '@material-ui/icons/MusicNote';
 import { makeStyles } from '@material-ui/core/styles';
 import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
+import PauseCircleOutlineIcon from '@material-ui/icons/PauseCircleOutline';
 import PlaylistAddIcon from "@material-ui/icons/PlaylistAdd";
 import Button from '@material-ui/core/Button';
 import { useTransition, animated, config } from 'react-spring'
@@ -81,7 +82,7 @@ const useStyles = makeStyles({
 
 	},
 });
-
+var oldId = null;
 const useStylesFamilies = makeStyles(familyStyles);
 
 function EventsList() {
@@ -98,11 +99,28 @@ function EventsList() {
 	let control = Control.useContainer()
 	let statcontrol = StatControl.useContainer()
 
+
+
 	function handlePlay(item) {
 		console.log("$handlePlay",item);
-		control.setId(item.spotifyTopFive[0])
-		control.setId(item.spotifyTopFive[0])
-		control.togglePlay(!control.play)
+		api.getArtistTopTracks(({auth:globalUI,artist:item}))
+			.then(r =>{
+				control.setId(r[0].id)
+				control.setPlayArtist(item.id)
+				oldId === null ? oldId = r[0].id:{}
+
+				//pause/unpause the same track
+				if(oldId === r[0].id){
+					control.togglePlay((prevPlay) =>{return !(prevPlay)})
+				}else{
+					//if we changed play track id, only toggle true if we were already paused
+					oldId = r[0].id;
+					if(!(control.play)){control.togglePlay(true)}
+				}
+
+				//!(control.play) ? control.togglePlay(true):{};
+
+			})
 	}
 
 	function handleClick(item) {
@@ -116,9 +134,12 @@ function EventsList() {
 		// item.performance.forEach()
 		for(var x = 0; x < item.performance.length;x++){
 			var ip = item.performance[x];
-			if(ip.artist.spotifyTopFive){
-				return true
-			}
+			//testing: stopped harvesting when fetching events
+			//so just check if it has any genres? when we have another resolver running,
+			//we'll have to deal with that then. but rn any genres should indicate spotify viability
+			if(ip.artist.genres.length > 0){return true}
+
+			// if(ip.artist.spotifyTopFive){return true}
 		}
 		return false;
 	};
@@ -127,7 +148,15 @@ function EventsList() {
 
 		//console.log("$showPlay",sub);
 		return <div>
-			<span className={'play-events'}> {(sub.artist.spotifyTopFive ? <PlayCircleOutlineIcon fontSize={'small'} onClick={() => handlePlay(sub.artist)}> </PlayCircleOutlineIcon>:<div></div>)}</span>
+			<span className={'play-events'}>
+				{(sub.artist.genres.length >0 ?
+					<span>
+						{control.play && control.playArtist === sub.artist.id ? <PauseCircleOutlineIcon fontSize={'small'} onClick={() => handlePlay(sub.artist)}></PauseCircleOutlineIcon>
+						: <PlayCircleOutlineIcon fontSize={'small'} onClick={() => handlePlay(sub.artist)}></PlayCircleOutlineIcon>
+						}
+					</span>:<div></div>
+					)}
+			</span>
 			<span>{sub.displayName}</span>
 		</div>
 		// return <span>{sub.displayName}</span>

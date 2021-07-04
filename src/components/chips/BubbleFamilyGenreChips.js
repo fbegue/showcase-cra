@@ -64,15 +64,23 @@ function BubbleFamilyGenreChips(props) {
 	toMap = toMap.filter(f =>{return props.families.indexOf(f) !== -1})
 	//console.log("$toMap",toMap);
 	var _genres = [];
-	for (var k in props.genreArtist){
-		//todo: lol reconstucting this b/c I don't standardize anything that I'm passing around this mf
-		var famOfArtistFromGenre = props.genreArtist[k][0].familyAgg;
-		if(toMap.indexOf(famOfArtistFromGenre) !== -1 && friendscontrol.families.indexOf(famOfArtistFromGenre) !== -1 ){_genres.push({name:k,family:famOfArtistFromGenre})}
-	}
+	//console.log(props.genres);
+	//
+
+	// for (var k in props.genreArtist){
+	// 	//todo: lol reconstucting this b/c I don't standardize anything that I'm passing around this mf
+	// 	var famOfArtistFromGenre = props.genreArtist[k][0].familyAgg;
+	// 	if(toMap.indexOf(famOfArtistFromGenre) !== -1 && friendscontrol.families.indexOf(famOfArtistFromGenre) !== -1 ){_genres.push({name:k,family:famOfArtistFromGenre})}
+	// }
+
+	props.genres.forEach(g =>{
+		if(toMap.indexOf(g.family_name) !== -1 && friendscontrol.families.indexOf(g.family_name) !== -1 ){_genres.push(g)}
+	})
+
 
 	var initGColorState = {};
 	_genres.forEach(gOb =>{
-		map2[gOb.name] = {default: makeStyle(gOb.family,'default'),clicked:makeStyle(gOb.family,'clicked') }
+		map2[gOb.name] = {default: makeStyle(gOb.family_name,'default'),clicked:makeStyle(gOb.family_name,'clicked') }
 	})
 	_genres.forEach(gOb =>{
 		initGColorState[gOb.name] = map2[gOb.name]['default']
@@ -91,12 +99,6 @@ function BubbleFamilyGenreChips(props) {
 	//gcolor === null ? setGColor(initGColorState):{}
 
 
-	// useEffect(() => {
-	// 	console.log("$useEffect");
-	// 	//todo: little strange b/c I don't 'return' to the value before I intervened here
-	// 	//I just send it back to related (which I think is a good idea)
-	// 	friendscontrol.genres.length > 0 ? control.setGenreSens('selected'):control.setGenreSens('related')
-	// }, [friendscontrol.genres]);
 
 	const handleClick = (e) => {
 		//todo: this is a pretty shifty way of getting the value (which I can't set) here...
@@ -125,13 +127,14 @@ function BubbleFamilyGenreChips(props) {
 	const handleGClick = (gOb) => {
 
 		console.log(handleGClick);
-		if(!(friendscontrol.genres.includes(gOb.name))){
-			setGColor({ ...gcolor, [gOb.name]: map[gOb.family]["clicked"] });
-			friendscontrol.setGenres((prevState => {return [...prevState,gOb.name] }));
+		//testing: includes works?
+		if(!(friendscontrol.genres.includes(gOb))){
+			setGColor({ ...gcolor, [gOb.name]: map[gOb.family_name]["clicked"] });
+			friendscontrol.setGenres((prevState => {return [...prevState,gOb] }));
 		}else{
-			setGColor({ ...gcolor, [gOb.name]: map[gOb.family]["default"] });
+			setGColor({ ...gcolor, [gOb.name]: map[gOb.family_name]["default"] });
 			//var newval  = prevState.filter(r =>{return r !== gOb.name});
-			friendscontrol.setGenres((prevState => {return prevState.filter(r =>{return r !== gOb.name}) }));
+			friendscontrol.setGenres((prevState => {return prevState.filter(r =>{return r.name !== gOb.name}) }));
 		}
 	};
 

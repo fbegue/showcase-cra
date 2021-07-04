@@ -2,12 +2,13 @@ import React, {useContext, useEffect} from 'react';
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import Typography from "@material-ui/core/Typography";
-import {GLOBAL_UI_VAR} from "../storage/withApolloProvider";
+import {GLOBAL_UI_VAR,CHIPGENRESRANKED} from "../storage/withApolloProvider";
 import {Context} from "../storage/Store";
 import {FriendsControl, StatControl} from "../index";
 import {useReactiveVar} from "@apollo/react-hooks";
 import Library from "./Library";
 import Paper from '@material-ui/core/Paper';
+import GenreChipsSmartRanked from "./chips/GenreChipsSmartRanked";
 import GenreChipsSmart from "./chips/GenreChipsSmart";
 
 function InfoPanel(props) {
@@ -15,6 +16,8 @@ function InfoPanel(props) {
 	let statcontrol = StatControl.useContainer();
 	let friendscontrol = FriendsControl.useContainer()
 	const globalUI = useReactiveVar(GLOBAL_UI_VAR);
+	const chipGenresRanked = useReactiveVar(CHIPGENRESRANKED);
+	console.log("$InfoPanel",chipGenresRanked);
 	const [globalState, globalDispatch] = useContext(Context)
 
 	const [statCards, setStatCards] = React.useState([]);
@@ -110,64 +113,6 @@ function InfoPanel(props) {
 		};
 	},[statcontrol.stats.name,friendscontrol.selectedTabIndex,filter]);
 
-	//testing: example top genres
-	var genres = [
-		{
-			"id": 162,
-			"name": "underground hip hop",
-			"family_id": 4,
-			"family_name": "hip hop"
-		},
-		{
-			"id": 23,
-			"name": "rap",
-			"family_id": 4,
-			"family_name": "hip hop"
-		},
-		{
-			"id": 6,
-			"name": "hip hop",
-			"family_id": 4,
-			"family_name": "hip hop"
-		},
-
-		{
-			"id": 1272,
-			"name": "drill",
-			"family_id": null,
-			"family_name": null
-		},
-		{
-			"id": 1295,
-			"name": "pop r&b",
-			"family_id": 1,
-			"family_name": "pop"
-		},
-		{
-			"id": 1193,
-			"name": "trap queen",
-			"family_id": null,
-			"family_name": null
-		},
-		{
-			"id": 1118,
-			"name": "chicago rap",
-			"family_id": 4,
-			"family_name": "hip hop"
-		},
-		{
-			"id": 8,
-			"name": "r&b",
-			"family_id": 5,
-			"family_name": "r&b"
-		},
-		{
-			"id": 1146,
-			"name": "escape room",
-			"family_id": null,
-			"family_name": null
-		}
-	]
 
 	return(
 
@@ -217,7 +162,7 @@ function InfoPanel(props) {
 						</Typography>
 					</Paper>
 				</div>
-				<div style={{marginTop:".5em"}}><GenreChipsSmart chipData={genres}/></div>
+				<div style={{marginTop:".5em"}}><GenreChipsSmartRanked chipData={chipGenresRanked}/></div>
 
 				{/*<Paper elevation={3} style={{padding:"3px"}}>*/}
 				{/*	<ChipsArray chipData={genres}/>*/}

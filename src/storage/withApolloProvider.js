@@ -50,6 +50,7 @@ export const TILES = makeVar([]);
 export const STATS = makeVar({});
 export const CHIPFAMILIES = makeVar([]);
 export const CHIPGENRES = makeVar([]);
+export const CHIPGENRESRANKED = makeVar([]);
 export const EVENTS_VAR = makeVar([]);
 export const NODES_VAR = makeVar(nodes);
 

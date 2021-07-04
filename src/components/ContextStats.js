@@ -1,8 +1,9 @@
+// eslint-disable-next-line no-unused-expressions
 import {FriendsControl, GridControl, StatControl, TabControl} from "../index";
 import React, {useContext, useMemo,useEffect,useState} from "react";
 import {Context} from "../storage/Store";
 import {useReactiveVar} from "@apollo/react-hooks";
-import {CHIPFAMILIES, CHIPGENRES, GLOBAL_UI_VAR, TILES} from "../storage/withApolloProvider";
+import {TILES} from "../storage/withApolloProvider";
 import {a, useTransition} from "react-spring";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
@@ -17,10 +18,13 @@ import CustomizedInputBase from "./utility/CustomizedInputBase";
 import Slider from '@material-ui/core/Slider';
 import './ContextStats.css'
 import _ from "lodash";
+import NavigateNextIcon from '@material-ui/icons/NavigateNext';
+import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 
 import BubbleFamilyGenreChips from "./chips/BubbleFamilyGenreChips";
 import FilterGenreChips from "./chips/FilterGenreChips";
-
+import PlaylistCheckboxes from './tiles/PlaylistCheckboxes'
+import { GLOBAL_UI_VAR } from '../storage/withApolloProvider';
 
 function TabPanel(props) {
 	const { children, value, index, ...other } = props;
@@ -51,7 +55,7 @@ function ContextStats(props) {
 
 
 	// const [globalState, globalDispatch] = useContext(Context);
-	// const globalUI = useReactiveVar(GLOBAL_UI_VAR);
+	const globalUI = useReactiveVar(GLOBAL_UI_VAR);
 
 
 
@@ -106,8 +110,10 @@ function ContextStats(props) {
 
 	const tiles = useReactiveVar(TILES);
 	//console.log("$tiles",tiles);
-	console.log("componentDidRun | ContextStats",{tiles:tiles});
+
 	const [items, setItems] = useState(tiles);
+	const [tilesLoading, setTilesLoading] = useState(true);
+	//console.log("componentDidRun | ContextStats",{tiles:tiles});
 
 	//testing: is non-static data the issue?
 	//actually causes the problem sooner? idk
@@ -139,6 +145,7 @@ function ContextStats(props) {
 		})
 		return [heights, gridItems]
 	}, [columns, items,width])
+
 	// Hook6: Turn the static grid values into animated transitions, any addition, removal or change will be animated
 	const transitions = useTransition(
 		gridItems,
@@ -158,79 +165,69 @@ function ContextStats(props) {
 		chips.push({id:uuid(),"name":f,"family_id":null,"family_name":f})
 	})
 	//var sample = [{"id":8,"name":"r&b","family_id":5,"family_name":"r&b"},{"id":1118,"name":"chicago rap","family_id":4,"family_name":"hip hop"},{"id":23,"name":"rap","family_id":4,"family_name":"hip hop"},{"id":50,"name":"neo soul","family_id":5,"family_name":"r&b"},{"id":162,"name":"underground hip hop","family_id":4,"family_name":"hip hop"},{"id":6,"name":"hip hop","family_id":4,"family_name":"hip hop"},{"id":643,"name":"alternative r&b","family_id":5,"family_name":"r&b"}]
-	const [query, setQuery] = React.useState("");
+	// const [query, setQuery] = React.useState("");
+
+	const [page, setPage] = React.useState(1);
+	const [pageSize, setPageSize] = React.useState(20);
+
+//-----------------------------------------------
+
+	//
+	// const [checkboxes, setCheckboxes] = React.useState({
+	// 	collab: false,
+	// 	me: false,
+	// 	spotify: false,
+	// });
+
+	const handleCheck = (event) => {
+		friendscontrol.setCheckboxes({ ...friendscontrol.checkboxes, [event.target.name]: event.target.checked });
+	};
+
+//-----------------------------------------------
+
+
 
 	//todo: had noted but no longer experiencing....?
 	//testing: works a couple times, then infinite + same key issues
 	useEffect(() => {
-		var _t = null;
-		const friendscontrolCompareFilter = (r) => {
-			//console.log("friendscontrol.compare",friendscontrol.compare);
-			switch (friendscontrol.compare) {
-				case 'shared':return r.shared
-				case 'guest':
-				case 'user':
-					return r.owner === friendscontrol.compare
-				case 'all':return true
-			}
+		var _t = tiles;
+
+		//note: tiles.length/pageSize === total # of pages
+		if(_t.length > pageSize){
+			// _t = _t.slice((tiles.length/pageSize)*page,page*pageSize)
+			_t = _t.slice(pageSize*page,(page + 1)*pageSize)
 		}
-		//todo: tracks => search result includes album, artist name
-		//todo: albums => search result includes artist name
-		var queryFilter = (t) =>{
-
-			if(query === ""){return true}else{
-				//console.log("$$user",t);
-				//console.log("$q",query);
-				var pat = "^" + query.toLowerCase();
-				var re = new RegExp(pat,"g");
-				// var toTest = "display_name";
-				//
-				// switch (t.type) {
-				// 	case 'track': toTest = 'name';break;
-				// }
-				//debugger;
-				return (t['name'] && re.test(t['name'].toLowerCase()));
-			}
-		}
-
-		var famGenreFilter = (t) =>{
-
-
-			//family always overrides genre
-			if(friendscontrol.families.length > 0){
-				return friendscontrol.families.indexOf(t.familyAgg) !== -1
-			}else if(friendscontrol.genres.length > 0){
-				debugger;
-				var shared = _.intersectionBy(friendscontrol.genres, t.genres, 'id');
-				return shared > 0
-			}else{
-				return true
-			}
-		}
-
-		_t = tiles.filter(friendscontrolCompareFilter)
-		_t = _t.filter(queryFilter)
-		_t = _t.filter(famGenreFilter)
+		console.log("setItems",_t);
 		setItems(_t)
+		setTilesLoading(false)
+
 		//todo: put tiles here to capture on-load set
 		//but DOES print a extra sus $tiles....
-	}, [friendscontrol.compare,tiles,query,friendscontrol.families,friendscontrol.genres])
+	}, [friendscontrol.compare,tiles,friendscontrol.query,friendscontrol.families,friendscontrol.genres,page,friendscontrol.checkboxes])
 
+	//store displayed query here, and delay an update to global query
+	//i.e. debounce the keystrokes
+	const [searchTerm, setSearchTerm] = React.useState("");
+	React.useEffect(() => {
+		const delayDebounceFn = setTimeout(() => {
+			friendscontrol.setQuery(searchTerm)
+		}, 500);
 
-	const handleFormChange = (event) =>{
-		setQuery(event.target.value);
-	}
+		return () => clearTimeout(delayDebounceFn);
+	}, [searchTerm]);
+
 	const clearForm = () =>{
-		setQuery("");
+		friendscontrol.setQuery("");
 	}
 
+	//clear form on section leave
 	useEffect(() => {
 		clearForm()
 	},[tabcontrol.section]);
 
-	//-----------------------------------------------
+//-----------------------------------------------
 
-	//todo: duplicated in Tabify
+//todo: duplicated in Tabify
 	const handleTabChange = (event, tabindex) => {
 		console.log("handleTabChange",tabMap[tabcontrol.section][tabindex]);
 		tabcontrol.setActiveTab(tabindex);
@@ -254,14 +251,15 @@ function ContextStats(props) {
 			3:{"albums_friends":"Albums"}
 		}}
 
-	//todo: was collapsing tabify and this guy into tabcontrol
-	//1) seems odd that all the tab control isn't just one component, therefore
-	//I'm abstracting the tab business
-	//2) would ideally be the time I get rid of confusing stat control double duty with tab control
+//todo: was collapsing tabify and this guy into tabcontrol
+//1) seems odd that all the tab control isn't just one component, therefore
+//I'm abstracting the tab business
+//2) would ideally be the time I get rid of confusing stat control double duty with tab control
 	const getTabs = () =>{
 
 		//skip render for section = friends
 		var toRender = []
+
 		for (const [key, value] of Object.entries(tabMap[tabcontrol.section])) {toRender.push(value)}
 
 		return (
@@ -274,6 +272,7 @@ function ContextStats(props) {
 				{toRender.map((tab,i) =>
 					<Tab
 						key={i} label={tab[Object.keys(tab)[0]]}
+						onClick={() =>{console.log("setTilesLoading");setTilesLoading(true)}}
 					/>
 				)}
 				{/*<Tab*/}
@@ -286,10 +285,13 @@ function ContextStats(props) {
 		)
 	}
 
-	//-----------------------------------------------
-	 //const chipFamilies = useReactiveVar(CHIPFAMILIES);
-	// const chipGenres = useReactiveVar(CHIPGENRES);
+//-----------------------------------------------
+//const chipFamilies = useReactiveVar(CHIPFAMILIES);
+// const chipGenres = useReactiveVar(CHIPGENRES);
 
+	const print = (r) =>{
+		console.log(r);
+	}
 	return(
 		<div>
 			{/*<MyCustomWrapper ref={containerRef} className={classnames(params)}>the box</MyCustomWrapper>*/}
@@ -309,41 +311,59 @@ function ContextStats(props) {
 			{/*{statcontrol.stats.name === 'friends' &&*/}
 			<div style={{display:"flex"}}>
 
-					<div className={'filterItems'} style={{display:"flex",flexDirection:"column"}}>
-						<div >
-							<CustomizedInputBase value={query} placeholder={'filter'} onChange={handleFormChange} clearForm={() =>{clearForm()}}/>
+				<div className={'filterItems'} style={{display:"flex",flexDirection:"column"}}>
+					<div style={{display:'flex',flexDirection:"column"}}>
+						<div>
+							<CustomizedInputBase value={searchTerm} placeholder={'filter'} onChange={(e) =>{setSearchTerm(e.target.value)}} clearForm={() =>{clearForm()}}/>
 						</div>
-						<div style={{display:"flex",flexDirection:"column",width:"20em",background:"darkgrey"}}>
-							<div>Release Range
-								<Slider
-									value={100}
-									marks={[
-										{
-											value: 0,
-											label: '1970',
-										},
-										{
-											value: 100,
-											label: '2021',
-										}]}
-									// onChange={handleChange}
-									valueLabelDisplay="auto"
-									aria-labelledby="range-slider"
-								/>
+						<div style={{display:'flex',flexDirection:"row"}}>
+							<div>{items.length}/{tiles.length}</div>
+							<div>
+								<NavigateBeforeIcon fontSize={'large'} onClick={() =>{setPage((prevState => {
+									return prevState !== 1 ? prevState - 1:prevState
+								}))}}/>
+								{page}/{tiles.length/pageSize}
+								<NavigateNextIcon fontSize={'large'} onClick={() =>{setPage((prevState => {
+									return prevState <= tiles.length/pageSize ? prevState + 1:prevState
+								}))}}/>
 							</div>
 						</div>
-						<div style={{width:"1em"}}>
-							{/*testing: re-using BubbleFamily from above - it'll just never show genres?*/}
-							<BubbleFamilyGenreChips families={friendscontrol.families} genreArtist={friendscontrol.genres} flexDirection={'column'}/>
-							<FilterGenreChips genres={friendscontrol.genres}/>
-							<button>some</button> <button>sortof</button> <button>filters</button>
+					</div>
+					<div style={{display:"flex",flexDirection:"column",width:"20em",background:"darkgrey"}}>
+						{(tabcontrol.section === 1 && tabcontrol.tab === 1) &&
+						<div>
+							<PlaylistCheckboxes setState={friendscontrol.setCheckboxes} state={friendscontrol.checkboxes} handleChange={handleCheck}/>
+						</div>
+						}
+						<div>Release Range
+							<Slider
+								value={100}
+								marks={[
+									{
+										value: 0,
+										label: '1970',
+									},
+									{
+										value: 100,
+										label: '2021',
+									}]}
+								// onChange={handleChange}
+								valueLabelDisplay="auto"
+								aria-labelledby="range-slider"
+							/>
 						</div>
 					</div>
+					<div style={{width:"1em"}}>
+						{/*testing: re-using BubbleFamily from above - it'll just never show genres?*/}
+						<BubbleFamilyGenreChips families={friendscontrol.families} genres={friendscontrol.genres} flexDirection={'column'}/>
+					</div>
+				</div>
 
+				<div style={{flexGrow:"1"}}>
+					{/*<div style={{width:"20em",background:"darkgrey"}}>hmm</div>*/}
+					{tabcontrol.section === 2 &&
 					<div>
-						{/*<div style={{width:"20em",background:"darkgrey"}}>hmm</div>*/}
-						{tabcontrol.section === 2 &&
-						<div style={{"marginLeft":"13em","border":"#e2e2e2 1px solid","borderRadius":"5px"}}>
+						<div style={{"marginLeft":"5em","border":"#e2e2e2 1px solid","borderRadius":"5px"}}>
 
 							{getTabs()}
 							{/*testing: just using the look of these tabs - the panel switching to change content is replaced with reactive tiles*/}
@@ -361,28 +381,38 @@ function ContextStats(props) {
 							{/*	Item Four*/}
 							{/*</TabPanel>*/}
 						</div>
-						}
-						{/*todo: make width shift transition*/}
-						<div className={styles.list} style={{ height: Math.max(...heights),width:gridControl.gridClass === 'defaultGrid' ? '64em':'57em' }}>
-							{transitions((style, item) => (
-								<a.div style={style}>
-									{item.type === "track" &&
-									<div>
-										<img height={120} src={item.album.images[0] && item.album.images[0].url}/>
-										<div style={{padding:"2px",background:"rgb(128 128 128 / .7)",position:"relative",top:"-43px",color:"white",height:"20px"}}>{item.name}</div>
-									</div>
-									}
-									{item.type !== "track" &&
-									<div>
-										<img height={120} src={item.images[0] && item.images[0].url}/>
-										<div style={{padding:"2px",background:"rgb(128 128 128 / .7)",position:"relative",top:"-43px",color:"white",height:"20px"}}>{item.name}</div>
-									</div>
-									}
-
-								</a.div>
-							))}
-						</div>
 					</div>
+					}
+
+					{/*testing: it's either happening really fast or the value isn't changing....*/}
+					{/*{tilesLoading && <div>tilesLoading</div>}*/}
+					{/*<div>tilesLoading {tilesLoading.toString()}</div>*/}
+
+					{/*todo: make width shift transition*/}
+					{/*testing: custom minHeight to keep tile space large*/}
+					{/*not sure how to go about 'growing' height like I do with horizontal space*/}
+					{/*<div className={styles.list} style={{ minHeight:"37em",minWidth:gridControl.gridClass === 'defaultGrid' ? '64em':'57em' }}>*/}
+
+					<div className={styles.list} style={{ height: "37em",minWidth:gridControl.gridClass === 'defaultGrid' ? '64em':'57em'}}>
+						{transitions((style, item) => (
+							<a.div style={style}>
+								{item.type === "track" &&
+								<div>
+									<img height={120} src={item.album.images[0] && item.album.images[0].url}/>
+									<div style={{padding:"2px",background:"rgb(128 128 128 / .7)",position:"relative",top:"-43px",color:"white",height:"20px"}}>{item.name}</div>
+								</div>
+								}
+								{item.type !== "track" &&
+								<div>
+									<img height={120} src={item.images[0] && item.images[0].url}/>
+									<div style={{padding:"2px",background:"rgb(128 128 128 / .7)",position:"relative",top:"-43px",color:"white",height:"20px"}}>{item.name}</div>
+								</div>
+								}
+
+							</a.div>
+						))}
+					</div>
+				</div>
 			</div>
 			{/*}*/}
 

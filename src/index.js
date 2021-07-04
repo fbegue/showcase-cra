@@ -34,7 +34,7 @@ function useControl(initialState = 0) {
     let [endDate, setEndDate] = useState(null);
     // let [endDate, setEndDate] = useState(new Date().addDays(30));
 
-    let togglePlay = () => _togglePlay(!play)
+    let togglePlay = (play) => _togglePlay(play)
     let setId = (id) => _setId(id);
     let selectMetro = (metroSel) => {
         //so this is new territory...
@@ -54,6 +54,8 @@ function useControl(initialState = 0) {
 
     }
 
+    let [playArtist, setPlayArtist] = useState(null);
+
     let [genreSens, setGenreSens] = useState('related');
     let [artistSens, setArtistSens] = useState('off');
     let [dataLoaded, setDataLoaded] = useState(false);
@@ -61,7 +63,7 @@ function useControl(initialState = 0) {
     let rmap = {"selected":0,"exact":1,"related":2}
     let mapArtist = {0:"exact",1:"off",2:"related"}
     let rmapArtist = {"exact":0,"off":1,"related":2}
-    return { play,id, togglePlay, setId,metro,selectMetro,
+    return { play,id, togglePlay, setId,metro,selectMetro,playArtist,setPlayArtist,
         startDate,endDate,setStartDate,setEndDate,
         genreSens,setGenreSens, artistSens, setArtistSens,map,rmap,mapArtist,rmapArtist,
         dataLoaded,setDataLoaded}
@@ -115,9 +117,10 @@ let StatControl  = createContainer(useStats);
 
 function useTabs(initialState = 0) {
     // const [section, setActiveSection] = useState(1);
-    const [section, setActiveSection] = useState(2);
-    const [tab, setActiveTab] = useState(0);
-    return { tab,setActiveTab,section,setActiveSection }
+    const [section, setActiveSection] = useState(1);
+    const [tab, setActiveTab] = useState(1);
+    const [data, setData] = useState('data1');
+    return { tab,setActiveTab,section,setActiveSection,data, setData }
 }
 let TabControl  = createContainer(useTabs);
 
@@ -130,14 +133,21 @@ function useFriends(initialState = 0) {
     //let [guest, setGuest] = useState(null);
     let [guest, setGuest] = useState({id:123028477,name:"Dan"});
     //user,guest,shared,all
-    let [compare, setCompare] = useState('all');
+    let [compare, setCompare] = useState('shared');
     let [families, setFamilies] = useState([]);
     let [genres, setGenres] = useState([]);
     let [selectedTabIndex, setTabIndex] = React.useState(1);
     let [sourceFilter, setSourceFilter] = React.useState('both');
+    let [checkboxes, setCheckboxes] = React.useState({
+        collab: false,
+        me: false,
+        spotify: false,
+    });
+    let [query, setQuery] = React.useState("");
 
 
-    return { guest,setGuest,compare,setCompare,families, setFamilies,genres,setGenres,
+
+    return { guest,setGuest,compare,setCompare,families, setFamilies,genres,setGenres,setCheckboxes, checkboxes,query, setQuery,
         selectedTabIndex,setTabIndex,sourceFilter,setSourceFilter}
 }
 

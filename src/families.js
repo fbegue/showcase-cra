@@ -57,6 +57,24 @@ familyColors["unknown"] =  '#00000036';
 familyColors["unknown2"] =  '#00000036';
 
 var families =  ["pop", "electro house", "rock", "hip hop", "r&b", "latin", "folk", "country", "metal", "punk", "blues", "reggae", "world", "jazz", "classical"];
+//todo: latin is coming thru as null?
+
+var familyIdMap =  {
+	"pop":"1",
+	"electro house":"2",
+	"rock":"3",
+	"hip hop":"4",
+	"r&b":"5",
+	"latin":"6",
+	"country":"7",
+	"metal":"8",
+	"punk":"9",
+	"blues":"10",
+	"jazz":"13",
+	"folk":"15",
+	"reggae":"11",
+	"world":"12",
+	"classical":"14"}
 
 var familyGenre_map = {};
 var genreFam_map= {};
@@ -92,15 +110,15 @@ Object.keys(familyColors).forEach((k,i,arr) =>{
 	// console.log(k[k.length-1]);
 
 	//todo: wtf is this?
-		if(k[k.length-1] === '2'){
-			familyStyles[k] = {
-				//color of chip
-				backgroundColor:familyColors[k],
-				// backgroundColor:'orange',
-				borderColor:'black'}
-		}
-		    //todo: this just isn't the way to go about this
-			//the values are right, but only fucking clicking on the element fixes the render,
+	if(k[k.length-1] === '2'){
+		familyStyles[k] = {
+			//color of chip
+			backgroundColor:familyColors[k],
+			// backgroundColor:'orange',
+			borderColor:'black'}
+	}
+		//todo: this just isn't the way to go about this
+		//the values are right, but only fucking clicking on the element fixes the render,
 		// else if(k === 'popclicked'){
 		// 	familyStyles[k] = {
 		// 		boxShadow: "inset 0px 0px 5px black",
@@ -109,28 +127,28 @@ Object.keys(familyColors).forEach((k,i,arr) =>{
 		// 			backgroundColor:familyColors['pop2'],
 		// 		},
 		// 	}
-		// }
-		else{
-			familyStyles[k] = {
-				//color of chip
-				// backgroundColor:familyColors[k],
-				backgroundColor:familyColors[k],
-				// '&:hover': {
-				// 	backgroundColor:familyColors[k + 2],
-				// },
-				borderColor:'black',
-				//text color on chip
-				color:'white',}
+	// }
+	else{
+		familyStyles[k] = {
+			//color of chip
+			// backgroundColor:familyColors[k],
+			backgroundColor:familyColors[k],
+			// '&:hover': {
+			// 	backgroundColor:familyColors[k + 2],
+			// },
+			borderColor:'black',
+			//text color on chip
+			color:'white',}
 
-			// familyStyles[k + "clicked"] = {
-			// 	boxShadow: "inset 0px 0px 5px black",
-			// 	backgroundColor:familyColors[k],
-			// 	'&:hover': {
-			// 		backgroundColor:familyColors[k + 2],
-			// 	},
-			// 	color:'white'}
+		// familyStyles[k + "clicked"] = {
+		// 	boxShadow: "inset 0px 0px 5px black",
+		// 	backgroundColor:familyColors[k],
+		// 	'&:hover': {
+		// 		backgroundColor:familyColors[k + 2],
+		// 	},
+		// 	color:'white'}
 
-		}
+	}
 
 });
 
@@ -141,5 +159,5 @@ console.log("$familyStyles",familyStyles);
 //------------------------------------------
 
 export {
-	families,familyColors,familyGenre_map,genreFam_map, familyStyles,familyNormal
+	families,familyColors,familyGenre_map,genreFam_map, familyStyles,familyNormal,familyIdMap
 }

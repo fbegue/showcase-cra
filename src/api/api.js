@@ -1,6 +1,8 @@
+/* eslint-disable no-unused-expressions */
 import $ from 'jquery';
 import {useReactiveVar} from "@apollo/react-hooks";
 import {GLOBAL_UI_VAR} from "../storage/withApolloProvider";
+import React from "react";
 
 let counter = 0
 const fakeDatabase = {
@@ -154,7 +156,7 @@ var getSavedTracks =  function(req){
             method: 'POST', // *GET, POST, PUT, DELETE, etc.
             mode: 'cors', // no-cors, *cors, same-origin
             headers: {'Content-Type': 'application/json'},
-            body: null
+            body: JSON.stringify(req)
         }).then(res => res.json())
             .then(function(res){
                 //console.log("retrieved: ",res);
@@ -302,6 +304,26 @@ var fetchEvents =  function(req){
         }).then(res => res.json())
             .then(function(res){
                 //console.log("retrieved: ",res);
+
+                function getCoverage(events){
+                    var c_familyAgg = 0,c_genres = 0,c_eventsWithOne = 0;var ptotal = 0;
+                    events.forEach(e =>{
+                        var ec = 0;
+                        e.performance.forEach(p =>{
+                            p.artist.familyAgg ? c_familyAgg++ :{};
+                            p.artist.familyAgg ? ec++ :{};
+                            p.artist.genres.length > 0 ? c_genres++ :{};
+                            ptotal++
+
+                        })
+                        ec > 0 ? c_eventsWithOne++:{};
+
+                    })
+                    return {perfArtistWithFamilyAgg:c_familyAgg + "/" + ptotal, perfArtistWithGenre:c_genres+ "/" + ptotal,
+                        eventWithAtLeastOneGenre: c_eventsWithOne + "/" + events.length}
+                }
+                console.log("getCoverage (events init):",getCoverage(res));
+
                 done(res)
             })
 
@@ -383,6 +405,23 @@ var refreshAuth =  function(refresh_token){
     })
 }
 
+var getArtistTopTracks =  function(req){
+    return new Promise(function(done, fail) {
+        fetch('http://localhost:8888/getArtistTopTracks', {
+            method: 'POST', // *GET, POST, PUT, DELETE, etc.
+            mode: 'cors', // no-cors, *cors, same-origin
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(req)
+        }).then(res => res.json())
+            .then(function(res){
+                done(res)
+            },e =>{console.error(e)})
+    })
+}
+
+
 var completeArtist =  function(param){
     return new Promise(function(done, fail) {
         $.ajax({
@@ -396,19 +435,6 @@ var completeArtist =  function(param){
 
         //testing:
         // fakeFetch3().then(r =>{done(r)})
-    })
-}
-
-var getArtistTopTracks  =  function(id){
-    return new Promise(function(done, fail) {
-        $.ajax({
-            url: 'http://localhost:8888/getArtistTopTracks',
-            type:"POST",
-            data: {id:id}
-        }).done(function(payload){
-            //console.log("retrieved: ",payload);
-            done(payload)
-        })
     })
 }
 
