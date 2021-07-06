@@ -101,12 +101,16 @@ background-color:#8080803b;
   /*width:70em;*/
   background: #54a3ff;
   grid-area: stats;
-  padding:5px
+  /*padding-left:.5em;*/
+  /*padding-right:.5em;*/
+
+  /*padding:5px*/
   /*height:20em*/
 }
 
 .events {
   grid-area: events;
+  max-width:40em;
   /*background: purple*/
 }
 

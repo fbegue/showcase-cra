@@ -12,9 +12,9 @@ import './BackdropParent.css'
 
 const StyledPaper = withStyles({
 	root: {
-		height: "17em",
+		// height: "17em",
 		// width:"41em",
-		width:"27em",
+		// width:"27em",
 		position: "relative"
 	}
 })(Paper);
@@ -24,6 +24,7 @@ const LimitedBackdrop = withStyles({
 		zIndex: 1
 	}
 })(Backdrop);
+
 export default function App(props) {
 	//const [showBackdrop, setShowBackdrop] = React.useState(false);
 

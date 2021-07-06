@@ -8,12 +8,14 @@ import PieChartIcon from "@material-ui/icons/PieChart";
 import CloudIcon from "@material-ui/icons/Cloud";
 import Divider from '@material-ui/core/Divider';
 import {families as systemFamilies,familyColors} from '../families'
-import {Control, FriendsControl, TabControl, StatControl,GridControl} from "../index";
+import {Control, FriendsControl, TabControl, StatControl, GridControl, TileSelectControl} from "../index";
 import util from "../util/util";
 import PieGenreChips from "./chips/PieGenreChips";
 import PieChart from "./Charts/PieChart";
+import {a, useSpring} from "react-spring";
 import VictoryPieChart from "./Charts/VictoryPieChart";
 import TestComp from "./TestComp"
+import DisplayTile from './tiles/DisplayTile'
 
 //todo: update spring list implementation
 // import GenresDisplayVertical from "./GenresDisplayVertical";
@@ -114,6 +116,7 @@ function useTraceUpdate(props) {
 var flag = 0;
 
 function Stats(props) {
+
 	// useTraceUpdate(props);
 	let statcontrol = StatControl.useContainer();
 	const [globalState, globalDispatch] = useContext(Context);
@@ -124,7 +127,8 @@ function Stats(props) {
 	//let highlighter = Highlighter.useContainer();
 	let friendscontrol = FriendsControl.useContainer()
 	let gridControl = GridControl.useContainer();
-
+	let tileSelectControl = TileSelectControl.useContainer();
+	console.log("Stats | tileSelectControl",tileSelectControl);
 
 	const chipFamilies = useReactiveVar(CHIPFAMILIES);
 	const chipGenres = useReactiveVar(CHIPGENRES);
@@ -354,10 +358,27 @@ function Stats(props) {
 		data.forEach(s =>{t = t + s.data.length})
 		return t
 	}
+
+
+	const handleToggleDrawer = () => {
+		tileSelectControl.setDrawerShowing(false);
+	};
+
+	const drawerProps = useSpring({
+		// top: show ? 200 : 0,
+		position: "absolute",
+		left: 0,
+		right:0,
+		backgroundColor: "#808080",
+		// width: "100%",
+		// height: "100%"
+		height: tileSelectControl.isDrawerShowing ? "20em" : "1em",
+		 minWidth:"40em"
+	});
 	return(
 
 		<div style={{position:"relative"}}>
-			<div style={{"position":"absolute","top":"0px","left":"0px","zIndex":"2"}}>
+			<div style={{"position":"absolute","top":"-40px","left":"0px","zIndex":"30"}}>
 				{statcontrol.stats.name}
 				<button  onClick={() =>{statcontrol.setMode(!statcontrol.mode)}}>{statcontrol.mode ===  true? 'Context':'Custom'}
 				</button>
@@ -370,8 +391,20 @@ function Stats(props) {
 					{statcontrol.chart ? <PieChartIcon fontSize={'small'}/>:<CloudIcon fontSize={'small'}/>}
 				</button>
 			</div>
+			<div style={{"position":"absolute","top":"0px","left":"0px","zIndex":"3"}}>
+				<a.div  style={drawerProps}>
+					<div>
+						{/*<div style={{border: "1px solid black",height:"1em"}}></div>*/}
+						{/*todo: was thinking this content display was taken care of for me by the drawer but nooooo!?*/}
+						{/*add delay on fade in*/}
+						<div style={{height:"10em",display:tileSelectControl.isDrawerShowing ? "initial":"none"}}>
+							<DisplayTile handleToggleDrawer={handleToggleDrawer} tile={tileSelectControl.tile}/>
+						</div>
+					</div>
+				</a.div>
+			</div>
 
-			<div style={{display:"flex"}} >
+			<div style={{display:"flex",paddingTop:"1em"}}>
 				{/*<div style={{flexGrow:"1"}}></div>*/}
 				{/*style={{display:"flex",flexDirection:"column"}} */}
 				{/*style={{top: "-4em",position: "relative",height: "21em",zIndex:1}}*/}

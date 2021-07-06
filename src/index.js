@@ -153,6 +153,12 @@ function useFriends(initialState = 0) {
 
 let FriendsControl  = createContainer(useFriends);
 
+function useTileSelect(initialState = 0) {
+    const [tile, selectTile] = useState(null);
+    const [isDrawerShowing, setDrawerShowing] = useState(false);
+    return { selectTile,tile,isDrawerShowing, setDrawerShowing}
+}
+let TileSelectControl  = createContainer(useTileSelect);
 
 const rootElement = document.getElementById("root");
 ReactDOM.render(
@@ -162,7 +168,9 @@ ReactDOM.render(
                 <FriendsControl.Provider>
                     <GridControl.Provider>
                         <TabControl.Provider>
-                            <App />
+                            <TileSelectControl.Provider>
+                                <App />
+                            </TileSelectControl.Provider>
                         </TabControl.Provider>
                     </GridControl.Provider>
                 </FriendsControl.Provider>
@@ -173,7 +181,7 @@ ReactDOM.render(
 );
 
 export{
-    Control,Highlighter,StatControl,FriendsControl,PaneControl,GridControl,TabControl
+    Control,Highlighter,StatControl,FriendsControl,PaneControl,GridControl,TabControl,TileSelectControl
 }
 
 //=====================================================

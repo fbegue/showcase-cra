@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 // import { useTransition, animated } from '@react-spring/web'
 import {animated, useTransition} from "react-spring";
-import data from './data2'
+import data from '../../data2'
 import styles from './Library.module.css'
 import './Library.css'
 import PlayCircleOutlineIcon from "@material-ui/icons/PlayCircleOutline";

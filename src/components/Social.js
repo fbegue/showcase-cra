@@ -273,8 +273,9 @@ function Social(props) {
 				{/*<button onClick={st}>trigger</button>*/}
 
 
-
-				<div style={{paddingLeft:"1em",paddingTop:"1em"}}>
+				{/*todo: I thiiiink the backdrop is preventing me from auto pushing / assigning a width that works to anything inside it?
+				simply b/c I can modify it here... still an issue b/c then I have to go modify width of everything else .... :/ */}
+				<div style={{paddingLeft:"1em",paddingTop:"1em",width:"40em"}}>
 					<div style={{display:"flex"}}>
 						<div>
 								{/*<TextField id="standard-basic" placeholder="search" value={query} onChange={handleChange} onClick={handleClick} />*/}
@@ -285,9 +286,7 @@ function Social(props) {
 
 					{/*todo: what was I setting up here? the cached stats for a user in card form?*/}
 
-
 					<BackdropParent defaultContent={
-
 						<div style={{display:"flex",flexDirection:"row"}}>
 							{/*	//	todo: why was this 480px? it covers stats panel beside it*/}
 							<div style={{display:"flex", flexWrap:"wrap",width:"13em"}}>
@@ -300,7 +299,7 @@ function Social(props) {
 							// <Paper>
 								<div style={{display:"flex",flexDirection:"row"}}>
 									<div><UserTile item={selectedUser} single={true} size={["200px","200px"]} /> </div>
-									<div style={{display:"flex", flexWrap:"wrap",width:"480px"}}>
+									<div style={{display:"flex", flexWrap:"wrap"}}>
 										{statCards.map((item,i) => (
 											<div key={item.label} style={{width:item.width, padding:"5px"}}>
 												<Card>

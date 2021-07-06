@@ -6,10 +6,10 @@ import {GLOBAL_UI_VAR,CHIPGENRESRANKED} from "../storage/withApolloProvider";
 import {Context} from "../storage/Store";
 import {FriendsControl, StatControl} from "../index";
 import {useReactiveVar} from "@apollo/react-hooks";
-import Library from "./Library";
 import Paper from '@material-ui/core/Paper';
 import GenreChipsSmartRanked from "./chips/GenreChipsSmartRanked";
 import GenreChipsSmart from "./chips/GenreChipsSmart";
+import BubbleFamilyGenreChips from "./chips/BubbleFamilyGenreChips";
 
 function InfoPanel(props) {
 
@@ -135,23 +135,6 @@ function InfoPanel(props) {
 					</div>}
 				</div>
 
-				{/*	todo: library's width is really odd = paper fills up that space
-		so just cutting it off for now but yeah...*/}
-				{/*same with my little label here*/}
-
-				<div style={{margin:"1em",width:"32.5em"}}>
-					<div style={{padding:"2px",position:"relative",top:"-10px",color:"white",height:"20px",width:"6.2em"}}>
-						<Paper elevation={3}>
-							<Typography variant="subtitle1">
-								My Favorites
-							</Typography>
-						</Paper>
-					</div>
-					<Paper elevation={3} style={{padding:"3px"}}>
-						<Library />
-					</Paper>
-				</div>
-
 			</div>
 
 			<div style={{margin:"1em"}}>
@@ -162,7 +145,8 @@ function InfoPanel(props) {
 						</Typography>
 					</Paper>
 				</div>
-				<div style={{marginTop:".5em"}}><GenreChipsSmartRanked chipData={chipGenresRanked}/></div>
+				{/*<div style={{marginTop:".5em"}}><GenreChipsSmartRanked chipData={chipGenresRanked}/></div>*/}
+				<BubbleFamilyGenreChips families={[]} familyDisabled={true} occurred={true} genres={chipGenresRanked} flexDirection={'column'}/>
 
 				{/*<Paper elevation={3} style={{padding:"3px"}}>*/}
 				{/*	<ChipsArray chipData={genres}/>*/}

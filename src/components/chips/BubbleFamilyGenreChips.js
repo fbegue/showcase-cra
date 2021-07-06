@@ -3,6 +3,7 @@ import React, {useState,useEffect} from 'react';
 import { makeStyles } from "@material-ui/core/styles";
 import Chip from "@material-ui/core/Chip";
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
+
 import {familyColors,families as systemFamilies} from '../../families'
 import {FriendsControl,Control} from "../../index";
 const useStyles = makeStyles({
@@ -21,6 +22,7 @@ const useStyles = makeStyles({
 });
 
 function BubbleFamilyGenreChips(props) {
+
 	const classes = useStyles();
 	let friendscontrol = FriendsControl.useContainer()
 	let control = Control.useContainer()
@@ -31,7 +33,7 @@ function BubbleFamilyGenreChips(props) {
 		var defaultSt = {
 			"--background-color-hover": familyColors[fam + "2"],
 			"--background-color":  familyColors[fam],
-			 "--box-shadow": "rgba(33, 203, 243, .3)"
+			"--box-shadow": "rgba(33, 203, 243, .3)"
 		};
 
 		//clicked simply keeps it's hover color
@@ -73,44 +75,58 @@ function BubbleFamilyGenreChips(props) {
 	// 	if(toMap.indexOf(famOfArtistFromGenre) !== -1 && friendscontrol.families.indexOf(famOfArtistFromGenre) !== -1 ){_genres.push({name:k,family:famOfArtistFromGenre})}
 	// }
 
-	props.genres.forEach(g =>{
-		if(toMap.indexOf(g.family_name) !== -1 && friendscontrol.families.indexOf(g.family_name) !== -1 ){_genres.push(g)}
-	})
-
-
 	var initGColorState = {};
-	_genres.forEach(gOb =>{
-		map2[gOb.name] = {default: makeStyle(gOb.family_name,'default'),clicked:makeStyle(gOb.family_name,'clicked') }
-	})
-	_genres.forEach(gOb =>{
-		initGColorState[gOb.name] = map2[gOb.name]['default']
-	})
 
-	// gcolor === null ? setGColor(gColorInit):{}
-	//-------------------------------------------------------------------------------
+	if(!(props.genres)){
+		//not loaded yet
+	}else{
+		props.genres.forEach(g =>{
+			if(props.familyDisabled || props.occurred){
+				_genres.push(g)
+			}else{
+				if(toMap.indexOf(g.family_name) !== -1 && friendscontrol.families.indexOf(g.family_name) !== -1 ){_genres.push(g)}
+			}
+		})
 
-	// console.log("map",map);
-	// console.log("map2",map2);
-	// console.log("initColorState",initColorState);
-	// console.log("initGColorState",initGColorState);
+		//testing: exact same code, just with extra 'genre' prop to drill thru and limiter
+
+		if(props.occurred){
+
+			_genres.forEach(gOb =>{
+				map2[gOb.genre.name] = {default: makeStyle( gOb.genre.family_name,'default'),clicked:makeStyle(gOb.genre.family_name,'clicked')}
+			})
+			_genres.forEach(gOb =>{
+				initGColorState[gOb.genre.name] = map2[gOb.genre.name]['default']
+			})
+
+			_genres = _genres.slice(0,5)
+		}
+		else{
+			_genres.forEach(gOb =>{
+				map2[gOb.name] = {default: makeStyle(gOb.family_name,'default'),clicked:makeStyle(gOb.family_name,'clicked') }
+			})
+			_genres.forEach(gOb =>{
+				initGColorState[gOb.name] = map2[gOb.name]['default']
+			})
+		}
+
+	}
+
+
 	const [color, setColor] = useState(initColorState);
 	const [gcolor, setGColor] = useState(initGColorState);
-	//const [clicked, setClicked] = useState(null);
-	//gcolor === null ? setGColor(initGColorState):{}
 
-
-
-	const handleClick = (e) => {
+	const handleClick = (fam) => {
 		//todo: this is a pretty shifty way of getting the value (which I can't set) here...
-		console.log("handleClick", e.target.innerText);
-		var sel = e.target.innerText;
+		console.log("handleClick", fam);
+		//var sel = e.target.innerText;
 
-		if(!(friendscontrol.families.includes(sel))){
-			setColor({ ...color, [sel]: map[sel]["clicked"] });
-			friendscontrol.setFamilies((prevState => {return [...prevState,sel] }));
+		if(!(friendscontrol.families.includes(fam))){
+			setColor({ ...color, [fam]: map[fam]["clicked"] });
+			friendscontrol.setFamilies((prevState => {return [...prevState,fam] }));
 		}else{
-			setColor({ ...color, [sel]: map[sel]["default"] });
-			friendscontrol.setFamilies((prevState => {return prevState.filter(r =>{return r !== sel}) }));
+			setColor({ ...color, [fam]: map[fam]["default"] });
+			friendscontrol.setFamilies((prevState => {return prevState.filter(r =>{return r !== fam}) }));
 		}
 
 		//if it's not clicked yet, set the new color to clicked and update it's clicked status to true
@@ -125,20 +141,40 @@ function BubbleFamilyGenreChips(props) {
 	};
 
 	const handleGClick = (gOb) => {
-
-		console.log(handleGClick);
+		console.log("handleGClick",gOb);
 		//testing: includes works?
-		if(!(friendscontrol.genres.includes(gOb))){
-			setGColor({ ...gcolor, [gOb.name]: map[gOb.family_name]["clicked"] });
-			friendscontrol.setGenres((prevState => {return [...prevState,gOb] }));
+
+		var family_name = null;
+		var genre_name = null;
+		var genre = null
+		if(props.occurred){
+			family_name = gOb.genre.family_name
+			genre_name = gOb.genre.name
+			genre = gOb.genre
 		}else{
-			setGColor({ ...gcolor, [gOb.name]: map[gOb.family_name]["default"] });
-			//var newval  = prevState.filter(r =>{return r !== gOb.name});
-			friendscontrol.setGenres((prevState => {return prevState.filter(r =>{return r.name !== gOb.name}) }));
+			family_name = gOb.family_name
+			genre_name = gOb.name
+			genre = gOb;
 		}
+
+		//note: if you click on just a genre, need to calculate the families
+
+		if(!(friendscontrol.genres.includes(genre))){
+			setGColor({ ...gcolor, [genre_name]: map[family_name]["clicked"] });
+			handleClick(family_name)
+			friendscontrol.setGenres((prevState => {return [...prevState,genre] }));
+		}else{
+			setGColor({ ...gcolor, [genre_name]: map[family_name]["default"] });
+			//var newval  = prevState.filter(r =>{return r !== gOb.name});
+			//todo: actually not sure about removing the last family that doesn't match
+			//sort of makes sense when it was added as a result of genre selection
+			//but especially not if you started with family selection first
+			//handleClick({target:{innerText:family_name}})
+			friendscontrol.setGenres((prevState => {return prevState.filter(r =>{return r.name !== genre_name}) }));
+
+		}
+
 	};
-
-
 
 	const resetSelections = () =>{
 		setColor(initColorState);
@@ -149,10 +185,15 @@ function BubbleFamilyGenreChips(props) {
 	//todo: gcolor not getting set on time?
 	//somehow setting init state for gcolor just isn't taking ...
 	const getGColor = (gOb) =>{
-		//console.log("getGColor",gOb);
-		//console.log(gcolor);
-		if(gcolor[gOb.name]){return gcolor[gOb.name]}
-		return initGColorState[gOb.name]
+
+		if(props.occurred){
+			if(gcolor[gOb.genre.name]){return gcolor[gOb.genre.name]}
+			return initGColorState[gOb.genre.name]
+		}else{
+			if(gcolor[gOb.name]){return gcolor[gOb.name]}
+			return initGColorState[gOb.name]
+		}
+
 	}
 
 
@@ -161,14 +202,16 @@ function BubbleFamilyGenreChips(props) {
 		<div style={{display:"flex",flexDirection:props.flexDirection}}>
 			<div>
 				{toMap.map((fam,i) =>
-					<Chip
-						// className={classes.chip}
-						className={[classes.chip,"famChip"].join(' ')}
-						label={fam}
-						onClick={handleClick}
-						style={color[fam]}
-						key={i}
-					/>
+					<div  style={{display:"flex"}} onClick={() =>{handleClick(fam)}}>
+						<Chip
+							// className={classes.chip}
+							className={[classes.chip,"famChip"].join(' ')}
+							label={fam}
+							style={color[fam]}
+							key={i}
+						/>
+						{ props.removable ? <div style={{"left":"-8px","position":"relative"}}><HighlightOffIcon fontSize={'small'}/> </div> : ""}
+					</div>
 				)}
 			</div>
 			<div  onClick={() =>{resetSelections()}}><HighlightOffIcon fontSize={'small'}/>Clear</div>
@@ -176,20 +219,26 @@ function BubbleFamilyGenreChips(props) {
 
 		{/*className={'genreChipContainer'}*/}
 		<div >
-		{_genres.map((gOb,i) =>
-			<Chip
-				// className={[classes.chip,"genreChip"].join(' ')}
-				className={classes.chip}
-				key={i}
-				// className={'genreChip'}
-				label={gOb.name}
-				onClick={() =>{handleGClick(gOb)}}
-				style={getGColor(gOb)}
-				// style={initGColorState[gOb.name]}
-				 // style={gcolor[gOb.name]}
-				// style={{"--background-color2":"blue"}}
-			/>
-		)}
+			{_genres.map((gOb,i) =>
+				<div style={{display:"flex"}} onClick={() =>{handleGClick(gOb)}}>
+					<Chip
+						// className={[classes.chip,"genreChip"].join(' ')}
+						className={classes.chip}
+						key={i}
+						// className={'genreChip'}
+						label={
+							props.occurred ? gOb.genre.name + " (" + gOb.occurred.toString() + ")"
+								: gOb.name
+						}
+
+						style={getGColor(gOb)}
+						// style={initGColorState[gOb.name]}
+						// style={gcolor[gOb.name]}
+						// style={{"--background-color2":"blue"}}
+					/>
+					{ props.removable ? <div style={{"left":"-8px","position":"relative"}}><HighlightOffIcon fontSize={'small'}/> </div> : ""}
+				</div>
+			)}
 		</div>
 
 	</div>)

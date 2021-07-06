@@ -1,8 +1,8 @@
 .filterItems{
     margin-left:.5em
 }
-.filterItems div{
-    margin-bottom:1em;
+.filterItems > div{
+    margin-bottom:2em;
 }
 .filterItems div:first-child{
     margin-top:.5em;

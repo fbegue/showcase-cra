@@ -1,5 +1,5 @@
 // eslint-disable-next-line no-unused-expressions
-import {FriendsControl, GridControl, StatControl, TabControl} from "../index";
+import {FriendsControl, GridControl, StatControl, TabControl,TileSelectControl} from "../index";
 import React, {useContext, useMemo,useEffect,useState} from "react";
 import {Context} from "../storage/Store";
 import {useReactiveVar} from "@apollo/react-hooks";
@@ -52,6 +52,7 @@ function ContextStats(props) {
 	let friendscontrol = FriendsControl.useContainer()
 	let tabcontrol = TabControl.useContainer()
 	let gridControl = GridControl.useContainer();
+	let tileSelectControl = TileSelectControl.useContainer();
 
 
 	// const [globalState, globalDispatch] = useContext(Context);
@@ -292,6 +293,13 @@ function ContextStats(props) {
 	const print = (r) =>{
 		console.log(r);
 	}
+
+	const handleTileSelect = (item) =>{
+		console.log("handleTileSelect");
+		tileSelectControl.setDrawerShowing(true);
+		tileSelectControl.selectTile(item)
+	}
+
 	return(
 		<div>
 			{/*<MyCustomWrapper ref={containerRef} className={classnames(params)}>the box</MyCustomWrapper>*/}
@@ -355,7 +363,7 @@ function ContextStats(props) {
 					</div>
 					<div style={{width:"1em"}}>
 						{/*testing: re-using BubbleFamily from above - it'll just never show genres?*/}
-						<BubbleFamilyGenreChips families={friendscontrol.families} genres={friendscontrol.genres} flexDirection={'column'}/>
+						<BubbleFamilyGenreChips removable={true} families={friendscontrol.families} genres={friendscontrol.genres} flexDirection={'column'}/>
 					</div>
 				</div>
 
@@ -395,9 +403,9 @@ function ContextStats(props) {
 
 					<div className={styles.list} style={{ height: "37em",minWidth:gridControl.gridClass === 'defaultGrid' ? '64em':'57em'}}>
 						{transitions((style, item) => (
-							<a.div style={style}>
+							<a.div style={style} onClick={() =>{handleTileSelect(item)}}>
 								{item.type === "track" &&
-								<div>
+								<div >
 									<img height={120} src={item.album.images[0] && item.album.images[0].url}/>
 									<div style={{padding:"2px",background:"rgb(128 128 128 / .7)",position:"relative",top:"-43px",color:"white",height:"20px"}}>{item.name}</div>
 								</div>
