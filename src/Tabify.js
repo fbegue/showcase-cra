@@ -32,7 +32,7 @@ import {useQuery,useReactiveVar} from "@apollo/react-hooks";
 //testing:
 import Home from './components/Home';
 import TabPanel from './components/utility/CustomTabPanel'
-import Social from "./components/Social";
+import Social from "./components/Social/Social";
 import MatTableTreeTest from './components/MatTableTreeTest'
 import Box from "@material-ui/core/Box";
 import Typography from "@material-ui/core/Typography";

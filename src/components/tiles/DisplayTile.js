@@ -16,6 +16,7 @@ function DisplayTile(props) {
 				</div>
 				<div>
 					<img style={{width:"15em",height:"15em"}} src={props.tile.images[0].url}/>
+					{props.tile.id}
 				</div>
 			</div>
 			<div>

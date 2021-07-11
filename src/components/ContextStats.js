@@ -11,7 +11,7 @@ import Typography from "@material-ui/core/Typography";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import Box from "@material-ui/core/Box";
-import styles from './styles.module.css'
+import styles from './ContextStats.tiles.module.css'
 import {families as systemFamilies} from "../families";
 import uuid from 'react-uuid'
 import CustomizedInputBase from "./utility/CustomizedInputBase";
@@ -363,7 +363,7 @@ function ContextStats(props) {
 					</div>
 					<div style={{width:"1em"}}>
 						{/*testing: re-using BubbleFamily from above - it'll just never show genres?*/}
-						<BubbleFamilyGenreChips removable={true} families={friendscontrol.families} genres={friendscontrol.genres} flexDirection={'column'}/>
+						<BubbleFamilyGenreChips removable={true} clearable={true} families={friendscontrol.families} genres={friendscontrol.genres} flexDirection={'column'}/>
 					</div>
 				</div>
 
@@ -405,13 +405,13 @@ function ContextStats(props) {
 						{transitions((style, item) => (
 							<a.div style={style} onClick={() =>{handleTileSelect(item)}}>
 								{item.type === "track" &&
-								<div >
+								<div className={tileSelectControl.tile && tileSelectControl.tile.id === item.id ? 'tile-selected':'tile-unselected' }>
 									<img height={120} src={item.album.images[0] && item.album.images[0].url}/>
 									<div style={{padding:"2px",background:"rgb(128 128 128 / .7)",position:"relative",top:"-43px",color:"white",height:"20px"}}>{item.name}</div>
 								</div>
 								}
 								{item.type !== "track" &&
-								<div>
+								<div className={tileSelectControl.tile && tileSelectControl.tile.id === item.id ? 'tile-selected':'tile-unselected' }>
 									<img height={120} src={item.images[0] && item.images[0].url}/>
 									<div style={{padding:"2px",background:"rgb(128 128 128 / .7)",position:"relative",top:"-43px",color:"white",height:"20px"}}>{item.name}</div>
 								</div>

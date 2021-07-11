@@ -2,7 +2,8 @@ import React, {} from 'react';
 function UserTile(props) {
 	return(
 
-		<div style={{display:"flex",flexDirection:"column",position:"relative",width:props.single ? "200px":null}} className={props.single ? null : props.selectedUser && props.selectedUser.id === props.item.id ? 'user-selected':'user-unselected' }>
+		<div style={{display:"flex",flexDirection:"column",position:"relative",width:props.single ? "200px":null}}
+			 className={props.single ? null : props.selectedUser && props.selectedUser.id === props.item.id ? 'tile-selected':'tile-unselected' }>
 
 			<div >
 				{/* width="150px" height="150px"*/}

@@ -146,7 +146,7 @@ function InfoPanel(props) {
 					</Paper>
 				</div>
 				{/*<div style={{marginTop:".5em"}}><GenreChipsSmartRanked chipData={chipGenresRanked}/></div>*/}
-				<BubbleFamilyGenreChips families={[]} familyDisabled={true} occurred={true} genres={chipGenresRanked} flexDirection={'column'}/>
+				<BubbleFamilyGenreChips families={[]} familyDisabled={true} occurred={true} clearable={false}  genres={chipGenresRanked} flexDirection={'column'}/>
 
 				{/*<Paper elevation={3} style={{padding:"3px"}}>*/}
 				{/*	<ChipsArray chipData={genres}/>*/}

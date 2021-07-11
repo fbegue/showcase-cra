@@ -1,24 +1,27 @@
 import React, {useContext, useState, useEffect, useMemo, useRef} from 'react';
 import TextField from '@material-ui/core/TextField';
 import _ from "lodash";
-import api from "../api/api";
-import {Context, initUser} from "../storage/Store";
-import {StatControl, Control, FriendsControl,PaneControl} from "../index";
+import api from "../../api/api";
+import {Context, initUser} from "../../storage/Store";
+import {StatControl, Control, FriendsControl,PaneControl} from "../../index";
 import {useReactiveVar} from "@apollo/react-hooks";
-import {GLOBAL_UI_VAR, STATS, TILES} from "../storage/withApolloProvider";
+import {CHIPFAMILIESRANKED, CHIPGENRESRANKED, GLOBAL_UI_VAR, STATS, TILES} from "../../storage/withApolloProvider";
 import { makeStyles } from '@material-ui/core/styles';
-import styles from './stylesFriends.module.css'
+import styles from './Social.tiles.module.css'
 import './Social.css'
-import CustomizedInputBase from "./utility/CustomizedInputBase";
-import UserTile from "./utility/UserTile";
-import FriendsDisplay from "./Social/FriendsDisplay";
-import util from "../util/util";
-import BackdropParent from "./utility/BackdropParent";
-import Paper from "@material-ui/core/Paper";
+import CustomizedInputBase from "../utility/CustomizedInputBase";
+import UserTile from "../utility/UserTile";
+import FriendsDisplay from "./FriendsDisplay";
+import InputIcon from '@material-ui/icons/Input';
+
+//import util from "../util/util";
+import BackdropParent from "../utility/BackdropParent";
+import Drawer from "./Drawer";
+//import Paper from "@material-ui/core/Paper";
 
 // import Image from '../util/Image'
 // import './Masonry/styles.css'
-import {a, useTransition,useSpring} from "react-spring";
+import {a, useTransition, useSpring, animated} from "react-spring";
 import Popper from '@material-ui/core/Popper';
 import Switch from '@material-ui/core/Switch';
 import Collapse from '@material-ui/core/Collapse';
@@ -26,6 +29,8 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import Typography from "@material-ui/core/Typography";
+import BubbleFamilyGenreChips from "../chips/BubbleFamilyGenreChips";
+import Paper from "@material-ui/core/Paper";
 
 const useStyles = makeStyles((theme) => ({
 	root: {
@@ -74,6 +79,10 @@ function Social(props) {
 	const globalUI = useReactiveVar(GLOBAL_UI_VAR);
 	const stats = useReactiveVar(STATS);
 	let control = Control.useContainer();
+	let friendscontrol = FriendsControl.useContainer();
+	const chipGenresRanked = useReactiveVar(CHIPGENRESRANKED);
+	const chipFamiliesRanked = useReactiveVar(CHIPFAMILIESRANKED);
+
 
 	let statcontrol = StatControl.useContainer();
 
@@ -113,9 +122,9 @@ function Social(props) {
 	}
 
 	//----------------------------------------------------------------------
-	const columns = 2;
+	const columns = 4;
 	//note: this width divided by # of columns = the width of one item
-	const width = 250;
+	const width = 550;
 	//note: replaced all references to data-height (designed to be unique values 300-500) with uHeight
 	// const uHeight = 480;
 	// const uHeight = 370;
@@ -225,17 +234,18 @@ function Social(props) {
 	useEffect(() => {
 		var _statCards = [];
 		//testing: going to let util set these up for me depending on context
-		if(stats['max']){
-			_statCards.push({label: "Max", value: stats['max'].name, width: "120px"})
-			// var user = globalState[globalUI.user.id + "_artists"];
-			// var guest = globalState[selectedUser.id + "_artists"];
-			// var shared = _.intersectionBy([{ 'x': 1 }], [{ 'x': 2 }, { 'x': 1 }], 'x');
-			console.log("_statCards");
-			// _statCards.push({label: "Shared Saved Artists", value: source.created, width: "120px"})
-			// _statCards.push({label: "Shared Saved Albums", value: source.followed, width: "120px"})
-			// _statCards.push({label: "Shared Saved Songs", value: source.followed, width: "120px"})
-			setStatCards(_statCards)
-		}
+
+		// if(stats['max']){
+		// 	_statCards.push({label: "Top Family", value: stats['max'].name, width: "200px"})
+		// 	// var user = globalState[globalUI.user.id + "_artists"];
+		// 	// var guest = globalState[selectedUser.id + "_artists"];
+		// 	// var shared = _.intersectionBy([{ 'x': 1 }], [{ 'x': 2 }, { 'x': 1 }], 'x');
+		// 	console.log("_statCards");
+		// 	// _statCards.push({label: "Shared Saved Artists", value: source.created, width: "120px"})
+		// 	// _statCards.push({label: "Shared Saved Albums", value: source.followed, width: "120px"})
+		// 	// _statCards.push({label: "Shared Saved Songs", value: source.followed, width: "120px"})
+		// 	setStatCards(_statCards)
+		// }
 
 	},[selectedUser,stats])
 	//[selectedUser]
@@ -255,101 +265,207 @@ function Social(props) {
 	}
 
 
-	const [showBackdrop, setShowBackdrop] = React.useState(false);
+	//deprecated
+	//const [showBackdrop, setShowBackdrop] = React.useState(false);
+
+	const [isDrawerShowing, setDrawerShowing] = useState(true);
+
 	const selectUser = (item) =>{
 		statcontrol.setStats({name:"friends",user:item});setSelectedUser(item);clearForm();
-		setShowBackdrop(true)
+		setDrawerShowing(false);
+		// setShowBackdrop(true)
+
 	}
 
 
+	const handleToggleDrawer = () => {
+		setDrawerShowing(!isDrawerShowing);
+	};
 
+	const drawerSpringStyle = useSpring({
+		// top: show ? 200 : 0,
+		position: "absolute",
+		left: 0,
+		backgroundColor: "#806290",
+		height: "100%",
+		margin:"0px",
+		// width: "300px",
+		width: isDrawerShowing ? "100%" : "8%"
+	});
 
 	return(
-		//todo: restore collapse
-		//https://material-ui.com/components/transitions/
-		<div >
-			<div>
-				{/*<button onClick={changeData}>changeData</button>*/}
-				{/*<button onClick={st}>trigger</button>*/}
+		<div>
+			<div
+				style={{
+					//todo: have to set explcit height here?
+					//not undertstanding why it just doesn't adjust to content
+					height: "20.5em",
+					border: "1px solid black",
+					position: "relative"
+				}}
+			>
+				<animated.div style={drawerSpringStyle}>
+					{!(isDrawerShowing) &&
+						<div onClick={handleToggleDrawer}>
+							<div style={{"position":"absolute","left":"6px"}}>
+								<InputIcon fontSize={'large'} />
+							</div>
 
-
-				{/*todo: I thiiiink the backdrop is preventing me from auto pushing / assigning a width that works to anything inside it?
-				simply b/c I can modify it here... still an issue b/c then I have to go modify width of everything else .... :/ */}
-				<div style={{paddingLeft:"1em",paddingTop:"1em",width:"40em"}}>
-					<div style={{display:"flex"}}>
-						<div>
-								{/*<TextField id="standard-basic" placeholder="search" value={query} onChange={handleChange} onClick={handleClick} />*/}
-								<CustomizedInputBase value={query} onChange={handleChange} onClick={handleClick} clearForm={() =>{clearForm()}} placeholder={'search for friends'}/>
 						</div>
-						<div> <button onClick={() =>{setShowBackdrop(false)}}>return</button></div>
-					</div>
 
-					{/*todo: what was I setting up here? the cached stats for a user in card form?*/}
+					// <button className="openButton" onClick={handleToggleDrawer}>
+					// 	{isDrawerShowing ? "Close" : "Open"}
+					// </button>
+					}
+					<div className="drawer">
+						<div style={{ width: "40em", border: "blue 1px solid",display:isDrawerShowing ? 'initial':'none'}}>
+							<div >
+								{/*<button onClick={changeData}>changeData</button>*/}
+								{/*<button onClick={st}>trigger</button>*/}
 
-					<BackdropParent defaultContent={
-						<div style={{display:"flex",flexDirection:"row"}}>
-							{/*	//	todo: why was this 480px? it covers stats panel beside it*/}
-							<div style={{display:"flex", flexWrap:"wrap",width:"13em"}}>
-								<FriendsDisplay onClick={selectUser} users={globalState['spotifyusers'].filter(myFriendsFilter)}/>
+
+								{/*todo: I thiiiink the backdrop is preventing me from auto pushing / assigning a width that works to anything inside it?
+				simply b/c I can modify it here... still an issue b/c then I have to go modify width of everything else .... :/ */}
+								<div>
+									<div style={{display:"flex",flexDirection:"column"}}>
+										<div  style={{display:"flex"}}>
+											{/*<TextField id="standard-basic" placeholder="search" value={query} onChange={handleChange} onClick={handleClick} />*/}
+											<div style={{flexGrow:"1"}}>
+												<CustomizedInputBase value={query} onChange={handleChange} onClick={handleClick} clearForm={() =>{clearForm()}} placeholder={'search for friends'}/>
+											</div>
+											<div onClick={handleToggleDrawer}>
+												<div style={{"transform":"scaleX(-1)",marginRight:".5em"}}>
+													<InputIcon fontSize={'large'} />
+												</div>
+											</div>
+										</div>
+										{/*<div> <button onClick={() =>{setShowBackdrop(false)}}>return</button></div>*/}
+										<div style={{display:"flex",flexDirection:"row"}}>
+											{/*	//	todo: why was this 480px? it covers stats panel beside it*/}
+											<div style={{display:"flex", flexWrap:"wrap",width:"13em"}}>
+												<FriendsDisplay onClick={selectUser} users={globalState['spotifyusers'].filter(myFriendsFilter)}/>
+											</div>
+										</div>
+									</div>
+
+									{globalState['spotifyusers'].length > 0 &&
+									//style={{marginTop:"1em"}}
+									<div>
+										<Popper
+											id={id}
+											open={open}
+											anchorEl={anchorEl}
+											container={tref}
+											transition
+											//todo :does no one give a shit about placement??
+											placement={'bottom-start'}
+										>
+											{({ TransitionProps }) => (
+												<Fade {...TransitionProps}>
+													<div className={styles.list} style={{ height: Math.max(...heights) }}>
+														{/*<div className={styles.list} style={{ height:"20em" }}>*/}
+														{transitions((style, item) => (
+															<a.div key={item.id} style={style} onClick={(e =>{selectUser(item)})}>
+																<UserTile selectedUser={selectedUser} item={item}/>
+
+															</a.div>
+														))}
+													</div>
+												</Fade>
+											)}
+
+										</Popper>
+									</div>
+									}
+
+									{/*todo: deprecated backdrop fader (always giving me width adjustment troubles  -possibly not it's fault*/}
+
+									{/*<BackdropParent defaultContent={*/}
+									{/*	<div style={{display:"flex",flexDirection:"row"}}>*/}
+									{/*		/!*	//	todo: why was this 480px? it covers stats panel beside it*!/*/}
+									{/*		<div style={{display:"flex", flexWrap:"wrap",width:"13em"}}>*/}
+									{/*			<FriendsDisplay onClick={selectUser} users={globalState['spotifyusers'].filter(myFriendsFilter)}/>*/}
+									{/*		</div>*/}
+									{/*	</div>*/}
+									{/*} setShowBackdrop={setShowBackdrop} showBackdrop={showBackdrop} shownContent={*/}
+									{/*	<div style={{"position":"absolute","top":"0px","left":"0px"}}>*/}
+									{/*		{selectedUser &&*/}
+									{/*		// <Paper>*/}
+									{/*		<div style={{display:"flex",flexDirection:"row"}}>*/}
+									{/*			<div><UserTile item={selectedUser} single={true} size={["200px","200px"]} /> </div>*/}
+									{/*			<div style={{display:"flex", flexWrap:"wrap"}}>*/}
+									{/*				{statCards.map((item,i) => (*/}
+									{/*					<div key={item.label} style={{width:item.width, padding:"5px"}}>*/}
+									{/*						<Card>*/}
+									{/*							<CardContent>*/}
+									{/*								<Typography variant="subtitle1" component={'span'} >{item.label}:{'\u00A0'}</Typography>*/}
+									{/*								/!*todo: color should be typo color prop set in MUI theme*!/*/}
+									{/*								<Typography variant="subtitle1" component={'span'} ><span style={{color:'#3f51b5'}}>{item.value}</span></Typography>*/}
+									{/*							</CardContent>*/}
+									{/*						</Card>*/}
+									{/*					</div>*/}
+									{/*				))}*/}
+									{/*			</div>*/}
+									{/*		</div>*/}
+									{/*			// </Paper>*/}
+									{/*		}*/}
+									{/*	</div>*/}
+									{/*}/>*/}
+
+								</div>
 							</div>
 						</div>
-					} setShowBackdrop={setShowBackdrop} showBackdrop={showBackdrop} shownContent={
-						<div style={{"position":"absolute","top":"0px","left":"0px"}}>
-							{selectedUser &&
-							// <Paper>
-								<div style={{display:"flex",flexDirection:"row"}}>
-									<div><UserTile item={selectedUser} single={true} size={["200px","200px"]} /> </div>
-									<div style={{display:"flex", flexWrap:"wrap"}}>
-										{statCards.map((item,i) => (
-											<div key={item.label} style={{width:item.width, padding:"5px"}}>
-												<Card>
-													<CardContent>
-														<Typography variant="subtitle1" component={'span'} >{item.label}:{'\u00A0'}</Typography>
-														{/*todo: color should be typo color prop set in MUI theme*/}
-														<Typography variant="subtitle1" component={'span'} ><span style={{color:'#3f51b5'}}>{item.value}</span></Typography>
-													</CardContent>
-												</Card>
-											</div>
-										))}
-									</div>
+					</div>
+				</animated.div>
+
+				{selectedUser && !(isDrawerShowing) &&
+				// <Paper>
+				<div style={{display:"flex",flexDirection:"row",marginLeft:"3em"}}>
+					<div><UserTile item={selectedUser} single={true} size={["200px","200px"]} /> </div>
+					<div style={{display:"flex",flexDirection:"column"}}>
+						<div style={{display:"flex", flexWrap:"wrap"}}>
+							{statCards.map((item,i) => (
+								<div key={item.label} style={{width:item.width, padding:"5px"}}>
+									<Card>
+										<CardContent>
+											<Typography variant="subtitle1" component={'span'} >{item.label}:{'\u00A0'}</Typography>
+
+											{/*todo: color should be typo color prop set in MUI theme*/}
+											<Typography variant="subtitle1" component={'span'} ><span style={{color:'#3f51b5'}}>{item.value}</span></Typography>
+										</CardContent>
+									</Card>
 								</div>
-							// </Paper>
-							}
+							))}
 						</div>
-
-					}/>
-
-
+						<div>
+							<div style={{padding:"2px",color:"white",height:"20px",width:"9.2em",marginBottom:"1em"}}>
+								<Paper elevation={3}>
+									<Typography variant="subtitle1">
+										{friendscontrol.families.length > 0 ? 'Selected Family':"Top Family"}
+									</Typography>
+								</Paper>
+							</div>
+							<div>
+								<BubbleFamilyGenreChips families={ chipFamiliesRanked[0] ? [chipFamiliesRanked[0].family_name]:[]} familyDisabled={true} occurred={true} clearable={false} genres={[]} flexDirection={'column'}/>
+							</div>
+							{/*todo: not sure why BubbleFamilyGenreChips is creeping up here*/}
+							<div style={{padding:"2px",color:"white",height:"20px",width:"9.2em",marginBottom:"1em"}}>
+								<Paper elevation={3}>
+									<Typography variant="subtitle1">
+										Top Shared Genres
+									</Typography>
+								</Paper>
+							</div>
+							<div>
+								<BubbleFamilyGenreChips families={[]} familyDisabled={true} occurred={true} clearable={false} genres={chipGenresRanked} flexDirection={'column'}/>
+							</div>
+						</div>
+					</div>
 				</div>
-				{globalState['spotifyusers'].length > 0 &&
-				//style={{marginTop:"1em"}}
-				<div  >
-					<Popper
-						id={id}
-						open={open}
-						anchorEl={anchorEl}
-						container={tref}
-						transition
-						placement={'right'}
-					>
-						{({ TransitionProps }) => (
-							<Fade {...TransitionProps}>
-								<div className={styles.list} style={{ height: Math.max(...heights) }}>
-									{/*<div className={styles.list} style={{ height:"20em" }}>*/}
-									{transitions((style, item) => (
-										<a.div key={item.id} style={style} onClick={(e =>{selectUser(item)})}>
-											<UserTile selectedUser={selectedUser} item={item}/>
-
-										</a.div>
-									))}
-								</div>
-							</Fade>
-						)}
-
-					</Popper>
-				</div>
+					// </Paper>
 				}
 			</div>
+
 		</div>
 
 	)

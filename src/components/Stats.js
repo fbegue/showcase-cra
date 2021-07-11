@@ -225,8 +225,8 @@ function Stats(props) {
 		title:{text:""},
 		loading:{showDuration:100,hideDuration:100},
 		chart:{
-			height:300,
-			width:600,
+			height:380,
+			width:800,
 		},
 		tooltip: {
 			useHTML: true,
@@ -243,7 +243,7 @@ function Stats(props) {
 				maxSize: "100%",
 				//not mentioned in docs?
 				zMin: 0,
-				zMax: 100,
+				zMax: 180,
 				layoutAlgorithm: {
 					gravitationalConstant: 0.05,
 					splitSeries: true,
@@ -373,7 +373,7 @@ function Stats(props) {
 		// width: "100%",
 		// height: "100%"
 		height: tileSelectControl.isDrawerShowing ? "20em" : "1em",
-		 minWidth:"40em"
+		minWidth:"40em"
 	});
 	return(
 
@@ -391,7 +391,7 @@ function Stats(props) {
 					{statcontrol.chart ? <PieChartIcon fontSize={'small'}/>:<CloudIcon fontSize={'small'}/>}
 				</button>
 			</div>
-			<div style={{"position":"absolute","top":"0px","left":"0px","zIndex":"3"}}>
+			<div style={{"position":"absolute","top":"0px","left":"0px","zIndex":"6"}}>
 				<a.div  style={drawerProps}>
 					<div>
 						{/*<div style={{border: "1px solid black",height:"1em"}}></div>*/}
@@ -404,7 +404,7 @@ function Stats(props) {
 				</a.div>
 			</div>
 
-			<div style={{display:"flex",paddingTop:"1em"}}>
+			<div style={{paddingTop:"1em"}}>
 				{/*<div style={{flexGrow:"1"}}></div>*/}
 				{/*style={{display:"flex",flexDirection:"column"}} */}
 				{/*style={{top: "-4em",position: "relative",height: "21em",zIndex:1}}*/}
@@ -412,71 +412,80 @@ function Stats(props) {
 					{/*options={{legend:legend}}*/}
 					<div style={{display:"flex"}} className={gridControl.gridClass === 'friendsGrid' ? 'fadeIn':'fadeOut'}>
 						{/*{statcontrol.stats.name === 'friends' &&*/}
-						{/*todo: stop infopanel from hogging this space*/}
-						<div style={{padding:"5px",zIndex:"5"}}>
-							<BubbleFamilyGenreChips families={chipFamilies} genres={chipGenres} flexDirection={'column'}/>
-						<div>{getPointSum(bubbleData)}</div></div>
-						<div>
-							<BubbleChart  options={{...bubbleOptionsGuest,series:bubbleData}}/>
+
+						<div style={{"padding":"5px","zIndex":"5","flexGrow":"1","overflowY":"auto","overflowX":"hidden","maxHeight":"23.5em","minWidth":"7em"}}>
+							<BubbleFamilyGenreChips families={chipFamilies} genres={chipGenres} flexDirection={'row'} clearable={true} seperator={true}/>
+							<div>{getPointSum(bubbleData)}</div></div>
+						<div style={{paddingRight:"1em"}}>
+							<BubbleChart  options={{...bubbleOptionsGuest,series:bubbleData}} size={{height:380,
+								width: friendscontrol.families.length === 0 ? 800:600}}/>
 						</div>
 
-						<div style={{zIndex:2,padding:"5px"}}>
-							<div style={{display:"flex"}}>
-								{/*<VennChart data={vennData}/>*/}
-								<div>
-									<FormControl component="fieldset">
-										{/*<FormLabel component="legend">Gender</FormLabel>*/}
-										<RadioGroup  name="radio1" value={friendscontrol.compare} onChange={handleChange}>
-											<FormControlLabel value="all" control={<Radio />} label="All" />
-											<FormControlLabel value="shared" control={<Radio />} label="Shared" />
-											<FormControlLabel value="user" control={<Radio />} label="User" />
-											<FormControlLabel value="guest" control={<Radio />} label="Guest" />
-										</RadioGroup>
-									</FormControl>
+						{/*todo: disabled until I can figure out some way to deal with data*/}
+						{/*<div style={{zIndex:2,padding:"5px"}}>*/}
+						{/*	<div style={{display:"flex"}}>*/}
+						{/*		/!*<VennChart data={vennData}/>*!/*/}
+						{/*		<div>*/}
+						{/*			<FormControl component="fieldset">*/}
+						{/*				/!*<FormLabel component="legend">Gender</FormLabel>*!/*/}
+						{/*				<RadioGroup  name="radio1" value={friendscontrol.compare} onChange={handleChange}>*/}
+						{/*					<FormControlLabel value="all" control={<Radio />} label="All" />*/}
+						{/*					<FormControlLabel value="shared" control={<Radio />} label="Shared" />*/}
+						{/*					<FormControlLabel value="user" control={<Radio />} label="User" />*/}
+						{/*					<FormControlLabel value="guest" control={<Radio />} label="Guest" />*/}
+						{/*				</RadioGroup>*/}
+						{/*			</FormControl>*/}
 
-									<Divider />
-									{/*note: sourceFilter doesn't make sense unless we're tracks,artists*/}
-									{/*todo: although it would be cool to do playlists = [followed,created]*/}
-									{(friendscontrol.selectedTabIndex === 1 || friendscontrol.selectedTabIndex === 1) &&
-									<FormControl component="fieldset">
-										<RadioGroup  name="radio1" value={friendscontrol.sourceFilter} onChange={handleChange2}>
-											<FormControlLabel value="both" control={<Radio />} label="Both" />
-											<FormControlLabel value="saved" control={<Radio />} label="Saved" />
-											<FormControlLabel value="top" control={<Radio />} label="Top" />
-										</RadioGroup>
-									</FormControl>
-									}
+						{/*			<Divider />*/}
+						{/*			/!*note: sourceFilter doesn't make sense unless we're tracks,artists*!/*/}
+						{/*			/!*todo: although it would be cool to do playlists = [followed,created]*!/*/}
+						{/*			{(friendscontrol.selectedTabIndex === 1 || friendscontrol.selectedTabIndex === 1) &&*/}
+						{/*			<FormControl component="fieldset">*/}
+						{/*				<RadioGroup  name="radio1" value={friendscontrol.sourceFilter} onChange={handleChange2}>*/}
+						{/*					<FormControlLabel value="both" control={<Radio />} label="Both" />*/}
+						{/*					<FormControlLabel value="saved" control={<Radio />} label="Saved" />*/}
+						{/*					<FormControlLabel value="top" control={<Radio />} label="Top" />*/}
+						{/*				</RadioGroup>*/}
+						{/*			</FormControl>*/}
+						{/*			}*/}
 
-								</div>
-								{/*<div>*/}
-								{/*	<Select*/}
-								{/*		multiple*/}
-								{/*		native*/}
-								{/*		value={friendscontrol.families}*/}
-								{/*		onChange={handleChangeMultiple}*/}
-								{/*		inputProps={{*/}
-								{/*			id: 'select-multiple-native',*/}
-								{/*		}}*/}
-								{/*	>*/}
-								{/*		<option key={'all'} value={'all'}>all</option>*/}
-								{/*		{systemFamilies.map((name) => (*/}
-								{/*			<option key={name} value={name}>{name}</option>*/}
-								{/*		))}*/}
+						{/*		</div>*/}
+						{/*		/!*<div>*!/*/}
+						{/*		/!*	<Select*!/*/}
+						{/*		/!*		multiple*!/*/}
+						{/*		/!*		native*!/*/}
+						{/*		/!*		value={friendscontrol.families}*!/*/}
+						{/*		/!*		onChange={handleChangeMultiple}*!/*/}
+						{/*		/!*		inputProps={{*!/*/}
+						{/*		/!*			id: 'select-multiple-native',*!/*/}
+						{/*		/!*		}}*!/*/}
+						{/*		/!*	>*!/*/}
+						{/*		/!*		<option key={'all'} value={'all'}>all</option>*!/*/}
+						{/*		/!*		{systemFamilies.map((name) => (*!/*/}
+						{/*		/!*			<option key={name} value={name}>{name}</option>*!/*/}
+						{/*		/!*		))}*!/*/}
 
-								{/*	</Select>*/}
-								{/*</div>*/}
+						{/*		/!*	</Select>*!/*/}
+						{/*		/!*</div>*!/*/}
 
-							</div>
-						</div>
+						{/*	</div>*/}
+						{/*</div>*/}
+
 						{/*testing: disabled solo user bubble chart*/}
 						{/*{statcontrol.stats.name !== 'friends' &&*/}
 						{/*<BubbleChart  options={{...bubbleOptions,series:bubbleData}}/>*/}
 						{/*}*/}
 					</div>
-					<div className={gridControl.gridClass === 'defaultGrid' ? 'fadeIn':'fadeOut'} style={{"display":"flex","overflowY":"scroll","height":"24em"}}>
-						<div><PieChart data={{series: {name: 'Genres', colorByPoint: true, data:pieData, animation: {duration: 2000}}}} />
+					<div className={gridControl.gridClass === 'defaultGrid' ? 'fadeIn':'fadeOut'} style={{"display":"flex"}}>
+
+						<div style={{"padding":"5px","zIndex":"5","flexGrow":"1","overflowY":"auto","overflowX":"hidden","maxHeight":"23.5em","minWidth":"7em"}}>
+							<div><PieGenreChips families={chipFamilies} genres={chipGenres}/></div>
 						</div>
-						<div><PieGenreChips families={chipFamilies} genres={chipGenres}/> </div>
+						<div style={{paddingRight:"1em"}}>
+							<div><PieChart data={{series: {name: 'Genres', colorByPoint: true, data:pieData, animation: {duration: 2000}}}} />
+							</div>
+						</div>
+
 					</div>
 				</div>
 

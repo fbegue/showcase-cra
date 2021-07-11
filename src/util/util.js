@@ -7,7 +7,7 @@ import {families as systemFamilies, familyColors,familyIdMap} from "../families"
 import {Highlighter, StatControl,FriendsControl,Control,TabControl} from "../index";
 import {Context} from "../storage/Store";
 import {useReactiveVar} from "@apollo/react-hooks";
-import {GLOBAL_UI_VAR,TILES,EVENTS_VAR,STATS,CHIPFAMILIES,CHIPGENRES,CHIPGENRESRANKED} from "../storage/withApolloProvider";
+import {GLOBAL_UI_VAR,TILES,EVENTS_VAR,STATS,CHIPFAMILIES,CHIPGENRES,CHIPGENRESRANKED,CHIPFAMILIESRANKED} from "../storage/withApolloProvider";
 import {data1} from './testData'
 const uuid = require('react-uuid')
 
@@ -278,54 +278,150 @@ function chooseData(statcontrol,friendscontrol,tabcontrol,globalState,globalUI){
 		return some
 	}
 
+
+
+	//if it does have a genre in that set, the item can't pass unless
+	//at least one of it's genres are an exact match
+
+	var exactMatchThru = function(genres){
+		var pass = false;
+		for(var x = 0; x < genres.length; x++) {
+			if(friendscontrol.genres.indexOf(genres[x]) !== -1){
+				pass = true; break;
+			}
+		}
+		return pass
+	}
+
+//otherwise, check every genre of the item, allowing certain items to pass thru to next check
+	//to pass-thru, it must have NO genres with fams that are in the fam set from selected genres
+
+	var passThru = function(genres,filterFams){
+		var passThru = true;
+		for(var x = 0; x < genres.length; x++) {
+			if(filterFams.indexOf(genres[x].family_name) !== -1){
+				passThru = false;
+			}
+		}
+		return passThru
+	}
+	var exactMatch = function(genres){
+		var ret = false;
+		for(var x = 0; x < genres.length; x++) {
+
+			if (_.find(friendscontrol.genres, function (fg) {
+				return genres[x].id === fg.id
+			})) {
+				ret = true;
+				break;
+			}
+		}
+		return ret
+	}
+	//if any are an exact match to a selected one, let it thru
+
 	var famGenreFilter = (r) =>{
 
-		//genre selection always overrides family
-		if(friendscontrol.genres.length > 0){
+		//set of families contained with selected genre list
+		var filterFams = friendscontrol.genres.map(g =>{return g.family_name})
 
+		//goal: when a genre is selected, perform filtering only on items
+		//who's main family is referenced by said genre.
+
+			if(friendscontrol.families.length > 0){
 			switch (r.type) {
 				case 'artist':
 
-					var shared = _.intersectionBy(friendscontrol.genres, r.genres, 'id');
-					return shared.length > 0
+					if(friendscontrol.genres.length > 0){
+
+						if(friendscontrol.families.indexOf(r.familyAgg) === -1){return false}
+
+						if(exactMatch(r.genres)){return true}
+
+						if(passThru(r.genres,filterFams)){return true}
+
+						return exactMatchThru(r.genres)
+
+					}//no genres, so only return if item is in selected families
+					else{
+						debugger;
+						return friendscontrol.families.indexOf(r.familyAgg) !== -1;
+					}
+
 				case 'playlist':
 				case 'track':
 				case 'album':
 
-					var flag2 = false;
-					for(var x = 0; x < r.artists.length; x++) {
-						//todo: someone is coming back without genres:[] when it has none
-						if (!r.artists[0].genres) {
-							console.warn("problem record:", r)
-							//skips it and continues looping
-						} else {
-							var shared = _.intersectionBy(friendscontrol.genres, r.artists[0].genres, 'id');
-							flag2 = shared.length > 0
-							if (flag2) {
-								break;
+					if(friendscontrol.genres.length > 0){
+
+						// if(r.id === '6cx4GVNs03Pu4ZczRnWiLd'){
+						// 	debugger;
+						// }
+						//if any artist has a selected familyAgg, return true
+						var flag = false;
+						for(var x = 0; x < r.artists.length; x++){
+							if(friendscontrol.families.indexOf(r.artists[x].familyAgg) !== -1){
+								flag = true;
 							}
+							if(flag){break;}
 						}
-					}
-					return flag2;
-			}
-		} else if(friendscontrol.families.length > 0){
-			switch (r.type) {
-				case 'artist':
-					return friendscontrol.families.indexOf(r.familyAgg) !== -1;
-				case 'playlist':
-				case 'track':
-				case 'album':
+						if(flag){
+							// if(r.id === '6cx4GVNs03Pu4ZczRnWiLd'){
+							// 	debugger;
+							// }
+							return true
+						}
 
-					var flag = false;
-					for(var x = 0; x < r.artists.length; x++){
-						if(friendscontrol.families.indexOf(r.artists[x].familyAgg) !== -1){
-							flag = true;
+						var exactFlag = false;
+						for(var x = 0; x < r.artists.length; x++){
+							if(exactMatch(r.artists[x].genres)){
+								exactFlag = true;
+							}
+							if(exactFlag){break;}
 						}
-						if(flag){break;}
+						if(exactFlag){return true}
+
+						if(r.id === '6cx4GVNs03Pu4ZczRnWiLd'){
+							debugger;
+						}
+						var passThruFlag = false;
+						for(var x = 0; x < r.artists.length; x++){
+							if(passThru(r.artists[x].genres,filterFams)){
+								passThruFlag = true;
+							}
+							if(passThruFlag){break;}
+						}
+
+						if(!(passThruFlag)){return false}
+
+						var exactMatchThruFlag = false;
+						for(var x = 0; x < r.artists.length; x++){
+							if(exactMatchThru(r.artists[x].genres)){
+								exactMatchThruFlag = true;
+							}
+							if(exactMatchThruFlag){break;}
+						}
+						if(r.id === '6cx4GVNs03Pu4ZczRnWiLd'){
+							debugger;
+						}
+						return exactMatchThruFlag
+
+					}//no genres, so only return if item is in selected families
+					else{
+						var flag = false;
+						for(var x = 0; x < r.artists.length; x++){
+							if(friendscontrol.families.indexOf(r.artists[x].familyAgg) !== -1){
+								flag = true;
+							}
+							if(flag){break;}
+						}
+						return flag;
 					}
-					return flag;
+			}//switch
+		}else{
+				//no families
+				return true
 			}
-		}else{return true}
 	}
 
 
@@ -837,7 +933,7 @@ function useProduceData(){
 				var series = _.find(bubbleData, function(o) { return o.name === fam });
 				series.data = []
 				Object.keys(map[fam].items).forEach(aname =>{
-					series.data.push({name:aname, value:scale[1], color:familyColors[fam]})
+					series.data.push({name:aname, value:scale[0], color:familyColors[fam]})
 
 					// if(mode === 'shared'){
 					// 	if(map[fam].items[aname].length > 1){
@@ -1126,8 +1222,15 @@ function useProduceData(){
 			}
 		]
 
-		//console.log("tempPieData",tempPieData);
-		setPieData(tempPieData);
+
+		//testing:
+		if(friendscontrol.families.length > 0){
+			console.log("skip setPieData with familiies selected");
+		}else{
+			console.log("setPieData",tempPieData);
+			setPieData(tempPieData);
+		}
+
 		setGenres(_genres)
 
 		//================================================
@@ -1140,6 +1243,8 @@ function useProduceData(){
 			max === null ? max = s:{};
 			s.data.length > max.data.length ? max = s:{}
 		})
+
+
 		//console.log("$max",max);
 		_stats.max = max;
 		STATS(_stats);
@@ -1151,7 +1256,6 @@ function useProduceData(){
 		// 	setBubbleData(bubbleData);
 		// },2000)
 
-		//testing:
 		setBubbleData(bubbleData);
 		setVennData(series_sample);
 
@@ -1376,6 +1480,7 @@ function useProduceEvents(){
 				});
 
 
+				console.log("friendscontrol",friendscontrol);
 
 				console.log("$$set new chip families/genres");
 				// console.log("CHIPFAMILIES",Object.keys(familyArtist));
@@ -1384,6 +1489,7 @@ function useProduceEvents(){
 				function makeGenreRank(genres){
 					//note: think I overmapped this guy but its fine!
 					var rankGenresMap = {};
+					var rankFamiliyMap = {};
 					genres.forEach(gob =>{
 
 						if(friendscontrol.families.length > 0){
@@ -1394,12 +1500,16 @@ function useProduceEvents(){
 							}else{
 								//skip this genre which is not in the selected family
 							}
+
 						}else{
 							!(rankGenresMap[gob.id]) ? rankGenresMap[gob.id] = [1,gob] :rankGenresMap[gob.id][0]++
 						}
+						!(rankFamiliyMap[gob.family_name]) ? rankFamiliyMap[gob.family_name] = 1 :rankFamiliyMap[gob.family_name]++
 						//!(rankGenresMap[gob.id]) ? rankGenresMap[gob.id] = [1,gob] :rankGenresMap[gob.id][0]++
 					})
 
+					var arrGenresSorted = []
+					var arrFamiliesSorted = []
 					if (!(_.isEmpty(rankGenresMap))) {
 						//convert map to array and find the max
 						var arr = [];
@@ -1407,23 +1517,40 @@ function useProduceEvents(){
 							var r = { occurred:tup[1][0],genre: tup[1][1]};
 							arr.push(r);
 						});
-						var arrSorted = _.sortBy(arr, function (r) {
+						arrGenresSorted = _.sortBy(arr, function (r) {
 							return r.occurred
 						}).reverse()
-
-						return arrSorted;
 					}
+					if (!(_.isEmpty(rankFamiliyMap))) {
+						//convert map to array and find the max
+						var arr = [];
+						Object.keys(rankFamiliyMap).forEach(k =>{
+							arr.push({family_name:k,occurred:rankFamiliyMap[k]});
+						})
+						arrFamiliesSorted = _.sortBy(arr, function (r) {return r.occurred}).reverse()
+					}
+
+					return {arrGenresSorted,arrFamiliesSorted}
 				};
 
-				var newRank = makeGenreRank(genres)
+				let {arrGenresSorted:newRank,arrFamiliesSorted:newFamRank} = makeGenreRank(genres)
 				console.log("makeGenreRank",newRank);
 				CHIPGENRESRANKED(newRank)
+				console.log("makeFamRank",newFamRank);
+				CHIPFAMILIESRANKED(newFamRank)
 
 				genres = _.uniqBy(genres,'id')
 				// console.log("CHIPGENRES",genres);
 				console.log("CHIPGENRES",genres.length);
 				// console.log(relatedArtist);
-				CHIPFAMILIES(Object.keys(familyArtist))
+
+
+				if(friendscontrol.families.length > 0){
+					//console.warn("skip CHIPFAMILIES set");
+				}else{
+					CHIPFAMILIES(Object.keys(familyArtist))
+				}
+
 				CHIPGENRES(genres)
 
 				//filter out by date/metro and sort by date

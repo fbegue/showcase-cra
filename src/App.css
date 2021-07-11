@@ -41,17 +41,20 @@
 /*https://stackoverflow.com/questions/19848697/css-grid-where-one-column-shrinks-to-fit-content-the-other-fills-the-remaning-s*/
 
 
+.separator div:last-child{
+  margin-bottom:1em;
+}
 
 .defaultGrid {
   display: grid;
-background-color:#8080803b;
-  grid-template-rows: 25em 20em 20em;
+  background-color:#8080803b;
+  grid-template-rows: 25em 20em;
   /*grid-template-rows: 4em;*/
 
   /*note: old auto-width*/
-  /*grid-template-columns: 30em minmax(50em, 60em) minmax(20em,30em);*/
+  grid-template-columns: 40em minmax(53em, 60em) minmax(30em,40em);
 
-  /*grid-template-columns: repeat(auto-fit, minmax([100em, 1fr));*/
+  /*grid-template-columns: repeat(auto-fit, minmax(30em, 1fr));*/
   /*grid-template-columns: 30em 70em 20em;*/
   /*grid-template-columns:1fr 1fr 1fr;*/
 
@@ -61,6 +64,7 @@ background-color:#8080803b;
           "tiles tiles events";
 }
 
+/*deprecated*/
 .friendsGrid {
   display: grid;
   /*grid-template-columns: 40em 70em 20em;*/

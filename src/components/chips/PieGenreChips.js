@@ -134,7 +134,7 @@ function PieGenreChips(props) {
 
 	const handleGClick = (gOb) => {
 
-		console.log(handleGClick);
+		//console.log(handleGClick);
 		//testing: includes works?
 		if(!(friendscontrol.genres.includes(gOb))){
 			setGColor({ ...gcolor, [gOb.name]: map[gOb.family_name]["clicked"] });

@@ -7,32 +7,20 @@
 
 .list {
   position: relative;
-  font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, helvetica neue, helvetica, ubuntu, roboto, noto,
-  segoe ui, arial, sans-serif;
-  /*width: 100%;*/
-  /*height: 100%;*/
-  height:50em !important;
-  /*todo: when using scroll here, I have to explicitly set a width? idk*/
-  /*width:17em;*/
-  width:20em;
-  overflow:auto;
-  margin-left:-1em;
-  background-color:white;
-  margin-top: .5em;
-  left: -56px;
-
-  /*todo: somehow when this transform fires, it also fires the translate in social.css ??*/
-  /*todo: eh this whole flippy scale thing is just to hard to pull with transitions in there */
-  /*transform: scaleX(-1);*/
-
+  /*width:20em;*/
+  /*height:30em;*/
+  /*direction: rtl;*/
+  overflow:scroll;
+  width: 100%;
 }
 
 .list > div {
   position: absolute;
   will-change: transform, width, height, opacity;
-  padding: 2px;
-
+  /*direction: rtl;*/
+  padding: 15px;
 }
+
 
 .list > div > div {
   position: relative;
@@ -46,8 +34,16 @@
   line-height: 10px;
   border-radius: 4px;
   box-shadow: 0px 10px 50px -10px rgba(0, 0, 0, 0.2);
-  /*transform: scaleX(-1);*/
+  transition: transform 330ms ease-in-out;
+  box-sizing: content-box;
+  /*background-color:black;*/
 }
+.list > div > div:hover,
+.list > div > div:focus {
+  box-shadow: 0 0.5em 0.5em -0.4em black;
+  transform: translateY(-0.25em);
+}
+
 
 .bg {
   position: absolute;

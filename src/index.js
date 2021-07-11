@@ -117,8 +117,8 @@ let StatControl  = createContainer(useStats);
 
 function useTabs(initialState = 0) {
     // const [section, setActiveSection] = useState(1);
-    const [section, setActiveSection] = useState(1);
-    const [tab, setActiveTab] = useState(1);
+    const [section, setActiveSection] = useState(2);
+    const [tab, setActiveTab] = useState(0);
     const [data, setData] = useState('data1');
     return { tab,setActiveTab,section,setActiveSection,data, setData }
 }

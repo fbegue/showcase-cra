@@ -10,6 +10,7 @@ import Profile from './components/Profile'
 import Tabify from './Tabify'
 import EventsList from './EventsList'
 import Stats from "./components/Stats";
+import ContextStats from "./components/ContextStats";
 
 import Store, {Context} from './storage/Store'
 import withApolloProvider from './storage/withApolloProvider';
@@ -25,12 +26,13 @@ import { withStyles } from '@material-ui/core/styles';
 import { createMuiTheme } from '@material-ui/core/styles';
 // import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
 import { ThemeProvider as MuiThemeProvider } from '@material-ui/core/styles';
+import logo from './assets/sound_found.png'
 import 'fontsource-roboto';
 import './App.css'
-import logo from './assets/sound_found.png'
-import MatTableTreeTest from "./components/MatTableTreeTest";
-import {Tab} from "react-tabify";
-import ContextStats from "./components/ContextStats";
+import './components/tiles/Tiles.css'
+
+
+//testing:
 import ControlTest from "./components/ControlTest";
 // import SpotifyWebApi from 'spotify-web-api-js';
 // const spotifyApi = new SpotifyWebApi();
@@ -248,6 +250,7 @@ function App(props) {
                             {globalUI.access_token  &&
                             <div style={control.play ? {opacity:1,flexGrow:2}: {opacity:.4,flexGrow:2}}>
                                 <Player token={globalUI.access_token} id={control.id} play={control.play}/>
+                                {/*<div>PLAYER</div>*/}
                             </div>
                             }
                         {/*</Delayed>*/}
@@ -264,15 +267,17 @@ function App(props) {
                             <Tabify></Tabify>
                             }
                         </div>
-                        {/*style={{width:"70em"}}*/}
-                        <div className="stats" style={{minWidth:"40em"}} >
+
+                        {/* style={{minWidth:"40em"}}*/}
+                        <div className="stats" >
                            <Stats/>
                         </div>
                         <div className="tiles" >
                             {/*testing:*/}
                             <ContextStats/>
                         </div>
-                        <div className="events" style={{minWidth:"30em"}}>
+                        {/*style={{minWidth:"30em"}}*/}
+                        <div className="events" >
                             <EventsList data={[]} />
                         </div>
                     </div>

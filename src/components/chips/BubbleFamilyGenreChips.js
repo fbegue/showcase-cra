@@ -157,11 +157,14 @@ function BubbleFamilyGenreChips(props) {
 			genre = gOb;
 		}
 
-		//note: if you click on just a genre, need to calculate the families
+
 
 		if(!(friendscontrol.genres.includes(genre))){
 			setGColor({ ...gcolor, [genre_name]: map[family_name]["clicked"] });
-			handleClick(family_name)
+			if(friendscontrol.families.indexOf(family_name) === -1){
+				//note: if you click on just a genre (from info panel or events list) need to add required families
+				handleClick(family_name)
+			}
 			friendscontrol.setGenres((prevState => {return [...prevState,genre] }));
 		}else{
 			setGColor({ ...gcolor, [genre_name]: map[family_name]["default"] });
@@ -199,8 +202,7 @@ function BubbleFamilyGenreChips(props) {
 
 	return(<div>
 		{/*todo: not sure this flexDirection is effective here*/}
-		<div style={{display:"flex",flexDirection:props.flexDirection}}>
-			<div>
+		<div style={{display:"flex",flexDirection:props.flexDirection,flexWrap:"wrap"}}>
 				{toMap.map((fam,i) =>
 					<div  style={{display:"flex"}} onClick={() =>{handleClick(fam)}}>
 						<Chip
@@ -213,12 +215,14 @@ function BubbleFamilyGenreChips(props) {
 						{ props.removable ? <div style={{"left":"-8px","position":"relative"}}><HighlightOffIcon fontSize={'small'}/> </div> : ""}
 					</div>
 				)}
-			</div>
-			<div  onClick={() =>{resetSelections()}}><HighlightOffIcon fontSize={'small'}/>Clear</div>
+			{ props.clearable ? <div  onClick={() =>{resetSelections()}}><HighlightOffIcon fontSize={'small'}/>Clear</div>:""}
 		</div>
 
+		{props.seperator ? <div style={{height:"1em"}}>{'\u00A0'}</div>:"" }
+
+
 		{/*className={'genreChipContainer'}*/}
-		<div >
+		<div style={{display:"flex",flexDirection:props.flexDirection,flexWrap:"wrap"}} >
 			{_genres.map((gOb,i) =>
 				<div style={{display:"flex"}} onClick={() =>{handleGClick(gOb)}}>
 					<Chip

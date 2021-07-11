@@ -1,7 +1,7 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import UserTile from "../utility/UserTile";
 import {a, useTransition} from "react-spring";
-import styles from "./stylesFriends.module.css";
+import styles from "./FriendsDisplay.tiles.module.css";
 function FriendsDisplay(props) {
 	console.log("FriendsDisplay | users",props.users);
 
