@@ -293,19 +293,27 @@ function chooseData(statcontrol,friendscontrol,tabcontrol,globalState,globalUI){
 		return pass
 	}
 
-//otherwise, check every genre of the item, allowing certain items to pass thru to next check
+	//otherwise, check every genre of the item, allowing certain items to pass thru to next check
 	//to pass-thru, it must have NO genres with fams that are in the fam set from selected genres
 
+	const doCheck = (gin) =>{
+		friendscontrol.genres.forEach(g =>{
+			if(gin.family_name === g.family_name){
+
+			}
+		})
+	}
 	var passThru = function(genres,filterFams){
 		var passThru = true;
 		for(var x = 0; x < genres.length; x++) {
+			//if the family also has genres tho, need to check against those
 			if(filterFams.indexOf(genres[x].family_name) !== -1){
 				passThru = false;
 			}
 		}
 		return passThru
 	}
-	var exactMatch = function(genres){
+	var exactArtistMatch = function(genres){
 		var ret = false;
 		for(var x = 0; x < genres.length; x++) {
 
@@ -328,7 +336,7 @@ function chooseData(statcontrol,friendscontrol,tabcontrol,globalState,globalUI){
 		//goal: when a genre is selected, perform filtering only on items
 		//who's main family is referenced by said genre.
 
-			if(friendscontrol.families.length > 0){
+		if(friendscontrol.families.length > 0){
 			switch (r.type) {
 				case 'artist':
 
@@ -336,7 +344,7 @@ function chooseData(statcontrol,friendscontrol,tabcontrol,globalState,globalUI){
 
 						if(friendscontrol.families.indexOf(r.familyAgg) === -1){return false}
 
-						if(exactMatch(r.genres)){return true}
+						if(exactArtistMatch(r.genres)){return true}
 
 						if(passThru(r.genres,filterFams)){return true}
 
@@ -344,84 +352,107 @@ function chooseData(statcontrol,friendscontrol,tabcontrol,globalState,globalUI){
 
 					}//no genres, so only return if item is in selected families
 					else{
-						debugger;
+
 						return friendscontrol.families.indexOf(r.familyAgg) !== -1;
 					}
-
 				case 'playlist':
 				case 'track':
 				case 'album':
 
+					var testId = '0x4zqBZSjYvVLuttqcfu9W';
+				function testIf(id){
+					if(id === testId){
+						debugger
+					}
+				}
 					if(friendscontrol.genres.length > 0){
 
-						// if(r.id === '6cx4GVNs03Pu4ZczRnWiLd'){
-						// 	debugger;
-						// }
-						//if any artist has a selected familyAgg, return true
+						//testIf(r.id)
+
+						//filter out records who don't have any artists in the familyAgg
 						var flag = false;
 						for(var x = 0; x < r.artists.length; x++){
 							if(friendscontrol.families.indexOf(r.artists[x].familyAgg) !== -1){
+								//testIf(r.id)
 								flag = true;
 							}
 							if(flag){break;}
 						}
-						if(flag){
-							// if(r.id === '6cx4GVNs03Pu4ZczRnWiLd'){
-							// 	debugger;
-							// }
-							return true
-						}
+						if(!(flag)){return false}
 
+						//keep records who have an exact ARTIST match on our list of selected genres
 						var exactFlag = false;
 						for(var x = 0; x < r.artists.length; x++){
-							if(exactMatch(r.artists[x].genres)){
+							if(exactArtistMatch(r.artists[x].genres)){
 								exactFlag = true;
 							}
 							if(exactFlag){break;}
 						}
 						if(exactFlag){return true}
 
-						if(r.id === '6cx4GVNs03Pu4ZczRnWiLd'){
-							debugger;
-						}
-						var passThruFlag = false;
-						for(var x = 0; x < r.artists.length; x++){
-							if(passThru(r.artists[x].genres,filterFams)){
-								passThruFlag = true;
-							}
-							if(passThruFlag){break;}
-						}
 
-						if(!(passThruFlag)){return false}
+						//when one family has a genre specified but the other doesn't, we still want to show all
+						//objects that belong to the family which doesn't have any genres specified - while filtering
+						// on the genres for object's that belong to one of those families.
+
+						//testIf(r.id)
 
 						var exactMatchThruFlag = false;
+
 						for(var x = 0; x < r.artists.length; x++){
-							if(exactMatchThru(r.artists[x].genres)){
-								exactMatchThruFlag = true;
+
+							//are we filtering on genres for this artist's familyAgg
+							if(filterFams.indexOf(r.artists[x].familyAgg) !== -1){
+
+								//yes. so in order to pass, we need an exact match
+								if(exactMatchThru(r.artists[x].genres)){
+									//if even one artist has exact genres, break on this truth
+									exactMatchThruFlag = true;
+								}
+							}
+							else{
+								//we don't care about genres for this artist.
+								//as long as the familyAgg is within selected families, let it thru
+								if(friendscontrol.families.indexOf(r.artists[x].familyAgg) !== -1){
+									return true
+								}
 							}
 							if(exactMatchThruFlag){break;}
 						}
-						if(r.id === '6cx4GVNs03Pu4ZczRnWiLd'){
-							debugger;
-						}
-						return exactMatchThruFlag
+
+						if(exactMatchThruFlag){return true}
+
+
+						//testIf(r.id)
+
+						//deprcated: this is part of the above check now
+
+						// var exactMatchThruFlag = false;
+						// for(var x = 0; x < r.artists.length; x++){
+						// 	if(exactMatchThru(r.artists[x].genres)){
+						// 		exactMatchThruFlag = true;
+						// 	}
+						// 	if(exactMatchThruFlag){break;}
+						// }
+						//
+						// return exactMatchThruFlag
 
 					}//no genres, so only return if item is in selected families
 					else{
-						var flag = false;
+						var flag2 = false;
 						for(var x = 0; x < r.artists.length; x++){
 							if(friendscontrol.families.indexOf(r.artists[x].familyAgg) !== -1){
-								flag = true;
+								flag2 = true;
 							}
-							if(flag){break;}
+							if(flag2){break;}
 						}
-						return flag;
+						return flag2;
 					}
 			}//switch
 		}else{
-				//no families
-				return true
-			}
+			//no families
+			return true
+		}
 	}
 
 
@@ -522,6 +553,17 @@ function chooseData(statcontrol,friendscontrol,tabcontrol,globalState,globalUI){
 
 	data_user = data_user.filter(famGenreFilter)
 	data_guest  = data_guest.filter(famGenreFilter)
+
+
+
+	var valueArr = data_user.map(function(item){ return item.id });
+	var isDuplicate = valueArr.some(function(item, idx){
+		return valueArr.indexOf(item) != idx
+	});
+	if(isDuplicate){
+		//debugger;
+	}
+	data_user = _.uniqBy(data_user,'id')
 
 
 
@@ -775,7 +817,7 @@ function useProduceData(){
 
 
 
-	console.log("useProduceData",statcontrol.stats.name);
+		console.log("useProduceData",statcontrol.stats.name);
 		//console.log("guest",friendscontrol.guest);
 		friendscontrol.guest.id ? console.log("guest:",friendscontrol.guest.id):{};
 		//console.log("tables",tables);
@@ -1194,7 +1236,7 @@ function useProduceData(){
 		//-------------------------------------------------------------------------------
 
 		//testing
-		 bubbleData = bubbleData.filter(r =>{return !(r.data.length === 0)})
+		bubbleData = bubbleData.filter(r =>{return !(r.data.length === 0)})
 
 		//bubbleData.forEach(s =>{s.animationLimit = 5})
 		console.log("$bubbleData",bubbleData);
@@ -1356,7 +1398,7 @@ function useProduceEvents(){
 
 	const [globalState, globalDispatch] = useContext(Context);
 	//const events = useReactiveVar(EVENTS_VAR);
-	console.log("$useProduceEvents",control.dataLoaded);
+	//console.log("$useProduceEvents",control.dataLoaded);
 
 
 	//const nodes = useReactiveVar(NODES_VAR);
@@ -1454,6 +1496,9 @@ function useProduceEvents(){
 						familyArtist[r.familyAgg] ? familyArtist[r.familyAgg].push(r):familyArtist[r.familyAgg] = [r]
 						r.genres.forEach(g =>{
 							genreArtist[g.name] ? genreArtist[g.name].push(r):genreArtist[g.name] = [r]
+							// if(g.id===88){
+							// 	debugger;
+							// }
 							genres.push(g)
 						})
 						//allArtist[r] ? allArtist[r] = r:allArtist[r]
@@ -1470,6 +1515,9 @@ function useProduceEvents(){
 							else{
 								a.genres.forEach(g =>{
 									genreArtist[g.name] ? genreArtist[g.name].push(r):genreArtist[g.name] = [r]
+									// if(g.id===88){
+									// 	debugger;
+									// }
 									genres.push(g)
 								})
 							}
@@ -1540,8 +1588,8 @@ function useProduceEvents(){
 				CHIPFAMILIESRANKED(newFamRank)
 
 				genres = _.uniqBy(genres,'id')
-				// console.log("CHIPGENRES",genres);
-				console.log("CHIPGENRES",genres.length);
+				console.log("CHIPGENRES",genres);
+				//console.log("CHIPGENRES",genres.length);
 				// console.log(relatedArtist);
 
 
@@ -1598,10 +1646,31 @@ function useProduceEvents(){
 						//testing: good of n^ as any to insert guest avatars in
 						//todo: different objects besides artists
 
+						//for every event > every performance artist > every user that's a friend
+						//if that user's global_state includes the artist, the event gets the friend added to an array
 						globalUI.user.related_users.filter(r =>{return r.friend}).forEach(f =>{
 							if(globalState[f.id + '_artists']){
 								globalState[f.id + '_artists'].forEach(fa =>{
-									fa.id === a.id ? e.friends.push(f):{}
+									fa.id === a.id ? e.friends.push({user:f,reason:"likes artist"}):{}
+								})
+							}
+							//testing: object type priority short circuit
+							//besides keeping the same artist from being tagged multiple times,
+							//this will also stop any artist in an event from being tagged after the first
+
+							if(e.friends.length === 0 && globalState[f.id + '_albums']){
+								globalState[f.id + '_albums'].forEach(falb =>{
+									falb.artists.forEach(falba =>{
+										falba.id === a.id ? e.friends.push({user:f,reason:"likes artist's album"}):{}
+									})
+
+								})
+							}
+							if(e.friends.length === 0 && globalState[f.id + '_tracks']){
+								globalState[f.id + '_tracks'].forEach(ftrack =>{
+									ftrack.artists.forEach(ftracka =>{
+										ftracka.id === a.id ? e.friends.push({user:f,reason:"likes artist's track"}):{}
+									})
 								})
 							}
 						})
@@ -1735,7 +1804,7 @@ function useProduceEvents(){
 		},
 		[statcontrol.stats.name,statcontrol.mode,
 			friendscontrol.compare,friendscontrol.families,friendscontrol.genres,friendscontrol.selectedTabIndex,friendscontrol.sourceFilter,friendscontrol.checkboxes,friendscontrol.query,
-			control.metro,control.startDate,control.endDate,control.genreSens,control.artistSens,control.dataLoaded,
+			control.metro,control.startDate,control.endDate,control.genreSens,control.artistSens,
 			tables['events']
 		]
 	)

@@ -94,16 +94,36 @@ function Social(props) {
 	const [term, setTerm] = useState('medium');
 
 	function setStatic(){
-		console.log("setStatic");
-		let req = {auth:globalUI,guest:guest};
-		api.fetchStaticUser(req)
-			.then(r =>{
-				initUser(guest);
-				//note:  have to read the type key off the tuple, which itself is a tuple w/ {typekey:[obs],stats:{stats}}
-				//note: artists follows this pattern even though it has no stats
-				globalDispatch({type: 'init', user:guest,payload:r.artists,context:'artists'});
-				globalDispatch({type: 'init', user:guest,payload:r.tracks,context:'tracks'});
-				globalDispatch({type: 'init', user:guest,payload:r.albums,context:'albums'});
+
+		var friendsProms = [];
+		friendsProms.push(api.fetchSpotifyUsers({auth:globalUI}))
+
+		globalUI.user.related_users.filter(r =>{return r.friend})
+			//testing: Dan only
+			.filter(r =>{return r.id === "123028477"})
+			.forEach(f =>{
+			friendsProms.push(api.fetchStaticUser( {auth:globalUI,friend:f}))
+		})
+		console.log("setStatic...",friendsProms.length - 1);
+		Promise.all(friendsProms)
+			.then(results =>{
+				//console.log("setStatic users fetched",results.length);
+				globalDispatch({type: 'init', payload:results[0],user: globalUI.user,context:'spotifyusers'});
+
+				// console.log(results.length);
+				// debugger;
+				var users = results.slice(1,results.length)
+				//var users =[]
+					users.forEach(r =>{
+
+					 initUser(r);
+					//note:  have to read the type key off the tuple, which itself is a tuple w/ {typekey:[obs],stats:{stats}}
+					//note: artists follows this pattern even though it has no stats
+					globalDispatch({type: 'init', user:{id:r.id},payload:r.artists,context:'artists'});
+					globalDispatch({type: 'init', user:{id:r.id},payload:r.tracks,context:'tracks'});
+					globalDispatch({type: 'init', user:{id:r.id},payload:r.albums,context:'albums'});
+				})
+
 			},err =>{
 				console.log(err);
 			})
@@ -131,10 +151,6 @@ function Social(props) {
 	const uHeight = 195;
 
 
-	//todo: sort friends to top
-	//todo: mark friends in ui
-	var friendIds = ['tipshishat','123028477']
-
 	//testing:
 	// const [query, setQuery] = React.useState("Dan");
 	const [query, setQuery] = React.useState("");
@@ -152,9 +168,14 @@ function Social(props) {
 		}
 	}
 
+	//todo: test
+	//idea is: take all MY related_users and filter out ones that are already friends
+	//then append to the end of that list the rest of the users, so my suggestions appear before the rest of the user catalog
 	useEffect(() => {
-		set(globalState['spotifyusers'].filter(testQuery))
-	}, [query,globalState['spotifyusers']])
+		var relatedNotFriends = globalUI.user.related_users.filter(testQuery).filter(r =>{return !(r.friend)})
+		var withAllUsers = _.uniqBy(relatedNotFriends.concat(globalState.spotifyusers),'id')
+		set(withAllUsers)
+	}, [query,globalUI.user])
 
 
 	const [heights, gridItems] = useMemo(() => {
@@ -258,11 +279,12 @@ function Social(props) {
 		//const divElement =
 	}, []);
 
-	const myFriendsFilter= (spotifyUser) => {
-		var myFriends = globalUI.user.related_users.filter(r =>{return r.friend})
-		return (!(undefined ===_.find(myFriends,{id:spotifyUser.id})))
-
-	}
+	//deprecated? what is this?
+	// const myFriendsFilter= (spotifyUser) => {
+	// 	var myFriends = globalUI.user.related_users.filter(r =>{return r.friend})
+	// 	return (!(undefined ===_.find(myFriends,{id:spotifyUser.id})))
+	//
+	// }
 
 
 	//deprecated
@@ -292,6 +314,7 @@ function Social(props) {
 		// width: "300px",
 		width: isDrawerShowing ? "100%" : "8%"
 	});
+
 
 	return(
 		<div>
@@ -343,7 +366,7 @@ function Social(props) {
 										<div style={{display:"flex",flexDirection:"row"}}>
 											{/*	//	todo: why was this 480px? it covers stats panel beside it*/}
 											<div style={{display:"flex", flexWrap:"wrap",width:"13em"}}>
-												<FriendsDisplay onClick={selectUser} users={globalState['spotifyusers'].filter(myFriendsFilter)}/>
+												<FriendsDisplay onClick={selectUser} users={globalUI.user.related_users.filter(r =>{return r.friend})}/>
 											</div>
 										</div>
 									</div>
@@ -365,9 +388,9 @@ function Social(props) {
 													<div className={styles.list} style={{ height: Math.max(...heights) }}>
 														{/*<div className={styles.list} style={{ height:"20em" }}>*/}
 														{transitions((style, item) => (
-															<a.div key={item.id} style={style} onClick={(e =>{selectUser(item)})}>
-																<UserTile selectedUser={selectedUser} item={item}/>
+															<a.div key={item.id} style={style}  onClick={(e =>{item.isUser ? selectUser(item):console.log("can't select non-instantiated user",item)})}>
 
+																<UserTile selectedUser={selectedUser} item={item}/>
 															</a.div>
 														))}
 													</div>

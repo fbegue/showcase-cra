@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-expressions */
-import React, {Component, useContext, useEffect, useState} from 'react'
+import React, {Component, useContext, useEffect, useState, Suspense} from 'react'
 import './EventsList.css'
 import { DateTime } from "luxon";
 import List from '@material-ui/core/List'
@@ -32,14 +32,17 @@ import spotifyLogo from './assets/spotify_logo_large.png'
 import songkick_badge_pink from './assets/songkick_badge_pink.png'
 import api from "./api/api";
 import {useReactiveVar} from "@apollo/react-hooks";
-import {GLOBAL_UI_VAR,EVENTS_VAR} from "./storage/withApolloProvider";
+import {GLOBAL_UI_VAR, EVENTS_VAR, CHIPGENRES} from "./storage/withApolloProvider";
 import { StatControl,Control} from "./index";
 import Map from './components/Map';
 import EventImageFader from "./components/EventImageFader";
 import OpenInNewIcon from '@material-ui/icons/OpenInNew';
 // import ListItemIcon from '@material-ui/core/ListItemIcon';
+import BubbleFamilyGenreChips from "./components/chips/BubbleFamilyGenreChips";
+import {useImage} from 'react-image'
+
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
-import GenreChipsDumb from './components/chips/GenreChipsDumb.js'
+//import GenreChipsDumb from './components/chips/GenreChipsDumb.js'
 function ChipsArray_dep(props) {
 	//const classes = useStyles();
 	//todo: implement useStyles
@@ -83,6 +86,7 @@ const useStyles = makeStyles({
 	},
 });
 var oldId = null;
+
 const useStylesFamilies = makeStyles(familyStyles);
 
 function EventsList() {
@@ -95,6 +99,7 @@ function EventsList() {
 	const [globalState, globalDispatch] = useContext(Context);
 	const globalUI = useReactiveVar(GLOBAL_UI_VAR);
 	const events = useReactiveVar(EVENTS_VAR);
+	const chipGenres = useReactiveVar(CHIPGENRES);
 
 	let control = Control.useContainer()
 	let statcontrol = StatControl.useContainer()
@@ -152,7 +157,7 @@ function EventsList() {
 				{(sub.artist.genres.length >0 ?
 					<span>
 						{control.play && control.playArtist === sub.artist.id ? <PauseCircleOutlineIcon fontSize={'small'} onClick={() => handlePlay(sub.artist)}></PauseCircleOutlineIcon>
-						: <PlayCircleOutlineIcon fontSize={'small'} onClick={() => handlePlay(sub.artist)}></PlayCircleOutlineIcon>
+ 						: <PlayCircleOutlineIcon fontSize={'small'} onClick={() => handlePlay(sub.artist)}></PlayCircleOutlineIcon>
 						}
 					</span>:<div></div>
 					)}
@@ -295,6 +300,7 @@ function EventsList() {
 
 	var classes = {menuHeader:"menuHeader",list:"list",root:"root",nested:"nested"};
 	const familyClasses = useStylesFamilies();
+	//console.log("$familyClasses",familyClasses);
 
 	//todo: need to test this with more events
 	function getFamilyClass(event){
@@ -305,15 +311,21 @@ function EventsList() {
 		//go thru all performances and determine what family to represent it with
 		var eventAgg = [];
 		event.performance.forEach(p =>{
-			//testing: start with headline for now
-			if(p.billing == 'headline'){
-				eventAgg.push(p.artist.familyAgg)
-			}
+			p.artist.familyAgg ? eventAgg.push(p.artist.familyAgg):{};
+
 		})
+
+		//testing: start with headline (assumed first in list) for now
 		if(eventAgg[0]){
 
-			//console.log("chose family:",familyClasses[eventAgg[0] + '2']);
-			return familyClasses[eventAgg[0] + '2']
+			//todo: monkeypatch fucking strings
+			let normal = eventAgg[0]
+			eventAgg[0] === 'hip hop' ? normal = "hiphop":{}
+			eventAgg[0] === 'electro house' ? normal = "electrohouse":{}
+
+			//console.log("chose family:",familyClasses[normal + '2']);
+			// return familyClasses[eventAgg[0] + '2']
+			return familyClasses[normal + '2']
 		}else{
 			//we don't want the non-familied events showing up with the 'grey' from 'unknown' families
 			//like the chips do
@@ -361,6 +373,31 @@ function EventsList() {
 		//const { classes } = props;
 		// const { state } = this;
 
+		//todo: suspense is failing when I fetch friends
+		//todo: fallback image needs to have alt text over it?
+		//doesn't seem like we would generate them ourselves - maybe apply some css w/ user.display_name?
+		//https://github.com/mbrevda/react-image
+
+		function MyImageComponent(props) {
+			let fallback = 'https://via.placeholder.com/150';
+			// const {src} = useImage({
+			// 	srcList: props.rec.user.images[0].url ? [props.rec.user.images[0].url,fallback]:fallback
+			// })
+
+			return props.rec.user.images[0].url
+			? <Tooltip title={props.rec.reason}>
+					<img style={{width: "50px",borderRadius: "50%"}} src={props.rec.user.images[0].url} />
+				</Tooltip>
+			: <Tooltip title={props.rec.reason}>
+					<img style={{width: "50px",borderRadius: "50%"}} src={fallback} />
+				</Tooltip>
+			// return <Suspense fallback={""}>
+			// 	<Tooltip title={props.rec.reason}>
+			// 		<img style={{width: "50px",borderRadius: "50%"}} src={src} />
+			// 	</Tooltip>
+			// </Suspense>
+		}
+
 		return children.map(subOption => {
 			if (!subOption.childrenKey) {
 				return (
@@ -379,8 +416,11 @@ function EventsList() {
 									{/*	</div>*/}
 									{/*	<div>*/}									{/*<div>{subOption.id}</div>*/}
 
-									<GenreChipsDumb familyAgg={subOption.artist.familyAgg} chipData={subOption.artist.genres}>
-									</GenreChipsDumb>
+									{/*<GenreChipsDumb familyAgg={subOption.artist.familyAgg} chipData={subOption.artist.genres}>*/}
+									{/*</GenreChipsDumb>*/}
+									<BubbleFamilyGenreChips families={[]} familyDisabled={true} varied={true} genres={subOption.artist.genres} genresFilter={chipGenres}>
+									</BubbleFamilyGenreChips>
+
 									{/*	</div>*/}
 									{/*</div>*/}
 
@@ -429,12 +469,14 @@ function EventsList() {
 											so just put the margin here for now*/}
 											{subOption.friends && subOption.friends.length > 0 &&
 											<div style={{display:"flex",justifyContent:"flex-start",marginLeft:"2em"}}>
-												{subOption.friends.map((f,i) =>
+												{subOption.friends.map((rec,i) =>
 													<div key={i}>
-														<Tooltip title="likes this artist">
-															<img src={f.images[0].url}
-																 style={{width: "50px",borderRadius: "50%"}}/>
-														</Tooltip>
+														<MyImageComponent rec={rec}/>
+														{/*<Tooltip title="likes this artist">*/}
+														{/*	<MyImageComponent user={f}/>*/}
+														{/*	/!*<img src={f.images[0].url}*!/*/}
+														{/*	/!*	 style={{width: "50px",borderRadius: "50%"}} alt={f.display_name}/>*!/*/}
+														{/*</Tooltip>*/}
 
 													</div>
 												)}

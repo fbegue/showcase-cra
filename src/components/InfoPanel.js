@@ -7,8 +7,8 @@ import {Context} from "../storage/Store";
 import {FriendsControl, StatControl} from "../index";
 import {useReactiveVar} from "@apollo/react-hooks";
 import Paper from '@material-ui/core/Paper';
-import GenreChipsSmartRanked from "./chips/GenreChipsSmartRanked";
-import GenreChipsSmart from "./chips/GenreChipsSmart";
+//import GenreChipsSmartRanked from "./chips/GenreChipsSmartRanked";
+//import GenreChipsSmart from "./chips/GenreChipsSmart";
 import BubbleFamilyGenreChips from "./chips/BubbleFamilyGenreChips";
 
 function InfoPanel(props) {
@@ -17,7 +17,7 @@ function InfoPanel(props) {
 	let friendscontrol = FriendsControl.useContainer()
 	const globalUI = useReactiveVar(GLOBAL_UI_VAR);
 	const chipGenresRanked = useReactiveVar(CHIPGENRESRANKED);
-	console.log("$InfoPanel",chipGenresRanked);
+	//console.log("$InfoPanel",chipGenresRanked);
 	const [globalState, globalDispatch] = useContext(Context)
 
 	const [statCards, setStatCards] = React.useState([]);
@@ -70,9 +70,11 @@ function InfoPanel(props) {
 				_statCards.push({label: "Created", value: source.created, width: "120px"})
 				_statCards.push({label: "Followed", value: source.followed, width: "120px"})
 				_statCards.push({label: "Collaborating", value: source.collaborative, width: "120px"})
-				_statCards.push({label: "Recently Modified", value: source.recent.playlist_name, width: "240px"})
+				// eslint-disable-next-line no-unused-expressions
+				source.recent ? _statCards.push({label: "Recently Modified", value: source.recent.playlist_name, width: "240px"}):{};
 				// items.push({label:"Most Active",value:null})
-				_statCards.push({label: "Oldest", value: source.oldest.playlist_name, width: "240px"})
+				// eslint-disable-next-line no-unused-expressions
+				source.oldest ? _statCards.push({label: "Oldest", value: source.oldest.playlist_name, width: "240px"}):{};
 				break;
 			case 'tracks_saved':
 				var source = globalState[globalUI.user.id + "_tracks_stats"];

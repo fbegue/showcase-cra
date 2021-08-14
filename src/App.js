@@ -33,7 +33,7 @@ import './components/tiles/Tiles.css'
 
 
 //testing:
-import ControlTest from "./components/ControlTest";
+//import ControlTest from "./components/ControlTest";
 // import SpotifyWebApi from 'spotify-web-api-js';
 // const spotifyApi = new SpotifyWebApi();
 
@@ -229,7 +229,7 @@ function App(props) {
                             <Profile/>
 
                         </div>
-                        <div><ControlTest/></div>
+                        {/*<div><ControlTest/></div>*/}
                         {/*<input value={code} onChange={(event) =>{setCode(event.target.value)}}  />*/}
                         {/*<button onClick={() =>{getAuth(code)}}>fake auth </button>*/}
 
@@ -249,8 +249,9 @@ function App(props) {
                         {/*<Delayed waitBeforeShow={2000}>*/}
                             {globalUI.access_token  &&
                             <div style={control.play ? {opacity:1,flexGrow:2}: {opacity:.4,flexGrow:2}}>
-                                <Player token={globalUI.access_token} id={control.id} play={control.play}/>
-                                {/*<div>PLAYER</div>*/}
+                                {/*todo:*/}
+                                {/*<Player token={globalUI.access_token} id={control.id} play={control.play}/>*/}
+                                <div>PLAYER</div>
                             </div>
                             }
                         {/*</Delayed>*/}

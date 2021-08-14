@@ -87,7 +87,7 @@ var fetchPlaylists =  function(){
 var fetchPlaylistsResolved =  function(req){
     return new Promise(function(done, fail) {
         //console.log("fetchPlaylistsResolved",req.user);
-        console.log("FETCHING MADEFORYOU ONLY");
+
         fetch('http://localhost:8888/resolvePlaylists', {
             method: 'POST', // *GET, POST, PUT, DELETE, etc.
             mode: 'cors', // no-cors, *cors, same-origin

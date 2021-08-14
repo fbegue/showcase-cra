@@ -3,6 +3,8 @@ import React, {useState,useEffect} from 'react';
 import { makeStyles } from "@material-ui/core/styles";
 import Chip from "@material-ui/core/Chip";
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
+import PropTypes from 'prop-types';
+import _ from 'lodash'
 
 import {familyColors,families as systemFamilies} from '../../families'
 import {FriendsControl,Control} from "../../index";
@@ -11,13 +13,25 @@ const useStyles = makeStyles({
 		//customize normal/hovered colors
 		backgroundColor: "var(--background-color)",
 		boxShadow: "var(--box-shadow)",
+		//this css prop is only visible when variant=default
+		// borderColor: "#7f7f7f",
+		borderColor:"#4e4949",
 		"&:hover": {
-			backgroundColor: "var(--background-color-hover)"
+			backgroundColor: "var(--background-color-hover)",
+			cursor:"pointer"
 		},
 		// override focus color change (just keep it the same on focus)
 		"&:focus": {
 			backgroundColor: "var(--background-color)"
-		}
+		},
+		//todo: really just don't get this shit
+		// outlined:{
+		// 	// border: "1px solid rgba(0, 0, 0, 0.23)"
+		// 	// outline: "none",
+		// 	borderColor: "#9ecaed",
+		// 	boxShadow: "0 0 10px #9ecaed"
+		// }
+
 	}
 });
 
@@ -29,12 +43,14 @@ function BubbleFamilyGenreChips(props) {
 
 	const makeStyle = (fam,which) =>{
 
+		fam === null? fam='unknown' :{};
 		//use fam to set colors
 		var defaultSt = {
 			"--background-color-hover": familyColors[fam + "2"],
 			"--background-color":  familyColors[fam],
-			"--box-shadow": "rgba(33, 203, 243, .3)"
+			"--box-shadow": "0 0 10px rgba(33, 203, 243, .3)"
 		};
+
 
 		//clicked simply keeps it's hover color
 		var clickedSt = {
@@ -62,6 +78,7 @@ function BubbleFamilyGenreChips(props) {
 	//from all families, filter out
 	//1) included in dataset produced during events calc
 	//2) genres are from selected
+
 	var toMap = systemFamilies;
 	toMap = toMap.filter(f =>{return props.families.indexOf(f) !== -1})
 	//console.log("$toMap",toMap);
@@ -112,6 +129,11 @@ function BubbleFamilyGenreChips(props) {
 
 	}
 
+	var varied = [];
+	if(props.genresFilter){
+		varied = _.intersectionBy(_genres,props.genresFilter,'id')
+	}
+
 
 	const [color, setColor] = useState(initColorState);
 	const [gcolor, setGColor] = useState(initGColorState);
@@ -122,6 +144,7 @@ function BubbleFamilyGenreChips(props) {
 		//var sel = e.target.innerText;
 
 		if(!(friendscontrol.families.includes(fam))){
+		//if(!(_.find(friendscontrol.families,r =>{return r.id === fam}))){
 			setColor({ ...color, [fam]: map[fam]["clicked"] });
 			friendscontrol.setFamilies((prevState => {return [...prevState,fam] }));
 		}else{
@@ -142,7 +165,6 @@ function BubbleFamilyGenreChips(props) {
 
 	const handleGClick = (gOb) => {
 		console.log("handleGClick",gOb);
-		//testing: includes works?
 
 		var family_name = null;
 		var genre_name = null;
@@ -157,12 +179,22 @@ function BubbleFamilyGenreChips(props) {
 			genre = gOb;
 		}
 
+		if(!(_.find(friendscontrol.genres,r =>{return r.id === genre.id}))){
 
-
-		if(!(friendscontrol.genres.includes(genre))){
 			setGColor({ ...gcolor, [genre_name]: map[family_name]["clicked"] });
+
 			if(friendscontrol.families.indexOf(family_name) === -1){
-				//note: if you click on just a genre (from info panel or events list) need to add required families
+
+				//note: auto-add-family
+				//if you click on just a genre (from info panel or events list) need to add required families
+
+				//todo: edgecase issue: An artist w/ genres from 2 + n families
+				//todo: still auto-adding family, but set familiesDisabled = true
+				//LCD Soundsystem
+				//clicking on 'indie pop' adds that genre and the 'pop' family - but b/c the artist was
+				//assigned familyAgg = 'rock', the tiles will filter it out based on the fact that
+				//friendscontrol.families is non-empty, so tiles should only be from that family
+
 				handleClick(family_name)
 			}
 			friendscontrol.setGenres((prevState => {return [...prevState,genre] }));
@@ -201,20 +233,23 @@ function BubbleFamilyGenreChips(props) {
 
 
 	return(<div>
+
+		{/*note: not sure how to get flex to respect any sort of height unless you specify it here */}
 		{/*todo: not sure this flexDirection is effective here*/}
+
 		<div style={{display:"flex",flexDirection:props.flexDirection,flexWrap:"wrap"}}>
-				{toMap.map((fam,i) =>
-					<div  style={{display:"flex"}} onClick={() =>{handleClick(fam)}}>
-						<Chip
-							// className={classes.chip}
-							className={[classes.chip,"famChip"].join(' ')}
-							label={fam}
-							style={color[fam]}
-							key={i}
-						/>
-						{ props.removable ? <div style={{"left":"-8px","position":"relative"}}><HighlightOffIcon fontSize={'small'}/> </div> : ""}
-					</div>
-				)}
+			{toMap.map((fam,i) =>
+				<div  key={i} style={{display:"flex"}} onClick={() =>{handleClick(fam)}}>
+					<Chip
+						// className={classes.chip}
+						className={[classes.chip,"famChip"].join(' ')}
+						label={fam}
+						style={color[fam]}
+						key={i}
+					/>
+					{ props.removable ? <div style={{"left":"-8px","position":"relative"}}><HighlightOffIcon fontSize={'small'}/> </div> : ""}
+				</div>
+			)}
 			{ props.clearable ? <div  onClick={() =>{resetSelections()}}><HighlightOffIcon fontSize={'small'}/>Clear</div>:""}
 		</div>
 
@@ -222,14 +257,19 @@ function BubbleFamilyGenreChips(props) {
 
 
 		{/*className={'genreChipContainer'}*/}
-		<div style={{display:"flex",flexDirection:props.flexDirection,flexWrap:"wrap"}} >
+		{/*note: set height | height:"17em"*/}
+		<div style={{display:"flex",flexDirection:props.flexDirection,flexWrap:"wrap",height:props.height || 'initial'}} >
 			{_genres.map((gOb,i) =>
-				<div style={{display:"flex"}} onClick={() =>{handleGClick(gOb)}}>
+				<div key={i} style={{display:"flex"}} onClick={() =>{handleGClick(gOb)}}>
 					<Chip
 						// className={[classes.chip,"genreChip"].join(' ')}
 						className={classes.chip}
 						key={i}
 						// className={'genreChip'}
+						variant={
+							props.varied ?
+								_.find(varied, r =>{return r.id === gOb.id}) ? "outlined" :"default"
+						:"default"}
 						label={
 							props.occurred ? gOb.genre.name + " (" + gOb.occurred.toString() + ")"
 								: gOb.name
@@ -246,6 +286,29 @@ function BubbleFamilyGenreChips(props) {
 		</div>
 
 	</div>)
+}
+
+BubbleFamilyGenreChips.propTypes = {
+	//constrain the genres displayed by these families
+	families: PropTypes.array,
+	//don't apply any family constraints (still requires [] families)
+	familyDisabled:PropTypes.bool,
+	//constrain the genres displayed by these genres
+	genresFilter:PropTypes.array,
+	//apply genresFilter to mark variants (EventList only)
+	varied:PropTypes.bool,
+	//pool of genres to filter on
+	genres: PropTypes.array,
+	//button for resetting families/genres
+	clearable: PropTypes.bool,
+	//each chip's little x symbol
+	removable :PropTypes.bool,
+	//display dataset which includes occurence values
+	occurred:PropTypes.bool,
+	//
+	seperator: PropTypes.bool
+
+
 }
 export default BubbleFamilyGenreChips;
 

@@ -22,7 +22,7 @@ import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 
 import BubbleFamilyGenreChips from "./chips/BubbleFamilyGenreChips";
-import FilterGenreChips from "./chips/FilterGenreChips";
+//import FilterGenreChips from "./chips/FilterGenreChips";
 import PlaylistCheckboxes from './tiles/PlaylistCheckboxes'
 import { GLOBAL_UI_VAR } from '../storage/withApolloProvider';
 
@@ -191,14 +191,22 @@ function ContextStats(props) {
 	//todo: had noted but no longer experiencing....?
 	//testing: works a couple times, then infinite + same key issues
 	useEffect(() => {
+
 		var _t = tiles;
 
 		//note: tiles.length/pageSize === total # of pages
+
 		if(_t.length > pageSize){
-			// _t = _t.slice((tiles.length/pageSize)*page,page*pageSize)
-			_t = _t.slice(pageSize*page,(page + 1)*pageSize)
+			if(page === 1){
+				_t = _t.slice(0,pageSize)
+			}else{
+				console.log("slice start index",pageSize*(page - 1));
+				console.log("slice end index",(page)*pageSize);
+				_t = _t.slice(pageSize*(page - 1),(page)*pageSize)
+			}
 		}
 		console.log("setItems",_t);
+
 		setItems(_t)
 		setTilesLoading(false)
 
@@ -296,8 +304,15 @@ function ContextStats(props) {
 
 	const handleTileSelect = (item) =>{
 		console.log("handleTileSelect");
-		tileSelectControl.setDrawerShowing(true);
-		tileSelectControl.selectTile(item)
+
+		if(tileSelectControl.tile && tileSelectControl.tile.id === item.id){
+			tileSelectControl.setDrawerShowing(false);
+			tileSelectControl.selectTile(null)
+		}else{
+			tileSelectControl.setDrawerShowing(true);
+			tileSelectControl.selectTile(item)
+		}
+
 	}
 
 	return(
@@ -330,7 +345,7 @@ function ContextStats(props) {
 								<NavigateBeforeIcon fontSize={'large'} onClick={() =>{setPage((prevState => {
 									return prevState !== 1 ? prevState - 1:prevState
 								}))}}/>
-								{page}/{tiles.length/pageSize}
+								{page}/{Math.ceil(tiles.length/pageSize)}
 								<NavigateNextIcon fontSize={'large'} onClick={() =>{setPage((prevState => {
 									return prevState <= tiles.length/pageSize ? prevState + 1:prevState
 								}))}}/>
@@ -343,27 +358,29 @@ function ContextStats(props) {
 							<PlaylistCheckboxes setState={friendscontrol.setCheckboxes} state={friendscontrol.checkboxes} handleChange={handleCheck}/>
 						</div>
 						}
-						<div>Release Range
-							<Slider
-								value={100}
-								marks={[
-									{
-										value: 0,
-										label: '1970',
-									},
-									{
-										value: 100,
-										label: '2021',
-									}]}
-								// onChange={handleChange}
-								valueLabelDisplay="auto"
-								aria-labelledby="range-slider"
-							/>
-						</div>
+						{/*todo: disabled (not implemented yet)*/}
+						{/*<div>Release Range*/}
+						{/*	<Slider*/}
+						{/*		value={100}*/}
+						{/*		marks={[*/}
+						{/*			{*/}
+						{/*				value: 0,*/}
+						{/*				label: '1970',*/}
+						{/*			},*/}
+						{/*			{*/}
+						{/*				value: 100,*/}
+						{/*				label: '2021',*/}
+						{/*			}]}*/}
+						{/*		// onChange={handleChange}*/}
+						{/*		valueLabelDisplay="auto"*/}
+						{/*		aria-labelledby="range-slider"*/}
+						{/*	/>*/}
+						{/*</div>*/}
 					</div>
 					<div style={{width:"1em"}}>
-						{/*testing: re-using BubbleFamily from above - it'll just never show genres?*/}
-						<BubbleFamilyGenreChips removable={true} clearable={true} families={friendscontrol.families} genres={friendscontrol.genres} flexDirection={'column'}/>
+						{/*testing: see BubbleFamilyGenreChips @ handleGClick
+						   can't delimit by families here if auto-add-family is disabled */}
+						<BubbleFamilyGenreChips removable={true} clearable={true} familyDisabled={true} families={friendscontrol.families} genres={friendscontrol.genres} flexDirection={'column'}/>
 					</div>
 				</div>
 

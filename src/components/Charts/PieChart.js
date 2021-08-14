@@ -80,8 +80,14 @@ function PieChart(props) {
 							var sel = event.point.name;
 							friendscontrol.setFamilies((prevState => {
 								//console.log("prev",prevState);
-								if(!(prevState.includes(sel))){return [...prevState,sel]}
-								else{return prevState.filter(r =>{return r !== sel})}
+								if(!(prevState.includes(sel))){
+
+									event.point.select(true,true)
+									return [...prevState,sel]}
+								else{
+
+									event.point.select(false,true)
+									return prevState.filter(r =>{return r !== sel})}
 							}));
 
 							// if(!(friendscontrol.families.includes(sel))){
@@ -93,7 +99,7 @@ function PieChart(props) {
 							// 	friendscontrol.setFamilies((prevState => {return prevState.filter(r =>{return r !== sel}) }));
 							// }
 
-							this.slice(null)
+							//
 						}
 					}
 				}
@@ -112,25 +118,66 @@ function PieChart(props) {
 	// }
 
 
-	//testing: setting this on init runs thru init animation instantly
-	useEffect(() => {
-		//console.log("$! set data...",props.data.series);
-		if(props.data.series.data[0] !== undefined){
-			console.log("$! set data",props.data.series);
-			chart.chart.series[0].setData(props.data.series.data);
+	//note: deprecated? idk what the whole idea was here
 
-			//programatically select/deselect points to account for family chip removal from tiles area
+	// useEffect(() => {
+	// 	//console.log("$! set data...",props.data.series);
+	// 	if(props.data.series.data[0] !== undefined){
+	// 		console.log("$! set data",props.data.series);
+	// 		chart.chart.series[0].setData(props.data.series.data);
+	//
+	// 		//programatically select/deselect points to account for family chip removal from tiles area
+	//
+	// 		chart.chart.series[0].points.forEach((p,i)=>{
+	// 			//console.log(friendscontrol.families);
+	// 			var f = _.find(friendscontrol.families, function(o) { return o === p.name });
+	// 			//if the family isn't in friendscontrol, deselect in chart
+	//
+	// 			//todo: no idea why select false never works?
+	// 			//https://api.highcharts.com/class-reference/Highcharts.Point#select
+	//
+	// 			 if(f === undefined) {
+	// 				 debugger;
+	// 			 	chart.chart.series[0].data[i].select(false);
+	//
+	// 				}
+	// 			 else{
+	// 				 debugger;
+	// 			 	chart.chart.series[0].data[i].select(true)}
+	// 		})
+	// 	}
+	//
+	// },[props.data.series]);
+
+	useEffect(() => {
+
+		if(props.data.series.data[0] !== undefined){
+			// console.log("$! set data",props.data.series);
+			// chart.chart.series[0].setData(props.data.series.data);
+
+			//note: there is currently no case in which you click on a family chip in ContextStats but aren't removing
+			//programatically deselect points to account for family chip removal from tiles area
 
 			chart.chart.series[0].points.forEach((p,i)=>{
-				//console.log(friendscontrol.families);
 				var f = _.find(friendscontrol.families, function(o) { return o === p.name });
-				//if the family isn't in friendscontrol, deselect in chart
-				//note: doesn't seem like point = selected carries over on time here?
-				 if(f === undefined) {chart.chart.series[0].data[i].select(false);}
+				if(f === undefined) {
+					chart.chart.series[0].data[i].select(false,true);
+				}
 			})
 		}
+	},[friendscontrol.families]);
 
-	},[props.data.series]);
+	// useEffect(() => {
+	// 	//console.log("$! set data...",props.data.series);
+	// 	if(props.data.series.data[0] !== undefined){
+	// 		console.log("$! set data",props.data.series);
+	// 		chart.chart.series[0].setData(props.data.series.data);
+	// 	}
+	// },[props.data.series]);
+
+
+
+
 
 
 	return(

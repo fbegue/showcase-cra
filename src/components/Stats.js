@@ -6,6 +6,8 @@ import {GLOBAL_UI_VAR, TILES,CHIPFAMILIES,CHIPGENRES} from '../storage/withApoll
 import RedoIcon from "@material-ui/icons/Redo";
 import PieChartIcon from "@material-ui/icons/PieChart";
 import CloudIcon from "@material-ui/icons/Cloud";
+import ExpandLessIcon from '@material-ui/icons/ExpandLess';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Divider from '@material-ui/core/Divider';
 import {families as systemFamilies,familyColors} from '../families'
 import {Control, FriendsControl, TabControl, StatControl, GridControl, TileSelectControl} from "../index";
@@ -224,10 +226,6 @@ function Stats(props) {
 	let bubbleOptionsGuest = {
 		title:{text:""},
 		loading:{showDuration:100,hideDuration:100},
-		chart:{
-			height:380,
-			width:800,
-		},
 		tooltip: {
 			useHTML: true,
 			pointFormat: '<b>{point.name}:</b> {point.value}'
@@ -372,8 +370,10 @@ function Stats(props) {
 		backgroundColor: "#808080",
 		// width: "100%",
 		// height: "100%"
-		height: tileSelectControl.isDrawerShowing ? "20em" : "1em",
-		minWidth:"40em"
+		// height: tileSelectControl.isDrawerShowing ? "20em" : "1em",
+		// minWidth:"40em"
+		height: tileSelectControl.isDrawerShowing ? "21em" : "1.5em",
+		minWidth:"44em"
 	});
 	return(
 
@@ -391,14 +391,22 @@ function Stats(props) {
 					{statcontrol.chart ? <PieChartIcon fontSize={'small'}/>:<CloudIcon fontSize={'small'}/>}
 				</button>
 			</div>
+
 			<div style={{"position":"absolute","top":"0px","left":"0px","zIndex":"6"}}>
 				<a.div  style={drawerProps}>
+					<div style={{"position":"absolute","top":"0px","right":"0px","zIndex":"7"}}
+						 onClick={() =>{handleToggleDrawer()}}>
+						{
+							tileSelectControl.isDrawerShowing ? <ExpandLessIcon fontSize={'large'}/>
+							:	<ExpandMoreIcon fontSize={'large'}/>
+						}
+					</div>
 					<div>
 						{/*<div style={{border: "1px solid black",height:"1em"}}></div>*/}
 						{/*todo: was thinking this content display was taken care of for me by the drawer but nooooo!?*/}
 						{/*add delay on fade in*/}
-						<div style={{height:"10em",display:tileSelectControl.isDrawerShowing ? "initial":"none"}}>
-							<DisplayTile handleToggleDrawer={handleToggleDrawer} tile={tileSelectControl.tile}/>
+						<div style={{display:tileSelectControl.isDrawerShowing ? "initial":"none"}}>
+							<DisplayTile tile={tileSelectControl.tile}/>
 						</div>
 					</div>
 				</a.div>
@@ -417,8 +425,7 @@ function Stats(props) {
 							<BubbleFamilyGenreChips families={chipFamilies} genres={chipGenres} flexDirection={'row'} clearable={true} seperator={true}/>
 							<div>{getPointSum(bubbleData)}</div></div>
 						<div style={{paddingRight:"1em"}}>
-							<BubbleChart  options={{...bubbleOptionsGuest,series:bubbleData}} size={{height:380,
-								width: friendscontrol.families.length === 0 ? 800:600}}/>
+							<BubbleChart  options={{...bubbleOptionsGuest,series:bubbleData}} size={{height:380, width: friendscontrol.families.length === 0 ? 700:600}}/>
 						</div>
 
 						{/*todo: disabled until I can figure out some way to deal with data*/}

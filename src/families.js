@@ -11,6 +11,10 @@ familyColors["pop2"] = 'rgba(255,246,134,.6)';
 familyColors["electro house"] = 'rgb(213,38,51,1)';
 familyColors["electro house2"] = 'rgb(213,38,51,.7)';
 
+//todo: monkeypatch (see EventsList @ getFamilyClass)
+familyColors["electrohouse"] = 'rgb(213,38,51,1)';
+familyColors["electrohouse2"] = 'rgb(213,38,51,.7)';
+
 //ROCK
 //#dcb250
 familyColors["rock"] = 'rgba(220,178,80,1)';
@@ -42,6 +46,12 @@ familyColors["jazz2"] = 'rgba(67,100,179,.7)';
 //#8e3761
 familyColors["hip hop"] = 'rgb(142,55,97,1)';
 familyColors["hip hop2"] = 'rgb(142,55,97,.7)';
+
+//todo: monkeypatch (see EventsList @ getFamilyClass)
+familyColors["hiphop"] = 'rgb(142,55,97,1)';
+familyColors["hiphop2"] = 'rgb(142,55,97,.7)';
+
+
 
 //#6e48af
 familyColors["reggae"] = 'rgb(110,72,175,1)'
@@ -78,6 +88,7 @@ var familyIdMap =  {
 
 var familyGenre_map = {};
 var genreFam_map= {};
+
 //note: to avoid doing replaces on my all_genres source, just going to define a map and use it here
 //todo: but I guess that really isn't the issue tho is it? I need these families to be proper objects w/ ids I can register on
 //so plan on genres coming in as normal, but when we resolve them on the familyGenre map the normalized ones
@@ -97,6 +108,7 @@ all_genres.forEach(function(t){
 
 });
 
+//init
 var familyStyles = {
 	root: {
 		// background: 'black',

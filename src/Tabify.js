@@ -38,6 +38,7 @@ import Box from "@material-ui/core/Box";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import InfoPanel from "./components/InfoPanel";
+import Spinner from './components/utility/Spinner';
 import './Tabify.css'
 
 // const styles = {
@@ -140,14 +141,23 @@ export default function Tabify() {
 	var slow = function(){ setTimeout(e=>{console.log("do something");},2000)}
 
 
+
+
+
+	//-------------------------------------------------------------------------------------
+	let control = Control.useContainer();
+	let friendscontrol = FriendsControl.useContainer()
+	let tabcontrol = TabControl.useContainer()
+	//-------------------------------------------------------------------------------------
+
 	useEffect(() => {
 
 		var userProms = [];
 		userProms.push(api.getMyFollowedArtists(req))
 		userProms.push(api.getTopArtists(req))
-		userProms.push(api.getRecentlyPlayedTracks(req))
-		userProms.push(api.fetchSpotifyUsers(req))
-		userProms.push(api.getSavedTracks(req))
+		// userProms.push(api.getRecentlyPlayedTracks(req))
+		//userProms.push(api.fetchSpotifyUsers(req))
+		// userProms.push(api.getSavedTracks(req))
 		userProms.push(api.getMySavedAlbums(req))
 		Promise.all(userProms)
 			.then(r =>{
@@ -164,11 +174,24 @@ export default function Tabify() {
 				artistsPay = artistsPay.concat(r[0].artists);artistsPay= artistsPay.concat(r[1]);
 				globalDispatch({type: 'init', payload:{artists:artistsPay,stats:null},user: globalUI.user,context:'artists'});
 
-				globalDispatch({type: 'init', payload:r[2],user: globalUI.user,context:'tracks'});
-				globalDispatch({type: 'init', payload:r[3],user: globalUI.user,context:'spotifyusers'});
-				globalDispatch({type: 'init', payload:r[4],user: globalUI.user,context:'tracks'});
-				globalDispatch({type: 'init', payload:r[5],user: globalUI.user,context:'albums'});
-				control.setDataLoaded(true)
+				//globalDispatch({type: 'init', payload:r[2],user: globalUI.user,context:'tracks'});
+				//globalDispatch({type: 'init', payload:r[2],user: globalUI.user,context:'spotifyusers'});
+				// globalDispatch({type: 'init', payload:r[4],user: globalUI.user,context:'tracks'});
+				globalDispatch({type: 'init', payload:r[2],user: globalUI.user,context:'albums'});
+				//control.setDataLoaded(true)
+
+				//testing: call tracks after
+				var userProms2 = [];
+				userProms2.push(api.getRecentlyPlayedTracks(req))
+				userProms2.push(api.getSavedTracks(req))
+				Promise.all(userProms2)
+					.then(r2 =>{
+						var tracksPay = {tracks:[]};
+						tracksPay.tracks = tracksPay.tracks.concat(r2[0].tracks);tracksPay.tracks = tracksPay.tracks.concat(r2[1].tracks);
+						tracksPay.stats = r2[1].stats
+						globalDispatch({type: 'init', payload:tracksPay,user: globalUI.user,context:'tracks'});
+					})
+
 			},err =>{
 				console.log(err);
 			})
@@ -182,14 +205,9 @@ export default function Tabify() {
 			},err =>{
 				console.log(err);
 			})
-
 	},[]);
 
-
 	//-------------------------------------------------------------------------------------
-	let control = Control.useContainer();
-	let friendscontrol = FriendsControl.useContainer()
-
 	//anytime metro selection changes, we recalc events based on the state of the new selection
 	//todo: this executes a fetch on every metro selection switch
 	//but in reality we should be caching
@@ -363,7 +381,7 @@ export default function Tabify() {
 	//----------------------------------------------------------------------------
 	let statcontrol = StatControl.useContainer();
 	let gridControl = GridControl.useContainer()
-	let tabcontrol = TabControl.useContainer()
+
 
 	//testing: set default tab on page load
 	// const [section, setActiveSection] = useState(0);
@@ -490,6 +508,16 @@ export default function Tabify() {
 		//console.log("toRender",toRender);
 		//console.log(tabcontrol.section);
 
+		const isLoaded = (tab) =>{
+			return globalState[globalUI.user.id + "_" + tab[Object.keys(tab)[0]].toLowerCase()].length > 0
+		}
+		const getTabLabel = (tab) =>{
+			return <div style={{display:"flex"}}>
+				<div>{tab[Object.keys(tab)[0]]}</div>
+				{!(isLoaded(tab)) && <Spinner/>}
+			</div>
+		}
+
 		return (
 			<AppBar position="static">
 				<Tabs
@@ -502,7 +530,7 @@ export default function Tabify() {
 				>
 					{toRender.map((tab,i) =>
 						<Tab
-							key={i} label={tab[Object.keys(tab)[0]]}
+							key={i} label={getTabLabel(tab)} disabled={!(isLoaded(tab))}
 						/>
 					)}
 					{/*<Tab*/}
