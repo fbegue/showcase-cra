@@ -6,8 +6,8 @@ import React from "react";
 
 //testing:
 //let apiAddress = "http://localhost:8888/"
-let apiAddress = "https://api.soundfound.io/api"
-
+// let apiAddress = "https://api.soundfound.io/api"
+let apiAddress = "https://api.soundfound.io"
 let counter = 0
 const fakeDatabase = {
     todos: [
@@ -371,9 +371,9 @@ var createPlaylist =  function(req){
 
 var getAuth =  function(code){
     return new Promise(function(done, fail) {
-        console.log("code for accessToken fetch",code);
+        //testing: replace getAuth with one of example gateway requests
 
-        fetch(apiAddress + '/getAuth', {
+        fetch(apiAddress + '/api/postinfo', {
             method: 'POST', // *GET, POST, PUT, DELETE, etc.
             mode: 'cors', // no-cors, *cors, same-origin
             headers: {
@@ -383,9 +383,24 @@ var getAuth =  function(code){
         })
             .then(res => res.json())
             .then(function(res){
-                console.log("login response: ",res);
+                console.log("postinfo response: ",res);
                 done(res)
             })
+
+        //console.log("code for accessToken fetch",code);
+        // fetch(apiAddress + '/getAuth', {
+        //     method: 'POST', // *GET, POST, PUT, DELETE, etc.
+        //     mode: 'cors', // no-cors, *cors, same-origin
+        //     headers: {
+        //         'Content-Type': 'application/json'
+        //     },
+        //     body: JSON.stringify({code:code})
+        // })
+        //     .then(res => res.json())
+        //     .then(function(res){
+        //         console.log("login response: ",res);
+        //         done(res)
+        //     })
     })
 }
 
