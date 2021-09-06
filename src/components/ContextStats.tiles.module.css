@@ -18,7 +18,8 @@
   position: absolute;
   will-change: transform, width, height, opacity;
   /*direction: rtl;*/
-  padding: 15px;
+  /*padding: 15px;*/
+  padding: 1px;
 }
 
 

@@ -304,6 +304,7 @@ function Social(props) {
 		setDrawerShowing(!isDrawerShowing);
 	};
 
+	//note: example of a contained drawer
 	const drawerSpringStyle = useSpring({
 		// top: show ? 200 : 0,
 		position: "absolute",
@@ -330,7 +331,7 @@ function Social(props) {
 				<animated.div style={drawerSpringStyle}>
 					{!(isDrawerShowing) &&
 						<div onClick={handleToggleDrawer}>
-							<div style={{"position":"absolute","left":"6px"}}>
+							<div style={{"position":"absolute"}}>
 								<InputIcon fontSize={'large'} />
 							</div>
 
@@ -444,8 +445,9 @@ function Social(props) {
 				{selectedUser && !(isDrawerShowing) &&
 				// <Paper>
 				<div style={{display:"flex",flexDirection:"row",marginLeft:"3em"}}>
-					<div><UserTile item={selectedUser} single={true} size={["200px","200px"]} /> </div>
-					<div style={{display:"flex",flexDirection:"column"}}>
+					{/*<div><UserTile item={selectedUser} single={true} size={["200px","200px"]} /> </div>*/}
+					<div style={{"position":"absolute","zIndex":"1"}}><UserTile item={selectedUser} single={true} size={["auto","auto"]} /> </div>
+					<div style={{"display":"flex","flexDirection":"column","zIndex":"2"}}>
 						<div style={{display:"flex", flexWrap:"wrap"}}>
 							{statCards.map((item,i) => (
 								<div key={item.label} style={{width:item.width, padding:"5px"}}>

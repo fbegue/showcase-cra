@@ -11,7 +11,9 @@ function Profile(props) {
 
 	var REACT_APP_CLIENT_ID="0e7ef13646c9410293a0119e652b35f7"
 	var REACT_APP_AUTHORIZE_URL= "https://accounts.spotify.com/authorize"
-	var REACT_APP_REDIRECT_URL= "http://localhost:3000/redirect"
+	//testing:
+	//var REACT_APP_REDIRECT_URL= "http://localhost:3000/redirect"
+	var REACT_APP_REDIRECT_URL= "https://master.d267e964bph18g.amplifyapp.com/redirect"
 
 	//outdated list of scopes?
 	//let all_scopes = ["playlist-read-private", "playlist-modify-private", "playlist-modify-public", "playlist-read-collaborative", "user-modify-playback-state", "user-read-currently-playing", "user-read-playback-state", "user-top-read", "user-read-recently-played", "app-remote-control", "streaming", "user-read-birthdate", "user-read-email", "user-read-private", "user-follow-read", "user-follow-modify", "user-library-modify", "user-library-read"];

@@ -47,39 +47,41 @@
 
 .defaultGrid {
   display: grid;
+  overflow-x:hidden;
   background-color:#8080803b;
-  grid-template-rows: 25em 20em;
+  /*grid-template-rows: 350px;*/
   /*grid-template-rows: 4em;*/
 
   /*note: old auto-width*/
-  grid-template-columns: 40em minmax(53em, 60em) minmax(30em,40em);
+  /*grid-template-columns: 40em minmax(53em, 60em) minmax(30em,40em);*/
 
   /*grid-template-columns: repeat(auto-fit, minmax(30em, 1fr));*/
   /*grid-template-columns: 30em 70em 20em;*/
   /*grid-template-columns:1fr 1fr 1fr;*/
 
   grid-template-areas:
-          "tabs stats events"
-          "tiles tiles events"
-          "tiles tiles events";
+          "tabs"
+          "stats"
+          "tiles";
+          /*"events";*/
 }
 
 /*deprecated*/
-.friendsGrid {
-  display: grid;
-  /*grid-template-columns: 40em 70em 20em;*/
-  grid-template-columns: 40em minmax(45em, 50em) minmax(20em,30em);
-  /*grid-template-rows: 25em 20em 20em;*/
-  grid-template-rows: 25em auto  auto;
-  grid-template-areas:
-    "tabs stats events"
-    "tabs tiles events"
-    "tabs tiles events";
-  /*grid-template-areas:*/
-  /*        "tabs stats events"*/
-  /*        "tiles tiles events"*/
-  /*        "tiles tiles events";*/
-}
+/*.friendsGrid {*/
+/*  display: grid;*/
+/*  !*grid-template-columns: 40em 70em 20em;*!*/
+/*  grid-template-columns: 40em minmax(45em, 50em) minmax(20em,30em);*/
+/*  !*grid-template-rows: 25em 20em 20em;*!*/
+/*  grid-template-rows: 25em auto  auto;*/
+/*  grid-template-areas:*/
+/*    "tabs stats events"*/
+/*    "tabs tiles events"*/
+/*    "tabs tiles events";*/
+/*  !*grid-template-areas:*!*/
+/*  !*        "tabs stats events"*!*/
+/*  !*        "tiles tiles events"*!*/
+/*  !*        "tiles tiles events";*!*/
+/*}*/
 
 .wrapper > div {
   border: 1px solid green;
@@ -99,12 +101,14 @@
   grid-area: tabs;
   /*background: red;*/
   transition: width 1s ease-out;
-
+  /*height:30em;*/
 }
 .stats {
   /*width:70em;*/
   background: #54a3ff;
   grid-area: stats;
+  transition: height 1s ease-out;
+  height:30em;
   /*padding-left:.5em;*/
   /*padding-right:.5em;*/
 
@@ -112,10 +116,38 @@
   /*height:20em*/
 }
 
+.stats-collapse{
+  background: #54a3ff;
+  grid-area: stats;
+  transition: height 1s ease-out;
+  height:4em;
+
+}
 .events {
   grid-area: events;
   max-width:40em;
   /*background: purple*/
+}
+
+
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+  overflow-x: hidden;
+  position: absolute;
+}
+
+body {
+  font-family: system-ui;
+  margin: 0;
+}
+
+*,
+*:after,
+*:before {
+  box-sizing: border-box;
 }
 
 

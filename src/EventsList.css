@@ -52,3 +52,8 @@ cursor:pointer;
 .songkickExt:hover {
   opacity: 1;
 }
+
+#events-collapse {
+  padding-top:0px !important;
+  padding-bottom:0px !important;
+}

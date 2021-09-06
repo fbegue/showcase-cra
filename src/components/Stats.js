@@ -378,54 +378,61 @@ function Stats(props) {
 	return(
 
 		<div style={{position:"relative"}}>
-			<div style={{"position":"absolute","top":"-40px","left":"0px","zIndex":"30"}}>
-				{statcontrol.stats.name}
-				<button  onClick={() =>{statcontrol.setMode(!statcontrol.mode)}}>{statcontrol.mode ===  true? 'Context':'Custom'}
-				</button>
-				<button onClick={checkState}>checkState</button>
-				<button onClick={setbubble}>setbubble</button>
-				{/*<button onClick={checkProviders}>checkProviders</button>*/}
-				{/*<button  onClick={() =>{friendscontrol.setCompare(!friendscontrol.compare)}}>{friendscontrol.compare ===  true? 'Both':'Difference'}</button>*/}
-				<RedoIcon fontSize={'small'}/>
-				<button onClick={() =>{statcontrol.setChart(!statcontrol.chart)}}>
-					{statcontrol.chart ? <PieChartIcon fontSize={'small'}/>:<CloudIcon fontSize={'small'}/>}
-				</button>
-			</div>
+			{/*<div style={{"position":"absolute","top":"-40px","left":"0px","zIndex":"30"}}>*/}
+			{/*	{statcontrol.stats.name}*/}
+			{/*	<button  onClick={() =>{statcontrol.setMode(!statcontrol.mode)}}>{statcontrol.mode ===  true? 'Context':'Custom'}*/}
+			{/*	</button>*/}
+			{/*	<button onClick={checkState}>checkState</button>*/}
+			{/*	<button onClick={setbubble}>setbubble</button>*/}
+			{/*	/!*<button onClick={checkProviders}>checkProviders</button>*!/*/}
+			{/*	/!*<button  onClick={() =>{friendscontrol.setCompare(!friendscontrol.compare)}}>{friendscontrol.compare ===  true? 'Both':'Difference'}</button>*!/*/}
+			{/*	<RedoIcon fontSize={'small'}/>*/}
+			{/*	<button onClick={() =>{statcontrol.setChart(!statcontrol.chart)}}>*/}
+			{/*		{statcontrFol.chart ? <PieChartIcon fontSize={'small'}/>:<CloudIcon fontSize={'small'}/>}*/}
+			{/*	</button>*/}
+			{/*</div>*/}
 
 			<div style={{"position":"absolute","top":"0px","left":"0px","zIndex":"6"}}>
-				<a.div  style={drawerProps}>
-					<div style={{"position":"absolute","top":"0px","right":"0px","zIndex":"7"}}
-						 onClick={() =>{handleToggleDrawer()}}>
-						{
-							tileSelectControl.isDrawerShowing ? <ExpandLessIcon fontSize={'large'}/>
-							:	<ExpandMoreIcon fontSize={'large'}/>
-						}
-					</div>
-					<div>
-						{/*<div style={{border: "1px solid black",height:"1em"}}></div>*/}
-						{/*todo: was thinking this content display was taken care of for me by the drawer but nooooo!?*/}
-						{/*add delay on fade in*/}
-						<div style={{display:tileSelectControl.isDrawerShowing ? "initial":"none"}}>
-							<DisplayTile tile={tileSelectControl.tile}/>
-						</div>
-					</div>
-				</a.div>
+				<button onClick={() =>{gridControl.setStatCollapse(!(gridControl.statCollapse))}}>statCollapse {gridControl.statCollapse.toString()}</button>
+
+				{/*testing: disabled tile detail drawer for now*/}
+				{/*<a.div  style={drawerProps}>*/}
+				{/*	<div style={{"position":"absolute","top":"0px","right":"0px","zIndex":"7"}}*/}
+				{/*		 onClick={() =>{handleToggleDrawer()}}>*/}
+				{/*		{*/}
+				{/*			tileSelectControl.isDrawerShowing ? <ExpandLessIcon fontSize={'large'}/>*/}
+				{/*			:	<ExpandMoreIcon fontSize={'large'}/>*/}
+				{/*		}*/}
+				{/*	</div>*/}
+				{/*	<div>*/}
+				{/*		/!*<div style={{border: "1px solid black",height:"1em"}}></div>*!/*/}
+				{/*		/!*todo: was thinking this content display was taken care of for me by the drawer but nooooo!?*!/*/}
+				{/*		/!*add delay on fade in*!/*/}
+				{/*		<div style={{display:tileSelectControl.isDrawerShowing ? "initial":"none"}}>*/}
+				{/*			<DisplayTile tile={tileSelectControl.tile}/>*/}
+				{/*		</div>*/}
+				{/*	</div>*/}
+				{/*</a.div>*/}
 			</div>
 
-			<div style={{paddingTop:"1em"}}>
+			{/*style={{paddingTop:"1em"}}*/}
+			<div >
 				{/*<div style={{flexGrow:"1"}}></div>*/}
 				{/*style={{display:"flex",flexDirection:"column"}} */}
 				{/*style={{top: "-4em",position: "relative",height: "21em",zIndex:1}}*/}
 				<div >
+					{/*,"minWidth":"7em"*/}
+					{/*<div style={{"padding":"5px","zIndex":"5","flexGrow":"1","overflowY":"auto","overflowX":"hidden","maxHeight":"23.5em",width:"26em"}}>*/}
+					{/*	<BubbleFamilyGenreChips families={chipFamilies} genres={chipGenres} flexDirection={'row'} clearable={true} seperator={true}/>*/}
+					{/*	/!*<div>{getPointSum(bubbleData)}</div>*!/*/}
+					{/*</div>*/}
 					{/*options={{legend:legend}}*/}
-					<div style={{display:"flex"}} className={gridControl.gridClass === 'friendsGrid' ? 'fadeIn':'fadeOut'}>
+					<div style={{display:"flex"}} className={gridControl.statCollapse ? 'fadeOut':'fadeIn'}>
 						{/*{statcontrol.stats.name === 'friends' &&*/}
 
-						<div style={{"padding":"5px","zIndex":"5","flexGrow":"1","overflowY":"auto","overflowX":"hidden","maxHeight":"23.5em","minWidth":"7em"}}>
-							<BubbleFamilyGenreChips families={chipFamilies} genres={chipGenres} flexDirection={'row'} clearable={true} seperator={true}/>
-							<div>{getPointSum(bubbleData)}</div></div>
 						<div style={{paddingRight:"1em"}}>
-							<BubbleChart  options={{...bubbleOptionsGuest,series:bubbleData}} size={{height:380, width: friendscontrol.families.length === 0 ? 700:600}}/>
+							{/*size={{height:380, width: friendscontrol.families.length === 0 ? 700:600}}*/}
+							<BubbleChart  options={{...bubbleOptionsGuest,series:bubbleData}}size={{height:400,width:380}} />
 						</div>
 
 						{/*todo: disabled until I can figure out some way to deal with data*/}

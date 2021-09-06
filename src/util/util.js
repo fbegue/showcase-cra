@@ -757,6 +757,7 @@ function getFriendsItems(map_user,map_guest){
 	Object.keys(map_user).forEach(fam =>{
 		//for each item key on a fam
 
+		debugger;
 		Object.keys(map_user[fam].items).forEach(aname =>{
 			items_user.push(map_user[fam].items[aname][0])
 		})

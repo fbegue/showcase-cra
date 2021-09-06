@@ -19,10 +19,10 @@ function UserTile(props) {
 	}
 	return(
 
-		<div style={{display:"flex",flexDirection:"column",position:"relative",width:props.single ? "200px":null}}
+		<div style={{display:"flex",flexDirection:"column",position:"relative"}}
 			 className={props.single ? null : props.selectedUser && props.selectedUser.id === props.item.id ? 'tile-selected':'tile-unselected'}>
 
-			<div style={{width:props.single ? "200px":null}}>
+			<div >
 				{!(props.item.isUser) ? getInvite(props.item):""}
 				{/* width="150px" height="150px"*/}
 				{/*114px | 80px*/}
@@ -40,5 +40,6 @@ function UserTile(props) {
 }
 export default UserTile;
 UserTile.defaultProps = {
+	// size: ["125px","104px"],
 	size: ["125px","104px"],
 }

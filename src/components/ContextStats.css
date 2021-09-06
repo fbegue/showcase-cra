@@ -2,11 +2,12 @@
     margin-left:.5em
 }
 .filterItems > div{
-    margin-bottom:2em;
+    margin-bottom:1em;
 }
-.filterItems div:first-child{
-    margin-top:.5em;
-}
+
+/*.filterItems div:first-child{*/
+/*    margin-top:.5em;*/
+/*}*/
 
 .wrapper, html, body {
     height: 100%;
@@ -16,3 +17,4 @@
     display: flex;
     flex-direction: column;
 }
+

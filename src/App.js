@@ -1,5 +1,6 @@
-import React, {useState, useEffect, useContext} from 'react';
+import React, {useState, useEffect, useRef, useContext} from 'react';
 import RedirectPage from './RedirectPage';
+
 
 //todo: wtf is this shit?
 // import 'brace/mode/json';
@@ -30,6 +31,14 @@ import logo from './assets/sound_found.png'
 import 'fontsource-roboto';
 import './App.css'
 import './components/tiles/Tiles.css'
+
+//testing: viewpager
+import { useSprings, animated } from '@react-spring/web'
+import useMeasure from 'react-use-measure'
+import { useDrag } from 'react-use-gesture'
+import {clamp} from 'lodash'
+import stylesViewPager from'./stylesViewPager.module.css'
+import ViewPager from "./ViewPager";
 
 
 //testing:
@@ -203,9 +212,12 @@ function App(props) {
         }
     });
 
+
+
     //testing:
     // const [gridClass, setGridClass] = useState('defaultGrid');
     // <button onClick={() =>{setGridClass(gridClass === 'defaultGrid' ? 'friendsGrid':'defaultGrid')}}>grid</button>
+
     return (
         <MuiThemeProvider theme={muiTheme}>
             <Store>
@@ -224,7 +236,8 @@ function App(props) {
                 <div>
                     <div  style={{position: "sticky",top: "-16px", padding:"1em 1em 0em 1em", borderBottom: "1px solid black", zIndex: "20",display:'flex',background:"#f0f0f0"}}>
                         <div><img style={{height:"4em"}} src={logo}/> </div>
-
+                        {/*testing:*/}
+                        {/*<button onClick={() =>{setStatCollapse(!(statCollapse))}}>statCollapse {statCollapse.toString()}</button>*/}
                         <div style={{marginRight:"1em"}}>
                             <Profile/>
 
@@ -258,6 +271,10 @@ function App(props) {
 
                     </div>
                     {/* className={gridControl.gridClass}*/}
+
+
+
+
                     <div className={'defaultGrid'}>
 
                         {/*testing: messed up width of tabs and stats, so disabled this transition for now */}
@@ -269,18 +286,24 @@ function App(props) {
                             }
                         </div>
 
+                        {/*todo: hiding for now - but ContextStats doesn't function without something that's happening in there*/}
                         {/* style={{minWidth:"40em"}}*/}
-                        <div className="stats" >
+                        <div style={{display:"none"}} className={gridControl.statCollapse ? 'stats-collapse':'stats'} >
                            <Stats/>
                         </div>
-                        <div className="tiles" >
-                            {/*testing:*/}
-                            <ContextStats/>
-                        </div>
-                        {/*style={{minWidth:"30em"}}*/}
-                        <div className="events" >
-                            <EventsList data={[]} />
-                        </div>
+
+
+                        <ViewPager/>
+
+                        {/*<div className="tiles" >*/}
+                        {/*    <ContextStats/>*/}
+                        {/*</div>*/}
+                        {/*/!*style={{minWidth:"30em"}}*!/*/}
+
+                        {/*<div className="events" >*/}
+                        {/*    <EventsList data={[]} />*/}
+                        {/*</div>*/}
+
                     </div>
 
                     {/*testing: flex version*/}

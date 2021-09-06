@@ -93,8 +93,11 @@ let PaneControl  = createContainer(usePane);
 
 function useGrid(initialState = 0) {
      const [gridClass, setGridClass] = useState('defaultGrid');
+    const [statCollapse, setStatCollapse] = useState(false);
+    const [eventsView, setEventsView] = useState(false);
+    const [tileFilterOpen, setTileFilterOpen] = useState(false);
     // const [gridClass, setGridClass] = useState('friendsGrid');
-    return { gridClass,setGridClass}
+    return { gridClass,setGridClass,setStatCollapse,statCollapse,eventsView,setEventsView,tileFilterOpen,setTileFilterOpen}
 }
 let GridControl  = createContainer(useGrid);
 

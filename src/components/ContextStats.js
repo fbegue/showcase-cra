@@ -3,7 +3,7 @@ import {FriendsControl, GridControl, StatControl, TabControl,TileSelectControl} 
 import React, {useContext, useMemo,useEffect,useState} from "react";
 import {Context} from "../storage/Store";
 import {useReactiveVar} from "@apollo/react-hooks";
-import {TILES} from "../storage/withApolloProvider";
+import {CHIPFAMILIES, CHIPGENRES, EVENTS_VAR, TILES} from "../storage/withApolloProvider";
 import {a, useTransition} from "react-spring";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
@@ -20,8 +20,10 @@ import './ContextStats.css'
 import _ from "lodash";
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
-
+import Drawer from "@material-ui/core/Drawer";
+import FilterListIcon from '@material-ui/icons/FilterList';
 import BubbleFamilyGenreChips from "./chips/BubbleFamilyGenreChips";
+import SwipeRight from '../assets/swipe-right.png'
 //import FilterGenreChips from "./chips/FilterGenreChips";
 import PlaylistCheckboxes from './tiles/PlaylistCheckboxes'
 import { GLOBAL_UI_VAR } from '../storage/withApolloProvider';
@@ -100,9 +102,9 @@ function ContextStats(props) {
 	}
 
 	//const columns = useMedia([ '(min-width: 1500px)', '(min-width: 1400px)'], [ 4, 3], 2)
-	const columns = 7;
+	const columns = 3;
 	//note: this width divided by # of columns = the width of one item
-	const width = 1000;
+	const width = 350;
 
 	//note: replaced all references to data-height (designed to be unique values 300-500) with uHeight
 
@@ -238,6 +240,7 @@ function ContextStats(props) {
 
 //todo: duplicated in Tabify
 	const handleTabChange = (event, tabindex) => {
+		console.log(tabindex);
 		console.log("handleTabChange",tabMap[tabcontrol.section][tabindex]);
 		tabcontrol.setActiveTab(tabindex);
 		statcontrol.setStats({name:Object.keys(tabMap[tabcontrol.section][tabindex])[0]})
@@ -255,9 +258,9 @@ function ContextStats(props) {
 			3:{"albums_saved":"Albums"}
 		},2:{
 			0:{"artists_friends":"Artists"},
-			1:{"playlists_friends":"!#Playlists#!"},
-			2:{"tracks_friends":"Tracks"},
-			3:{"albums_friends":"Albums"}
+			1:{"tracks_friends":"Tracks"},
+			2:{"albums_friends":"Albums"},
+			3:{"playlists_friends":"!#Playlists#!"}
 		}}
 
 //todo: was collapsing tabify and this guy into tabcontrol
@@ -269,7 +272,12 @@ function ContextStats(props) {
 		//skip render for section = friends
 		var toRender = []
 
-		for (const [key, value] of Object.entries(tabMap[tabcontrol.section])) {toRender.push(value)}
+		for (const [key, value] of Object.entries(tabMap[tabcontrol.section])) {
+			//testing: disabled Playlists ()
+			//toRender.push(value)
+			if(Object.keys(value)[0] !== 'playlists_friends'){toRender.push(value)}
+
+		}
 
 		return (
 			<Tabs
@@ -277,6 +285,8 @@ function ContextStats(props) {
 				value={tabcontrol.tab}
 				onChange={(e,v) =>{handleTabChange(e,v)}}
 				aria-label="simple tabs example"
+				class={'friend-tabs'}
+				style={{width:"14em"}}
 			>
 				{toRender.map((tab,i) =>
 					<Tab
@@ -315,42 +325,155 @@ function ContextStats(props) {
 
 	}
 
+	//-----------------------------------------------------
+	//const [open, setOpen] = React.useState(false);
+	const toggleDrawer = () => {
+		console.log("setToggle");
+		gridControl.setTileFilterOpen(!gridControl.tileFilterOpen)
+		//setOpen(!open);
+	};
+
+
+	const chipFamilies = useReactiveVar(CHIPFAMILIES);
+	const chipGenres = useReactiveVar(CHIPGENRES);
+	const events = useReactiveVar(EVENTS_VAR);
+
+	const getFilterLabel = () => {
+
+		// return "filter on" + tiles.length + " items"
+		return "filter"
+		}
+
+
+
 	return(
 		<div>
-			{/*<MyCustomWrapper ref={containerRef} className={classnames(params)}>the box</MyCustomWrapper>*/}
-			{/*<ContainerQuery query={query}>*/}
-			{/*	{(params) => (*/}
-			{/*		<div className={classnames(params)}>the box {printParams(params)} </div>*/}
+			<div>
+				{/*note: floating filter buttons*/}
+				<div>
+					{/*<button*/}
+					{/*	style={{ border: "1px solid blue", position: "absolute", zIndex: "2",transform:"rotate(90deg)",marginTop:"10em" }}*/}
+					{/*	onClick={() => {*/}
+					{/*		//switchView()*/}
+					{/*	}}*/}
+					{/*>*/}
+					{/*	<div ><FilterListIcon/> </div>*/}
+					{/*</button>*/}
 
-			{/*	)}*/}
-			{/*</ContainerQuery>*/}
-			{/*todo: not understanding why this doesn't obey width constraint 30em*/}
-			{/*so I just changed it to 35em LOL - basing this off the 60em on the tabify ... or was that not making any difference?*/}
-			{/*real question comes in with the panes - currently doing any window shrinking @ 35em flexes it sends it to the bottom*/}
+					<button
+						style={{ border: "1px solid red", position: "absolute", zIndex: "2",transform:"rotate(90deg)",marginTop:"10em" }}
+						onClick={() => {
+							toggleDrawer();
+						}}
+					>
+						<div ><FilterListIcon/> </div>
+					</button>
+				</div>
 
+				{/*note: drawer instantiation*/}
+				<div style={{position:"absolute"}}>
+					<div
+						id="drawer-container"
+						style={{
+							position: "relative",
+							// backgroundColor: "orange",
+							height: "28em",
+							width:"22em"
+						}}
+					>
+						{/*<div>container content</div>*/}
+					</div>
+				</div>
 
+				{/*note: tiles*/}
+				<div>
+					<div style={{"width":"100%","height":"2em","backgroundColor":"lightblue","display":"flex","alignItems":"center",justifyContent:"flex-end"}}>
+						<div style={{marginRight:"1em"}}>View {events.length} Events</div>  <div> <img style={{height:"3em",marginRight:".5em"}} src={SwipeRight}/> </div>
+					</div>
 
-			{/*todo: unfuck this (remove tables and switch everything to friendsGrid */}
-			{/*{statcontrol.stats.name === 'friends' &&*/}
-			<div style={{display:"flex"}}>
+					{tabcontrol.section === 2 &&
+					<div>
+						<div style={{"marginLeft":"0em","border":"#e2e2e2 1px solid","borderRadius":"5px",display:"flex",alignItems: "center"}}>
+							{getTabs()}
+							<div style={{flexGrow:"1"}}>{'\u00A0'}</div>
+							<div style={{display:'flex',flexDirection:"row",position:"relative"}}>
+								{/*testing :disabled total length for now*/}
+								{/*<div>{items.length}/{tiles.length}</div>*/}
+								<div>
+									<NavigateBeforeIcon fontSize={'large'} onClick={() =>{setPage((prevState => {
+										return prevState !== 1 ? prevState - 1:prevState
+									}))}}/>
+									<div style={{"display":"inline-block","top":"-11px","position":"relative"}}> {page}/{Math.ceil(tiles.length/pageSize)}</div>
+									<NavigateNextIcon fontSize={'large'} onClick={() =>{setPage((prevState => {
+										return prevState <= tiles.length/pageSize ? prevState + 1:prevState
+									}))}}/>
+								</div>
+							</div>
+						</div>
+					</div>
+					}
 
+					{/*testing: it's either happening really fast or the value isn't changing....*/}
+					{/*{tilesLoading && <div>tilesLoading</div>}*/}
+					{/*<div>tilesLoading {tilesLoading.toString()}</div>*/}
+
+					{/*todo: make width shift transition*/}
+					{/*testing: custom minHeight to keep tile space large*/}
+					{/*not sure how to go about 'growing' height like I do with horizontal space*/}
+					{/*<div className={styles.list} style={{ minHeight:"37em",minWidth:gridControl.gridClass === 'defaultGrid' ? '64em':'57em' }}>*/}
+
+					{/*<div className={styles.list} style={{ height: "37em",minWidth:gridControl.gridClass === 'defaultGrid' ? '64em':'57em'}}>*/}
+					{/*minWidth:gridControl.gridClass === 'defaultGrid' ? '64em':'57em'*/}
+					<div className={styles.list} style={{ height: "37em",width:"30em"}}>
+						{transitions((style, item) => (
+							<a.div style={style} onClick={() =>{handleTileSelect(item)}}>
+								{item.type === "track" &&
+								<div className={tileSelectControl.tile && tileSelectControl.tile.id === item.id ? 'tile-selected':'tile-unselected' }>
+									<img height={120} src={item.album.images[0] && item.album.images[0].url}/>
+									<div style={{padding:"2px",background:"rgb(128 128 128 / .7)",position:"relative",top:"-43px",color:"white",height:"20px"}}>{item.name}</div>
+								</div>
+								}
+								{item.type !== "track" &&
+								<div className={tileSelectControl.tile && tileSelectControl.tile.id === item.id ? 'tile-selected':'tile-unselected' }>
+									<img height={120} src={item.images[0] && item.images[0].url}/>
+									<div style={{padding:"2px",background:"rgb(128 128 128 / .7)",position:"relative",top:"-43px",color:"white",height:"20px"}}>{item.name}</div>
+								</div>
+								}
+
+							</a.div>
+						))}
+					</div>
+				</div>
+
+			</div>
+
+			{/*note: drawer content*/}
+			<Drawer
+				open={gridControl.tileFilterOpen}
+				onClose={() => {}}
+				PaperProps={{ style: { position: "absolute"} }}
+				BackdropProps={{ style: { position: "absolute" } }}
+				ModalProps={{
+					container: document.getElementById("drawer-container"),
+					style: { position: "absolute" }
+				}}
+				variant="temporary"
+			>
+
+				<button
+					style={{"border":"1px solid red","position":"absolute","zIndex":"2","marginTop":"50%","right":"0px","transform":"rotate(90deg)"}}
+					onClick={() => {
+						toggleDrawer();
+					}}
+				>
+					<FilterListIcon/>
+				</button>
 				<div className={'filterItems'} style={{display:"flex",flexDirection:"column"}}>
 					<div style={{display:'flex',flexDirection:"column"}}>
 						<div>
-							<CustomizedInputBase value={searchTerm} placeholder={'filter'} onChange={(e) =>{setSearchTerm(e.target.value)}} clearForm={() =>{clearForm()}}/>
+							<CustomizedInputBase value={searchTerm} placeholder={getFilterLabel()} onChange={(e) =>{setSearchTerm(e.target.value)}} clearForm={() =>{clearForm()}}/>
 						</div>
-						<div style={{display:'flex',flexDirection:"row"}}>
-							<div>{items.length}/{tiles.length}</div>
-							<div>
-								<NavigateBeforeIcon fontSize={'large'} onClick={() =>{setPage((prevState => {
-									return prevState !== 1 ? prevState - 1:prevState
-								}))}}/>
-								{page}/{Math.ceil(tiles.length/pageSize)}
-								<NavigateNextIcon fontSize={'large'} onClick={() =>{setPage((prevState => {
-									return prevState <= tiles.length/pageSize ? prevState + 1:prevState
-								}))}}/>
-							</div>
-						</div>
+
 					</div>
 					<div style={{display:"flex",flexDirection:"column",width:"20em",background:"darkgrey"}}>
 						{(tabcontrol.section === 1 && tabcontrol.tab === 1) &&
@@ -378,67 +501,22 @@ function ContextStats(props) {
 						{/*</div>*/}
 					</div>
 					<div style={{width:"1em"}}>
-						{/*testing: see BubbleFamilyGenreChips @ handleGClick
-						   can't delimit by families here if auto-add-family is disabled */}
-						<BubbleFamilyGenreChips removable={true} clearable={true} familyDisabled={true} families={friendscontrol.families} genres={friendscontrol.genres} flexDirection={'column'}/>
-					</div>
-				</div>
 
-				<div style={{flexGrow:"1"}}>
-					{/*<div style={{width:"20em",background:"darkgrey"}}>hmm</div>*/}
-					{tabcontrol.section === 2 &&
-					<div>
-						<div style={{"marginLeft":"5em","border":"#e2e2e2 1px solid","borderRadius":"5px"}}>
-
-							{getTabs()}
-							{/*testing: just using the look of these tabs - the panel switching to change content is replaced with reactive tiles*/}
-							{/*<TabPanel value={friendscontrol.selectedTabIndex} index={0}>*/}
-							{/*	Item One*/}
-							{/*</TabPanel>*/}
-							{/*<TabPanel style={{paddingTop:"0px !important"}} value={friendscontrol.selectedTabIndex} index={1}>*/}
-							{/*	/!*Item two*!/*/}
-							{/*	/!*<button onClick={() =>{setShared()}}>setShared</button>*!/*/}
-							{/*</TabPanel>*/}
-							{/*<TabPanel value={friendscontrol.selectedTabIndex} index={2}>*/}
-							{/*	Item Three*/}
-							{/*</TabPanel>*/}
-							{/*<TabPanel value={friendscontrol.selectedTabIndex} index={3}>*/}
-							{/*	Item Four*/}
-							{/*</TabPanel>*/}
+						<div style={{"padding":"5px","zIndex":"5","flexGrow":"1","overflowY":"auto","overflowX":"hidden","maxHeight":"23.5em",width:"21em"}}>
+							<BubbleFamilyGenreChips families={chipFamilies} genres={chipGenres} flexDirection={'row'} clearable={true} seperator={true}/>
+							{/*<div>{getPointSum(bubbleData)}</div>*/}
 						</div>
-					</div>
-					}
 
-					{/*testing: it's either happening really fast or the value isn't changing....*/}
-					{/*{tilesLoading && <div>tilesLoading</div>}*/}
-					{/*<div>tilesLoading {tilesLoading.toString()}</div>*/}
+						{/*testing: old 'reactive' companion to rest of chip selection in app*/}
+						{/*note: see BubbleFamilyGenreChips @ handleGClick
+						   can't delimit by families here if auto-add-family is disabled */}
+						{/*<BubbleFamilyGenreChips removable={true} clearable={true} familyDisabled={true} families={friendscontrol.families} genres={friendscontrol.genres} flexDirection={'column'}/>*/}
 
-					{/*todo: make width shift transition*/}
-					{/*testing: custom minHeight to keep tile space large*/}
-					{/*not sure how to go about 'growing' height like I do with horizontal space*/}
-					{/*<div className={styles.list} style={{ minHeight:"37em",minWidth:gridControl.gridClass === 'defaultGrid' ? '64em':'57em' }}>*/}
-
-					<div className={styles.list} style={{ height: "37em",minWidth:gridControl.gridClass === 'defaultGrid' ? '64em':'57em'}}>
-						{transitions((style, item) => (
-							<a.div style={style} onClick={() =>{handleTileSelect(item)}}>
-								{item.type === "track" &&
-								<div className={tileSelectControl.tile && tileSelectControl.tile.id === item.id ? 'tile-selected':'tile-unselected' }>
-									<img height={120} src={item.album.images[0] && item.album.images[0].url}/>
-									<div style={{padding:"2px",background:"rgb(128 128 128 / .7)",position:"relative",top:"-43px",color:"white",height:"20px"}}>{item.name}</div>
-								</div>
-								}
-								{item.type !== "track" &&
-								<div className={tileSelectControl.tile && tileSelectControl.tile.id === item.id ? 'tile-selected':'tile-unselected' }>
-									<img height={120} src={item.images[0] && item.images[0].url}/>
-									<div style={{padding:"2px",background:"rgb(128 128 128 / .7)",position:"relative",top:"-43px",color:"white",height:"20px"}}>{item.name}</div>
-								</div>
-								}
-
-							</a.div>
-						))}
 					</div>
 				</div>
-			</div>
+
+			</Drawer>
+
 			{/*}*/}
 
 

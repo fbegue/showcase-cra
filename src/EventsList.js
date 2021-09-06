@@ -32,7 +32,7 @@ import spotifyLogo from './assets/spotify_logo_large.png'
 import songkick_badge_pink from './assets/songkick_badge_pink.png'
 import api from "./api/api";
 import {useReactiveVar} from "@apollo/react-hooks";
-import {GLOBAL_UI_VAR, EVENTS_VAR, CHIPGENRES} from "./storage/withApolloProvider";
+import {GLOBAL_UI_VAR, EVENTS_VAR, CHIPGENRES, TILES} from "./storage/withApolloProvider";
 import { StatControl,Control} from "./index";
 import Map from './components/Map';
 import EventImageFader from "./components/EventImageFader";
@@ -42,6 +42,7 @@ import BubbleFamilyGenreChips from "./components/chips/BubbleFamilyGenreChips";
 import {useImage} from 'react-image'
 
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
+import SwipeRight from "./assets/swipe-right.png";
 //import GenreChipsDumb from './components/chips/GenreChipsDumb.js'
 function ChipsArray_dep(props) {
 	//const classes = useStyles();
@@ -258,15 +259,17 @@ function EventsList() {
 						<TextField value={name} onChange={handleSetName} id="standard-basic" label="" />
 					</form>
 				</div>
-				<div>
-					{/*todo: what a mess
-					1) this needs to be memo'd to stop rerenders caused by handleChange results, but can't find any working examples
-					2) really made a fuckery of the mapping here*/}
-					artistSens {control.artistSens}
-					genreSens {control.genreSens}
-					<SliderEvents map={control.mapArtist} defaultValue={control.rmapArtist[control.artistSens]} handleChange={(v) =>{control.setArtistSens(v)}}/>
-					<SliderEvents2 map={control.map} defaultValue={control.rmap[control.genreSens]} handleChange={(v) =>{control.setGenreSens(v)}}/>
-				</div>
+
+				{/*todo: thinking about putting this in a floating-filter similar to genres in ContextStats*/}
+				{/*<div>*/}
+				{/*	/!*todo: what a mess*/}
+				{/*	1) this needs to be memo'd to stop rerenders caused by handleChange results, but can't find any working examples*/}
+				{/*	2) really made a fuckery of the mapping here*!/*/}
+				{/*	artistSens {control.artistSens}*/}
+				{/*	genreSens {control.genreSens}*/}
+				{/*	<SliderEvents map={control.mapArtist} defaultValue={control.rmapArtist[control.artistSens]} handleChange={(v) =>{control.setArtistSens(v)}}/>*/}
+				{/*	<SliderEvents2 map={control.map} defaultValue={control.rmap[control.genreSens]} handleChange={(v) =>{control.setGenreSens(v)}}/>*/}
+				{/*</div>*/}
 			</div>
 		)
 	}
@@ -566,6 +569,7 @@ function EventsList() {
 		return <div>agg:{c_familyAgg} genres:{c_genres} eventsWithOne: {c_eventsWithOne} total: {events.length} </div>
 	}
 
+	const tiles = useReactiveVar(TILES);
 
 	return (
 		<div style={{display:"flex",flexDirection:"column"}}>
@@ -580,6 +584,9 @@ function EventsList() {
 			{/*</div>*/}
 
 			<div>
+				<div style={{"width":"100%","height":"2em","backgroundColor":"lightblue","display":"flex","alignItems":"center",justifyContent:"flex-start"}}>
+					<div style={{"transform":"rotate(180deg)"}}> <img style={{height:"3em",marginRight:".5em"}} src={SwipeRight}/> </div> <div style={{marginLeft:"1em"}}>View {tiles.length} Items </div>
+				</div>
 				<List>
 					{/*<ListItem button divider key={'stats'} style={{zIndex:10}} onClick={handleClickConfig3}>*/}
 					{/*	Analysis*/}
@@ -606,9 +613,11 @@ function EventsList() {
 					{/*		</ListItem>*/}
 					{/*	</List>*/}
 					{/*</Collapse>*/}
-					<ListItem key={'events'} button divider onClick={handleClickConfig2}>
-						<ListItemText primary={<div>Events ({events.length}) {getCoverage(events)}</div>} />
-						{open2 ? <ExpandLess /> : <ExpandMore />}
+					<ListItem id={'events-collapse'} key={'events'} button divider onClick={handleClickConfig2}>
+						{/*<ListItemText primary={<div>Events ({events.length})*/}
+						{/*	/!*{getCoverage(events)}*!/*/}
+						{/*</div>} />*/}
+						<div style={{"marginLeft":"93%"}}>{open2 ? <ExpandLess /> : <ExpandMore />}</div>
 					</ListItem>
 					<Collapse  key={'events-collapse'}  in={open2} timeout="auto" unmountOnExit>
 						<div style={{marginTop:"1em",marginBottom:"1em"}} key={'special'}><CreatePlay/></div>
