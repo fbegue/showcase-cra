@@ -371,21 +371,41 @@ var createPlaylist =  function(req){
 
 var getAuth =  function(code){
     return new Promise(function(done, fail) {
-        console.log("code for accessToken fetch",code);
+        //testing: replace getAuth with one of example gateway requests
 
-        fetch(apiAddress + '/getAuth', {
+        console.log("postinfo...");
+        fetch(apiAddress + '/api/postinfo', {
             method: 'POST', // *GET, POST, PUT, DELETE, etc.
             mode: 'cors', // no-cors, *cors, same-origin
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({code:code})
+            //testing: idfk
+            // body: JSON.stringify({code:code})
         })
             .then(res => res.json())
             .then(function(res){
-                console.log("login response: ",res);
-                done(res)
+                console.log("postinfo response: ",res);
+
+                console.log("code for accessToken fetch",code);
+                fetch(apiAddress + '/getAuth', {
+                    method: 'POST', // *GET, POST, PUT, DELETE, etc.
+                    mode: 'cors', // no-cors, *cors, same-origin
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({code:code})
+                })
+                    .then(res => res.json())
+                    .then(function(res){
+                        console.log("login response: ",res);
+                        done(res)
+                    })
+
+               // done(res)
             })
+
+
     })
 }
 
