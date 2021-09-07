@@ -5,9 +5,9 @@ import {GLOBAL_UI_VAR} from "../storage/withApolloProvider";
 import React from "react";
 
 //testing:
-let apiAddress = "http://localhost:8888"
+//let apiAddress = "http://localhost:8888"
 // let apiAddress = "https://api.soundfound.io/api"
-//let apiAddress = "https://api.soundfound.io"
+let apiAddress = "https://api.soundfound.io"
 let counter = 0
 const fakeDatabase = {
     todos: [
