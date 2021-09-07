@@ -3,6 +3,7 @@ import { GLOBAL_UI_VAR } from '../storage/withApolloProvider';
 import {useReactiveVar} from "@apollo/react-hooks";
 import Button from '@material-ui/core/Button';
 import Typography from "@material-ui/core/Typography";
+import api from "../api/api";
 function Profile(props) {
 
 	const globalUI = useReactiveVar(GLOBAL_UI_VAR);
@@ -39,11 +40,32 @@ function Profile(props) {
 		GLOBAL_UI_VAR({access_token:false,refresh_token:false,user:null})
 	}
 
+
+	const handlepostInfo = () => {
+		api.postInfo()
+			.then(r =>{
+				console.log("postInfo complete",r);
+			},e=>{
+				console.error("postInfo error",e);
+			})
+		};
+
+	const handlepostInfo2 = () => {
+		api.postInfo2()
+			.then(r =>{
+				console.log("postInfo2 complete",r);
+			},e=>{
+				console.error("postInfo2 error",e);
+			})
+	};
+
 	return(
 		<div>
 			{!(globalUI.access_token) &&
 			<div>
 				<Button size="small"  onClick={handleLogin} variant="contained">Login with Spotify</Button>
+				<Button size="small"  onClick={handlepostInfo} variant="contained">handlepostInfo</Button>
+				<Button size="small"  onClick={handlepostInfo2} variant="contained">handlepostInfo2</Button>
 			</div>
 			}
 			{globalUI.access_token &&
