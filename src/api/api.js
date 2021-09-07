@@ -379,7 +379,7 @@ var getAuth =  function(code){
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({code:code})
+            // body: JSON.stringify({code:code})
         })
             .then(res => res.json())
             .then(function(res){
