@@ -1,9 +1,10 @@
-import React, {} from 'react';
+import React, {useState} from 'react';
 import { GLOBAL_UI_VAR } from '../storage/withApolloProvider';
 import {useReactiveVar} from "@apollo/react-hooks";
 import Button from '@material-ui/core/Button';
 import Typography from "@material-ui/core/Typography";
 import api from "../api/api";
+import CustomizedInputBase from "./utility/CustomizedInputBase";
 function Profile(props) {
 
 	const globalUI = useReactiveVar(GLOBAL_UI_VAR);
@@ -41,8 +42,12 @@ function Profile(props) {
 	}
 
 
+	const [query, setQuery] = useState("")
+	const handleChange = (event) =>{
+		setQuery(event.target.value);
+	}
 	const handlepostInfo = () => {
-		api.postInfo()
+		api.postInfo(query)
 			.then(r =>{
 				console.log("postInfo complete",r);
 			},e=>{
@@ -51,7 +56,7 @@ function Profile(props) {
 		};
 
 	const handlepostInfo2 = () => {
-		api.postInfo2()
+		api.postInfo2(query)
 			.then(r =>{
 				console.log("postInfo2 complete",r);
 			},e=>{
@@ -66,6 +71,7 @@ function Profile(props) {
 				<Button size="small"  onClick={handleLogin} variant="contained">Login with Spotify</Button>
 				<Button size="small"  onClick={handlepostInfo} variant="contained">handlepostInfo</Button>
 				<Button size="small"  onClick={handlepostInfo2} variant="contained">handlepostInfo2</Button>
+				<CustomizedInputBase value={query} onChange={handleChange} placeholder={'url'}/>
 			</div>
 			}
 			{globalUI.access_token &&

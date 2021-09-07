@@ -413,11 +413,11 @@ var postInfo =  function(code){
     })
 }
 
-var postInfo2 =  function(code){
+var postInfo2 =  function(url){
     return new Promise(function(done, fail) {
         //testing: replace getAuth with one of example gateway requests
-        console.log("postinfo...");
-        fetch(apiAddress + '/api/postinfo', {
+        console.log("postinfo2...",url);
+        fetch(url, {
             method: 'POST', // *GET, POST, PUT, DELETE, etc.
             mode: 'cors', // no-cors, *cors, same-origin
             headers: {
@@ -428,7 +428,7 @@ var postInfo2 =  function(code){
         })
             .then(res => res.json())
             .then(function(res){
-                console.log("postinfo response: ",res);
+                console.log("postinfo2 response: ",res);
                 done(res)
             })
 
