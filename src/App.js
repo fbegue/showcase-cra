@@ -5,7 +5,7 @@ import RedirectPage from './RedirectPage';
 //todo: wtf is this shit?
 // import 'brace/mode/json';
 // import 'brace/theme/monokai';
-
+import Dispatch from './api/Dispatch'
 import Player,{} from './components/Player'
 import Profile from './components/Profile'
 import Tabify from './Tabify'
@@ -221,7 +221,7 @@ function App(props) {
     return (
         <MuiThemeProvider theme={muiTheme}>
             <Store>
-
+                {globalUI.user && <Dispatch/>}
                 {/*<TestComp/>*/}
                 <BrowserRouter>
                     <div className="main">

@@ -290,11 +290,6 @@ function Stats(props) {
 		// ]
 	};
 
-	function checkState(){
-		console.log("$globalstate",globalState);
-		console.log("$globalUI",globalUI);
-	}
-
 	let tabcontrol = TabControl.useContainer();
 
 	//testing:

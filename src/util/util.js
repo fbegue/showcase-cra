@@ -638,7 +638,7 @@ function getFriendsMaps(data_user,data_guest){
 				}
 			}
 			else if(d.artists) {
-				//playlists
+				debugger;
 				//todo: hard part is representing a playlist proportionately within itself
 				//I have the familyAgg for each artist - so just make a ranking of these then using the artistFreq
 				var rank = makeRank(d.artists, d.artistFreq, "familyAgg");
@@ -757,7 +757,6 @@ function getFriendsItems(map_user,map_guest){
 	Object.keys(map_user).forEach(fam =>{
 		//for each item key on a fam
 
-		debugger;
 		Object.keys(map_user[fam].items).forEach(aname =>{
 			items_user.push(map_user[fam].items[aname][0])
 		})
@@ -1187,6 +1186,7 @@ function useProduceData(){
 						// producePieData(_shared,'artists','shared')
 						if(objectType === 'album' ||objectType === 'track'){
 
+							debugger;
 							_tiles = _.uniqBy(data_user.concat(data_guest), 'id').filter(r => {return r.shared})
 							produceBubbleDataFriendsAlbums(makeCombinedMap(map_user, map_guest,'shared'))
 
@@ -1494,6 +1494,8 @@ function useProduceEvents(){
 
 				dataset.forEach(r =>{
 					if(r.type === 'artist'){
+
+
 						familyArtist[r.familyAgg] ? familyArtist[r.familyAgg].push(r):familyArtist[r.familyAgg] = [r]
 						r.genres.forEach(g =>{
 							genreArtist[g.name] ? genreArtist[g.name].push(r):genreArtist[g.name] = [r]
@@ -1511,6 +1513,7 @@ function useProduceEvents(){
 						r.artists.forEach(a =>{
 							familyArtist[a.familyAgg] ? familyArtist[a.familyAgg].push(r):familyArtist[a.familyAgg] = [r]
 
+							debugger;
 							//todo: someone is coming back without genres:[] when it has none
 							if(!a.genres){console.warn("problem record:",a)}
 							else{

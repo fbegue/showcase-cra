@@ -1,10 +1,18 @@
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import { GLOBAL_UI_VAR } from '../storage/withApolloProvider';
 import {useReactiveVar} from "@apollo/react-hooks";
 import Button from '@material-ui/core/Button';
 import Typography from "@material-ui/core/Typography";
 import api from "../api/api";
 import CustomizedInputBase from "./utility/CustomizedInputBase";
+import {Context} from "../storage/Store";
+
+//const api_address = "http://localhost:8888"
+const api_address = "https://api.soundfound.io"
+//const redirect_address = "http://localhost:3000"
+const redirect_address = api_address
+// const api_address ="http://localhost:3000"
+
 function Profile(props) {
 
 	const globalUI = useReactiveVar(GLOBAL_UI_VAR);
@@ -14,8 +22,8 @@ function Profile(props) {
 	var REACT_APP_CLIENT_ID="0e7ef13646c9410293a0119e652b35f7"
 	var REACT_APP_AUTHORIZE_URL= "https://accounts.spotify.com/authorize"
 	//testing:
-	//var REACT_APP_REDIRECT_URL= "http://localhost:3000/redirect"
-	var REACT_APP_REDIRECT_URL= "https://master.d267e964bph18g.amplifyapp.com/redirect"
+	var REACT_APP_REDIRECT_URL= redirect_address +"/redirect"
+	//var REACT_APP_REDIRECT_URL= "https://master.d267e964bph18g.amplifyapp.com/redirect"
 
 	//outdated list of scopes?
 	//let all_scopes = ["playlist-read-private", "playlist-modify-private", "playlist-modify-public", "playlist-read-collaborative", "user-modify-playback-state", "user-read-currently-playing", "user-read-playback-state", "user-top-read", "user-read-recently-played", "app-remote-control", "streaming", "user-read-birthdate", "user-read-email", "user-read-private", "user-follow-read", "user-follow-modify", "user-library-modify", "user-library-read"];
@@ -53,7 +61,7 @@ function Profile(props) {
 			},e=>{
 				console.error("postInfo error",e);
 			})
-		};
+	};
 
 	const handlepostInfo2 = () => {
 		api.postInfo2(query)
@@ -64,8 +72,18 @@ function Profile(props) {
 			})
 	};
 
+	const [globalState, globalDispatch] = useContext(Context);
+	function checkState(){
+		console.log("$globalstate",globalState);
+		console.log("$globalUI",globalUI);
+	}
+
 	return(
 		<div>
+
+			<div style={{"position":"absolute","top":"0px","left":"0px","zIndex":"30"}}>
+					<button onClick={checkState}>checkState</button>
+			</div>
 			{!(globalUI.access_token) &&
 			<div>
 				<Button size="small"  onClick={handleLogin} variant="contained">Login with Spotify</Button>
@@ -92,3 +110,4 @@ function Profile(props) {
 		</div>)
 }
 export default Profile;
+export {api_address}

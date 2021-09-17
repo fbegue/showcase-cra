@@ -24,6 +24,7 @@ import Drawer from "@material-ui/core/Drawer";
 import FilterListIcon from '@material-ui/icons/FilterList';
 import BubbleFamilyGenreChips from "./chips/BubbleFamilyGenreChips";
 import SwipeRight from '../assets/swipe-right.png'
+import {tabMap} from "../Tabify";
 //import FilterGenreChips from "./chips/FilterGenreChips";
 import PlaylistCheckboxes from './tiles/PlaylistCheckboxes'
 import { GLOBAL_UI_VAR } from '../storage/withApolloProvider';
@@ -246,22 +247,7 @@ function ContextStats(props) {
 		statcontrol.setStats({name:Object.keys(tabMap[tabcontrol.section][tabindex])[0]})
 	};
 
-	const tabMap = {
-		0:{
-			0:{"home":"Home"},
-			1:{"tracks_recent":"Recently Saved Tracks"},
-			2:{"artists_top":"Top Artists"}},
-		1:{
-			0:{"artists_saved":"Artists"},
-			1:{"playlists":"Playlists"},
-			2:{"tracks_saved":"Tracks"},
-			3:{"albums_saved":"Albums"}
-		},2:{
-			0:{"artists_friends":"Artists"},
-			1:{"tracks_friends":"Tracks"},
-			2:{"albums_friends":"Albums"},
-			3:{"playlists_friends":"!#Playlists#!"}
-		}}
+
 
 //todo: was collapsing tabify and this guy into tabcontrol
 //1) seems odd that all the tab control isn't just one component, therefore
@@ -271,13 +257,10 @@ function ContextStats(props) {
 
 		//skip render for section = friends
 		var toRender = []
-
-		for (const [key, value] of Object.entries(tabMap[tabcontrol.section])) {
-			//testing: disabled Playlists ()
-			//toRender.push(value)
-			if(Object.keys(value)[0] !== 'playlists_friends'){toRender.push(value)}
-
-		}
+		for (const [key, value] of Object.entries(tabMap[tabcontrol.section])) {value.key = parseInt(key); toRender.push(value)}
+		toRender = toRender.sort((r1,r2) =>{return r1.key < r2.key})
+		//testing: disabled Playlists
+		toRender = toRender.filter(r =>{return r.key !== 3})
 
 		return (
 			<Tabs
@@ -285,7 +268,7 @@ function ContextStats(props) {
 				value={tabcontrol.tab}
 				onChange={(e,v) =>{handleTabChange(e,v)}}
 				aria-label="simple tabs example"
-				class={'friend-tabs'}
+				className={'friend-tabs'}
 				style={{width:"14em"}}
 			>
 				{toRender.map((tab,i) =>

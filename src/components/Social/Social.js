@@ -93,45 +93,46 @@ function Social(props) {
 	//todo:
 	const [term, setTerm] = useState('medium');
 
-	function setStatic(){
-
-		var friendsProms = [];
-		friendsProms.push(api.fetchSpotifyUsers({auth:globalUI}))
-
-		globalUI.user.related_users.filter(r =>{return r.friend})
-			//testing: Dan only
-			.filter(r =>{return r.id === "123028477"})
-			.forEach(f =>{
-			friendsProms.push(api.fetchStaticUser( {auth:globalUI,friend:f}))
-		})
-		console.log("setStatic...",friendsProms.length - 1);
-		Promise.all(friendsProms)
-			.then(results =>{
-				//console.log("setStatic users fetched",results.length);
-				globalDispatch({type: 'init', payload:results[0],user: globalUI.user,context:'spotifyusers'});
-
-				// console.log(results.length);
-				// debugger;
-				var users = results.slice(1,results.length)
-				//var users =[]
-					users.forEach(r =>{
-
-					 initUser(r);
-					//note:  have to read the type key off the tuple, which itself is a tuple w/ {typekey:[obs],stats:{stats}}
-					//note: artists follows this pattern even though it has no stats
-					globalDispatch({type: 'init', user:{id:r.id},payload:r.artists,context:'artists'});
-					globalDispatch({type: 'init', user:{id:r.id},payload:r.tracks,context:'tracks'});
-					globalDispatch({type: 'init', user:{id:r.id},payload:r.albums,context:'albums'});
-				})
-
-			},err =>{
-				console.log(err);
-			})
-	}
-	useEffect(()=>{
-		//testing:
-		setStatic();
-	},[])
+	//testing: moved to dispatch
+	// function setStatic(){
+	//
+	// 	var friendsProms = [];
+	// 	friendsProms.push(api.fetchSpotifyUsers({auth:globalUI}))
+	//
+	// 	globalUI.user.related_users.filter(r =>{return r.friend})
+	// 		//testing: Dan only
+	// 		.filter(r =>{return r.id === "123028477"})
+	// 		.forEach(f =>{
+	// 		friendsProms.push(api.fetchStaticUser( {auth:globalUI,friend:f}))
+	// 	})
+	// 	console.log("setStatic...",friendsProms.length - 1);
+	// 	Promise.all(friendsProms)
+	// 		.then(results =>{
+	// 			//console.log("setStatic users fetched",results.length);
+	// 			globalDispatch({type: 'init', payload:results[0],user: globalUI.user,context:'spotifyusers'});
+	//
+	// 			// console.log(results.length);
+	// 			// debugger;
+	// 			var users = results.slice(1,results.length)
+	// 			//var users =[]
+	// 				users.forEach(r =>{
+	//
+	// 				 initUser(r);
+	// 				//note:  have to read the type key off the tuple, which itself is a tuple w/ {typekey:[obs],stats:{stats}}
+	// 				//note: artists follows this pattern even though it has no stats
+	// 				globalDispatch({type: 'init', user:{id:r.id},payload:r.artists,context:'artists'});
+	// 				globalDispatch({type: 'init', user:{id:r.id},payload:r.tracks,context:'tracks'});
+	// 				globalDispatch({type: 'init', user:{id:r.id},payload:r.albums,context:'albums'});
+	// 			})
+	//
+	// 		},err =>{
+	// 			console.log(err);
+	// 		})
+	// }
+	// useEffect(()=>{
+	// 	//testing:
+	// 	setStatic();
+	// },[])
 
 
 	var handleSelectGuest = function(rows){

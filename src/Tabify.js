@@ -41,6 +41,7 @@ import InfoPanel from "./components/InfoPanel";
 import Spinner from './components/utility/Spinner';
 import './Tabify.css'
 
+
 // const styles = {
 // 	fontFamily: "sans-serif",
 // 	textAlign: "center"
@@ -97,6 +98,23 @@ const useStyles = makeStyles((theme) => ({
 	}
 }));
 
+const tabMap = {
+	0:{
+		0:{"home":"Home"},
+		1:{"tracks_recent":"Recently Saved Tracks"},
+		2:{"artists_top":"Top Artists"}},
+	1:{
+		0:{"artists_saved":"Artists"},
+		1:{"playlists":"Playlists"},
+		2:{"tracks_saved":"Tracks"},
+		3:{"albums_saved":"Albums"}
+	},2:{
+		0:{"artists_friends":"Artists"},
+		1:{"albums_friends":"Albums"},
+		2:{"tracks_friends":"Tracks"},
+		3:{"playlists_friends":"Playlists"},
+	}}
+export {tabMap}
 export default function Tabify() {
 
 	const classes = useStyles();
@@ -141,93 +159,94 @@ export default function Tabify() {
 	var slow = function(){ setTimeout(e=>{console.log("do something");},2000)}
 
 
-
-
-
-	//-------------------------------------------------------------------------------------
+	//------------------------------------------------------------------------------------
 	let control = Control.useContainer();
 	let friendscontrol = FriendsControl.useContainer()
 	let tabcontrol = TabControl.useContainer()
 	//-------------------------------------------------------------------------------------
 
-	useEffect(() => {
+	//testing: moved to Dispatch
 
-		var userProms = [];
-		userProms.push(api.getMyFollowedArtists(req))
-		userProms.push(api.getTopArtists(req))
-		// userProms.push(api.getRecentlyPlayedTracks(req))
-		//userProms.push(api.fetchSpotifyUsers(req))
-		// userProms.push(api.getSavedTracks(req))
-		userProms.push(api.getMySavedAlbums(req))
-		Promise.all(userProms)
-			.then(r =>{
-
-				//all these artist's have 'sources' so they all end up in here together
-				//note: to keep init payload signatures consistent, I reconstruct it below
-				//note: stats:
-				//followedArtists: 			{stats:null}
-				//getTopArtists : 			none
-				//getRecentlyPlayedTracks:	none
-				//getSavedTracks:			{stats:{},tracks:[]}
-				//getSavedAlbums:			{stats:{},tracks:[]}
-				var artistsPay = [];
-				artistsPay = artistsPay.concat(r[0].artists);artistsPay= artistsPay.concat(r[1]);
-				globalDispatch({type: 'init', payload:{artists:artistsPay,stats:null},user: globalUI.user,context:'artists'});
-
-				//globalDispatch({type: 'init', payload:r[2],user: globalUI.user,context:'tracks'});
-				//globalDispatch({type: 'init', payload:r[2],user: globalUI.user,context:'spotifyusers'});
-				// globalDispatch({type: 'init', payload:r[4],user: globalUI.user,context:'tracks'});
-				globalDispatch({type: 'init', payload:r[2],user: globalUI.user,context:'albums'});
-				//control.setDataLoaded(true)
-
-				//testing: call tracks after
-				var userProms2 = [];
-				userProms2.push(api.getRecentlyPlayedTracks(req))
-				userProms2.push(api.getSavedTracks(req))
-				Promise.all(userProms2)
-					.then(r2 =>{
-						var tracksPay = {tracks:[]};
-						tracksPay.tracks = tracksPay.tracks.concat(r2[0].tracks);tracksPay.tracks = tracksPay.tracks.concat(r2[1].tracks);
-						tracksPay.stats = r2[1].stats
-						globalDispatch({type: 'init', payload:tracksPay,user: globalUI.user,context:'tracks'});
-					})
-
-			},err =>{
-				console.log(err);
-			})
-
-		//testing:
-		api.fetchPlaylistsResolved(req)
-			.then(r =>{
-				console.log("r.stats",r.stats);
-				globalDispatch({type: 'init', payload: r,user: globalUI.user,context:'playlists'});
-
-			},err =>{
-				console.log(err);
-			})
-	},[]);
+	// useEffect(() => {
+	//
+	// 	var userProms = [];
+	// 	userProms.push(api.getMyFollowedArtists(req))
+	// 	//userProms.push(api.getTopArtists(req))
+	// 	// userProms.push(api.getRecentlyPlayedTracks(req))
+	// 	//userProms.push(api.fetchSpotifyUsers(req))
+	// 	// userProms.push(api.getSavedTracks(req))
+	// 	//userProms.push(api.getMySavedAlbums(req))
+	// 	Promise.all(userProms)
+	// 		.then(r =>{
+	//
+	// 			//all these artist's have 'sources' so they all end up in here together
+	// 			//note: to keep init payload signatures consistent, I reconstruct it below
+	// 			//note: stats:
+	// 			//followedArtists: 			{stats:null}
+	// 			//getTopArtists : 			none
+	// 			//getRecentlyPlayedTracks:	none
+	// 			//getSavedTracks:			{stats:{},tracks:[]}
+	// 			//getSavedAlbums:			{stats:{},tracks:[]}
+	// 			var artistsPay = [];
+	// 			artistsPay = artistsPay.concat(r[0].artists);
+	// 			//artistsPay= artistsPay.concat(r[1]);
+	// 			globalDispatch({type: 'init', payload:{artists:artistsPay,stats:null},user: globalUI.user,context:'artists'});
+	//
+	// 			//globalDispatch({type: 'init', payload:r[2],user: globalUI.user,context:'tracks'});
+	// 			//globalDispatch({type: 'init', payload:r[2],user: globalUI.user,context:'spotifyusers'});
+	// 			// globalDispatch({type: 'init', payload:r[4],user: globalUI.user,context:'tracks'});
+	// 			//globalDispatch({type: 'init', payload:r[2],user: globalUI.user,context:'albums'});
+	// 			//control.setDataLoaded(true)
+	//
+	// 			//testing: call tracks after
+	// 			// var userProms2 = [];
+	// 			// userProms2.push(api.getRecentlyPlayedTracks(req))
+	// 			// userProms2.push(api.getSavedTracks(req))
+	// 			// Promise.all(userProms2)
+	// 			// 	.then(r2 =>{
+	// 			// 		var tracksPay = {tracks:[]};
+	// 			// 		tracksPay.tracks = tracksPay.tracks.concat(r2[0].tracks);tracksPay.tracks = tracksPay.tracks.concat(r2[1].tracks);
+	// 			// 		tracksPay.stats = r2[1].stats
+	// 			// 		globalDispatch({type: 'init', payload:tracksPay,user: globalUI.user,context:'tracks'});
+	// 			// 	})
+	//
+	// 		},err =>{
+	// 			console.log(err);
+	// 		})
+	//
+	// 	//testing: moved to Dispatch
+	// 	// api.fetchPlaylistsResolved(req)
+	// 	// 	.then(r =>{
+	// 	// 		console.log("r.stats",r.stats);
+	// 	// 		globalDispatch({type: 'init', payload: r,user: globalUI.user,context:'playlists'});
+	// 	//
+	// 	// 	},err =>{
+	// 	// 		console.log(err);
+	// 	// 	})
+	// },[]);
 
 	//-------------------------------------------------------------------------------------
 	//anytime metro selection changes, we recalc events based on the state of the new selection
 	//todo: this executes a fetch on every metro selection switch
 	//but in reality we should be caching
+	//testing: moved to Dispatch
 
-	useEffect(() => {
-		if(globalState.events.length === 0){
-			console.log("ONE TIME EVENT FETCH");
-			api.fetchEvents({metros:control.metro})
-				.then(r =>{
-					globalDispatch({type: 'update_events', payload: r,context:'events', control:control});
-				},err =>{
-					console.log(err);
-				})
-		}
-		// else{
-		// 	console.log("UPDATING ON METRO SELECT",control.metro);
-		// 	globalDispatch({type: 'update_events', payload: [],context:'events', control:control});
-		// }
-
-	},[control.metro,control.startDate,control.endDate])
+	// useEffect(() => {
+	// 	if(globalState.events.length === 0){
+	// 		console.log("ONE TIME EVENT FETCH");
+	// 		api.fetchEvents({metros:control.metro})
+	// 			.then(r =>{
+	// 				globalDispatch({type: 'update_events', payload: r,context:'events', control:control});
+	// 			},err =>{
+	// 				console.log(err);
+	// 			})
+	// 	}
+	// 	// else{
+	// 	// 	console.log("UPDATING ON METRO SELECT",control.metro);
+	// 	// 	globalDispatch({type: 'update_events', payload: [],context:'events', control:control});
+	// 	// }
+	//
+	// },[control.metro,control.startDate,control.endDate])
 
 	//-----------------------------
 	//sending this along 'seemed' to work but didn't test hard
@@ -420,22 +439,7 @@ export default function Tabify() {
 
 	};
 
-	const tabMap = {
-		0:{
-			0:{"home":"Home"},
-			1:{"tracks_recent":"Recently Saved Tracks"},
-			2:{"artists_top":"Top Artists"}},
-		1:{
-			0:{"artists_saved":"Artists"},
-			1:{"playlists":"Playlists"},
-			2:{"tracks_saved":"Tracks"},
-			3:{"albums_saved":"Albums"}
-		},2:{
-			0:{"artists_friends":"Artists"},
-			1:{"playlists_friends":"Playlists"},
-			2:{"tracks_friends":"Tracks"},
-			3:{"albums_friends":"Albums"}
-		}}
+
 
 
 	// function handleTabSelect(event,tabkey,sectionkey){
@@ -501,9 +505,9 @@ export default function Tabify() {
 
 	const getTabs = () =>{
 
-		//skip render for section = friends
 		var toRender = []
-		for (const [key, value] of Object.entries(tabMap[tabcontrol.section])) {toRender.push(value)}
+		for (const [key, value] of Object.entries(tabMap[tabcontrol.section])) {value.key = parseInt(key); toRender.push(value)}
+		toRender = toRender.sort((r1,r2) =>{return r1.key < r2.key})
 
 		//console.log("toRender",toRender);
 		//console.log(tabcontrol.section);
@@ -547,6 +551,7 @@ export default function Tabify() {
 	return(
 		// style={styles}
 		<div  >
+
 			<AppBar position="static">
 				<Tabs className={classes.root} value={tabcontrol.section} onChange={handleSectionSelect} >
 					{/*todo: disabled for now (broke in multiple places)*/}

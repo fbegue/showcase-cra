@@ -3,11 +3,11 @@ import $ from 'jquery';
 import {useReactiveVar} from "@apollo/react-hooks";
 import {GLOBAL_UI_VAR} from "../storage/withApolloProvider";
 import React from "react";
-
+import {api_address }from '../components/Profile'
 //testing:
-//let apiAddress = "http://localhost:8888"
-// let apiAddress = "https://api.soundfound.io/api"
-let apiAddress = "https://api.soundfound.io"
+//let api_address = "http://localhost:8888"
+// let api_address = "https://api.soundfound.io/api"
+// let api_address = "https://api.soundfound.io"
 let counter = 0
 const fakeDatabase = {
     todos: [
@@ -78,7 +78,7 @@ var fetchPlaylists =  function(){
         //testing: must turn cors off in browser
 
         $.ajax({
-            url: apiAddress + '/getUserPlaylists',
+            url: api_address + '/getUserPlaylists',
             type:"POST"
         }).done(function(payload){
             //console.log("$retrieved: ",payload);
@@ -92,7 +92,7 @@ var fetchPlaylistsResolved =  function(req){
     return new Promise(function(done, fail) {
         //console.log("fetchPlaylistsResolved",req.user);
 
-        fetch(apiAddress + '/resolvePlaylists', {
+        fetch(api_address + '/resolvePlaylists', {
             method: 'POST', // *GET, POST, PUT, DELETE, etc.
             mode: 'cors', // no-cors, *cors, same-origin
             headers: {
@@ -121,7 +121,7 @@ var fetchPlaylistsResolved =  function(req){
 var getMyFollowedArtists =  function(req){
     return new Promise(function(done, fail) {
         //testing: must turn cors off in browser
-        fetch(apiAddress + '/getFollowedArtists', {
+        fetch(api_address + '/getFollowedArtists', {
             method: 'POST', // *GET, POST, PUT, DELETE, etc.
             mode: 'cors', // no-cors, *cors, same-origin
             headers: {
@@ -138,7 +138,7 @@ var getMyFollowedArtists =  function(req){
 
 var getRecentlyPlayedTracks =  function(req){
     return new Promise(function(done, fail) {
-        fetch(apiAddress + '/getRecentlyPlayedTracks', {
+        fetch(api_address + '/getRecentlyPlayedTracks', {
             method: 'POST', // *GET, POST, PUT, DELETE, etc.
             mode: 'cors', // no-cors, *cors, same-origin
             headers: {
@@ -156,7 +156,7 @@ var getRecentlyPlayedTracks =  function(req){
 var getSavedTracks =  function(req){
     return new Promise(function(done, fail) {
 
-        fetch(apiAddress + '/getMySavedTracks', {
+        fetch(api_address + '/getMySavedTracks', {
             method: 'POST', // *GET, POST, PUT, DELETE, etc.
             mode: 'cors', // no-cors, *cors, same-origin
             headers: {'Content-Type': 'application/json'},
@@ -173,7 +173,7 @@ var getSavedTracks =  function(req){
 var getMySavedAlbums =  function(req){
     return new Promise(function(done, fail) {
 
-        fetch(apiAddress + '/getMySavedAlbums', {
+        fetch(api_address + '/getMySavedAlbums', {
             method: 'POST', // *GET, POST, PUT, DELETE, etc.
             mode: 'cors', // no-cors, *cors, same-origin
             headers: {'Content-Type': 'application/json'},
@@ -190,7 +190,7 @@ var getMySavedAlbums =  function(req){
 var getMySavedTracksLast =  function(req){
     return new Promise(function(done, fail) {
 
-        fetch(apiAddress + '/getMySavedTracksLast', {
+        fetch(api_address + '/getMySavedTracksLast', {
             method: 'POST', // *GET, POST, PUT, DELETE, etc.
             mode: 'cors', // no-cors, *cors, same-origin
             headers: {'Content-Type': 'application/json'},
@@ -205,7 +205,7 @@ var getMySavedTracksLast =  function(req){
 
 var getTopArtists =  function(req){
     return new Promise(function(done, fail) {
-        fetch(apiAddress + '/getTopArtists', {
+        fetch(api_address + '/getTopArtists', {
             method: 'POST', // *GET, POST, PUT, DELETE, etc.
             mode: 'cors', // no-cors, *cors, same-origin
             headers: {
@@ -226,7 +226,7 @@ var fetchStaticUser =  function(req){
     return new Promise(function(done, fail) {
 
         console.log("$user",req);
-        fetch(apiAddress + '/fetchStaticUser', {
+        fetch(api_address + '/fetchStaticUser', {
             method: 'POST', // *GET, POST, PUT, DELETE, etc.
             mode: 'cors', // no-cors, *cors, same-origin
             headers: {
@@ -245,7 +245,7 @@ var fetchStaticUser =  function(req){
 var getUserPlaylistFriends =  function(req){
     return new Promise(function(done, fail) {
 
-        fetch(apiAddress + '/getUserPlaylistFriends', {
+        fetch(api_address + '/getUserPlaylistFriends', {
             method: 'POST', // *GET, POST, PUT, DELETE, etc.
             mode: 'cors', // no-cors, *cors, same-origin
             headers: {
@@ -263,7 +263,7 @@ var getUserPlaylistFriends =  function(req){
 var fetchSpotifyUsers =  function(req){
     return new Promise(function(done, fail) {
 
-        fetch(apiAddress + '/fetchSpotifyUsers', {
+        fetch(api_address + '/fetchSpotifyUsers', {
             method: 'POST', // *GET, POST, PUT, DELETE, etc.
             mode: 'cors', // no-cors, *cors, same-origin
             headers: {
@@ -298,7 +298,7 @@ var fetchEvents =  function(req){
         //b/c if you change the mode here, you can't send fucking json? ffs
         //https://stackoverflow.com/questions/54016068/empty-body-in-fetch-post-request
 
-        fetch(apiAddress + '/resolveEvents', {
+        fetch(api_address + '/resolveEvents', {
             method: 'POST', // *GET, POST, PUT, DELETE, etc.
             mode: 'cors', // no-cors, *cors, same-origin
             headers: {
@@ -332,7 +332,7 @@ var fetchEvents =  function(req){
             })
 
         // $.ajax({
-        //     url: apiAddress + '/resolveEvents',
+        //     url: api_address + '/resolveEvents',
         //     type:"POST",
         //     data: {data:JSON.stringify(param)}
         //     //todo:[Object: null prototype] when trying to read
@@ -353,7 +353,7 @@ var fetchEvents =  function(req){
 var createPlaylist =  function(req){
     return new Promise(function(done, fail) {
 
-        fetch(apiAddress + '/createPlaylist', {
+        fetch(api_address + '/createPlaylist', {
             method: 'POST', // *GET, POST, PUT, DELETE, etc.
             mode: 'cors', // no-cors, *cors, same-origin
             headers: {
@@ -372,7 +372,7 @@ var createPlaylist =  function(req){
 var getAuth =  function(code){
     return new Promise(function(done, fail) {
         console.log("code for accessToken fetch",code);
-        fetch(apiAddress + '/getAuth', {
+        fetch(api_address + '/getAuth', {
             method: 'POST', // *GET, POST, PUT, DELETE, etc.
             mode: 'cors', // no-cors, *cors, same-origin
             headers: {
@@ -394,7 +394,7 @@ var postInfo =  function(code){
         //testing: replace getAuth with one of example gateway requests
 
         console.log("postinfo...");
-        fetch(apiAddress + '/api/postinfo', {
+        fetch(api_address + '/api/postinfo', {
             method: 'POST', // *GET, POST, PUT, DELETE, etc.
             mode: 'cors', // no-cors, *cors, same-origin
             headers: {
@@ -442,7 +442,7 @@ var refreshAuth =  function(refresh_token){
     return new Promise(function(done, fail) {
         console.log("refresh token",refresh_token);
 
-        fetch(apiAddress + '/refreshAuth', {
+        fetch(api_address + '/refreshAuth', {
             method: 'POST', // *GET, POST, PUT, DELETE, etc.
             mode: 'cors', // no-cors, *cors, same-origin
             headers: {
@@ -460,7 +460,7 @@ var refreshAuth =  function(refresh_token){
 
 var getArtistTopTracks =  function(req){
     return new Promise(function(done, fail) {
-        fetch(apiAddress + '/getArtistTopTracks', {
+        fetch(api_address + '/getArtistTopTracks', {
             method: 'POST', // *GET, POST, PUT, DELETE, etc.
             mode: 'cors', // no-cors, *cors, same-origin
             headers: {
@@ -478,7 +478,7 @@ var getArtistTopTracks =  function(req){
 var completeArtist =  function(param){
     return new Promise(function(done, fail) {
         $.ajax({
-            url: apiAddress + '/completeArtist',
+            url: api_address + '/completeArtist',
             type:"POST",
             data: {artistQuery:param}
         }).done(function(payload){
@@ -501,7 +501,7 @@ var fetchArtistGenres =  function(playlists){
         //testing: must turn cors off in browser
 
         $.ajax({
-            url: apiAddress + '/resolvePlaylists',
+            url: api_address + '/resolvePlaylists',
             type:"POST",
             data: {playlists:JSON.stringify(playlists)}
         }).done(function(payload){
@@ -518,7 +518,7 @@ var getToken =  function(playlists){
         //testing: must turn cors off in browser
 
         $.ajax({
-            url: apiAddress + '/getToken',
+            url: api_address + '/getToken',
             type:"POST",
             // data: {playlists:JSON.stringify(playlists)}
         }).done(function(payload){
