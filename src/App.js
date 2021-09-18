@@ -227,7 +227,7 @@ function App(props) {
                     <div className="main">
                         <Switch>
                             {/*<Route path="/" component={Home} exact={true} />*/}
-                            {/*<Route path="/redirect" component={RedirectPage} />*/}
+                            <Route path="/redirect" component={RedirectPage} />
                             {/*<Route path="/dashboard" component={Dashboard} />*/}
                             {/*<Route component={NotFoundPage} />*/}
                         </Switch>

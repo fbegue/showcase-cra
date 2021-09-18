@@ -10,7 +10,8 @@ import {Context} from "../storage/Store";
 //const api_address = "http://localhost:8888"
 const api_address = "https://api.soundfound.io"
 //const redirect_address = "http://localhost:3000"
-const redirect_address = 'https://soundfound.io'
+const redirect_address = "https://master.d267e964bph18g.amplifyapp.com/"
+//const redirect_address = 'https://soundfound.io'
 // const api_address ="http://localhost:3000"
 
 function Profile(props) {

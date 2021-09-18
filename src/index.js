@@ -6,14 +6,12 @@ import { DateTime } from "luxon";
 import './index.css'
 import { createContainer } from "unstated-next"
 
+//     window.addEventListener('load', function() {
+//
+//         alert(window.location)
+//     });
 
-if ('serviceWorker' in navigator) {
 
-    window.addEventListener('load', function() {
-
-        alert(window.location)
-    });
-}
 //todo: should probably break out play control here...
 
 function useControl(initialState = 0) {

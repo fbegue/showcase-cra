@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-expressions */
-import $ from 'jquery';
+//import $ from 'jquery';
 import {useReactiveVar} from "@apollo/react-hooks";
 import {GLOBAL_UI_VAR} from "../storage/withApolloProvider";
 import React from "react";
@@ -31,24 +31,24 @@ const fakeDatabase = {
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-const fetchTodos = filter =>
-    delay(1000).then(() => {
-        switch (filter) {
-            case 'all':
-                return fakeDatabase.todos;
-            case 'active':
-                return fakeDatabase.todos.filter(t => !t.completed);
-            case 'completed':
-                return fakeDatabase.todos.filter(t => t.completed);
-            default:
-                throw new Error(`Unknown filter: ${filter}`);
-        }
-    });
+// const fetchTodos = filter =>
+//     delay(1000).then(() => {
+//         switch (filter) {
+//             case 'all':
+//                 return fakeDatabase.todos;
+//             case 'active':
+//                 return fakeDatabase.todos.filter(t => !t.completed);
+//             case 'completed':
+//                 return fakeDatabase.todos.filter(t => t.completed);
+//             default:
+//                 throw new Error(`Unknown filter: ${filter}`);
+//         }
+//     });
 
-const fetchTodo = id =>
+/*const fetchTodo = id =>
     delay(500).then(() => {
         return fakeDatabase.todos.find(t => t.id === id);
-    });
+    });*/
 
 
 var fakeFetch1 = function(){
@@ -76,14 +76,14 @@ var fakeFetch1 = function(){
 var fetchPlaylists =  function(){
     return new Promise(function(done, fail) {
         //testing: must turn cors off in browser
-
-        $.ajax({
-            url: api_address + '/getUserPlaylists',
-            type:"POST"
-        }).done(function(payload){
-            //console.log("$retrieved: ",payload);
-            done(payload.items)
-        })
+        //todo: replace with fetch
+        // $.ajax({
+        //     url: api_address + '/getUserPlaylists',
+        //     type:"POST"
+        // }).done(function(payload){
+        //     //console.log("$retrieved: ",payload);
+        //     done(payload.items)
+        // })
         // fakeFetch2()
     })
 };
@@ -477,14 +477,15 @@ var getArtistTopTracks =  function(req){
 
 var completeArtist =  function(param){
     return new Promise(function(done, fail) {
-        $.ajax({
-            url: api_address + '/completeArtist',
-            type:"POST",
-            data: {artistQuery:param}
-        }).done(function(payload){
-            //console.log("retrieved: ",payload);
-            done(payload.result.body.artists.items)
-        })
+        //todo: replace with fetch
+        // $.ajax({
+        //     url: api_address + '/completeArtist',
+        //     type:"POST",
+        //     data: {artistQuery:param}
+        // }).done(function(payload){
+        //     //console.log("retrieved: ",payload);
+        //     done(payload.result.body.artists.items)
+        // })
 
         //testing:
         // fakeFetch3().then(r =>{done(r)})
@@ -499,15 +500,15 @@ var fetchArtistGenres =  function(playlists){
     return new Promise(function(done, fail) {
 
         //testing: must turn cors off in browser
-
-        $.ajax({
-            url: api_address + '/resolvePlaylists',
-            type:"POST",
-            data: {playlists:JSON.stringify(playlists)}
-        }).done(function(payload){
-            //console.log("retrieved: ",payload);
-            done(payload)
-        })
+        //todo: replace with fetch
+        // $.ajax({
+        //     url: api_address + '/resolvePlaylists',
+        //     type:"POST",
+        //     data: {playlists:JSON.stringify(playlists)}
+        // }).done(function(payload){
+        //     //console.log("retrieved: ",payload);
+        //     done(payload)
+        // })
     })
 }
 
@@ -516,15 +517,15 @@ var getToken =  function(playlists){
     return new Promise(function(done, fail) {
 
         //testing: must turn cors off in browser
-
-        $.ajax({
-            url: api_address + '/getToken',
-            type:"POST",
-            // data: {playlists:JSON.stringify(playlists)}
-        }).done(function(payload){
-            console.log("retrieved token: ",payload);
-            done(payload)
-        })
+        //todo: replace with fetch
+        // $.ajax({
+        //     url: api_address + '/getToken',
+        //     type:"POST",
+        //     // data: {playlists:JSON.stringify(playlists)}
+        // }).done(function(payload){
+        //     console.log("retrieved token: ",payload);
+        //     done(payload)
+        // })
     })
 }
 
@@ -560,8 +561,8 @@ const deleteTodo = (id) =>
 export default {
     postInfo,
     postInfo2,
-    fetchTodos,
-    fetchTodo,
+    // fetchTodos,
+    // fetchTodo,
     addTodo,
     updateTodo,
     deleteTodo,
