@@ -419,8 +419,8 @@ var stateOb = {
 //todo: change name from init (obviously)
 
 const Reducer = (state, action) => {
-	console.log("Reducer",action);
-	console.log("tables",tables);
+	console.log("reducer action:",action);
+	//console.log("tables",tables);
 	switch (action.type) {
 		//refilter events based on some filter change (on events itself only)
 		//- changing selected metro
@@ -440,7 +440,7 @@ const Reducer = (state, action) => {
 			}
 		//todo: why is it that I'm not recalcing node on these inits?
 		case 'init':
-			console.log('action', action);
+			//console.log('action', action);
 
 			if(action.context === 'artists'){
 				//register with global artists
@@ -512,9 +512,9 @@ const Reducer = (state, action) => {
 				//register with global tracks
 				tables[action.context] = tables[action.context].concat(action.payload.tracks);
 
-				console.log("$",tables);
-				console.log("$",action.user.id);
-				console.log("$",tables["users"][action.user.id]);
+				//console.log("$",tables);
+				//console.log("$",action.user.id);
+				//console.log("$",tables["users"][action.user.id]);
 				tables["users"][action.user.id][action.context] = tables["users"][action.user.id][action.context].concat(action.payload.tracks)
 
 				var key = action.user.id + '_' + action.context;
@@ -531,9 +531,9 @@ const Reducer = (state, action) => {
 				//register with global tracks
 				tables[action.context] = tables[action.context].concat(action.payload.albums);
 
-				console.log("$",tables);
-				console.log("$",action.user.id);
-				console.log("$",tables["users"][action.user.id]);
+				//console.log("$",tables);
+				//console.log("$",action.user.id);
+				//console.log("$",tables["users"][action.user.id]);
 				tables["users"][action.user.id][action.context] = tables["users"][action.user.id][action.context].concat(action.payload.albums)
 
 				var key = action.user.id + '_' + action.context;

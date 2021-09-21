@@ -6,7 +6,7 @@ HC_more(Highcharts)
 
 function BubbleChart(props) {
 
-	console.log("BubbleChart",props);
+	//console.log("BubbleChart",props);
 	//const [legend, setLegend] = useState(false);
 
 	//todo:is there a need for legend at all?

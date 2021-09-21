@@ -225,7 +225,7 @@ var getTopArtists =  function(req){
 var fetchStaticUser =  function(req){
     return new Promise(function(done, fail) {
 
-        console.log("$user",req);
+        //console.log("$user",req);
         fetch(api_address + '/fetchStaticUser', {
             method: 'POST', // *GET, POST, PUT, DELETE, etc.
             mode: 'cors', // no-cors, *cors, same-origin

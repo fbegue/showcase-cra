@@ -3,11 +3,11 @@ import UserTile from "../utility/UserTile";
 import {a, useTransition} from "react-spring";
 import styles from "./FriendsDisplay.tiles.module.css";
 function FriendsDisplay(props) {
-	console.log("FriendsDisplay | users",props.users);
+	//console.log("FriendsDisplay | users",props.users);
 
-	const columns = 4;
+	const columns = 3;
 	//note: this width divided by # of columns = the width of one item
-	const width = 500;
+	const width = 350;
 	//note: replaced all references to data-height (designed to be unique values 300-500) with uHeight
 	const uHeight = 195;
 
@@ -17,7 +17,56 @@ function FriendsDisplay(props) {
 	const [query, setQuery] = React.useState("");
 	const [items, set] = useState(props.users)
 
-
+	//testing:
+	let t1 = {
+		"display_name": "First Lastt1",
+		"id": "T1123028477",
+		"external_urls": {
+		"spotify": "https://open.spotify.com/user/123028477#2"
+	},
+		"href": "https://api.spotify.com/v1/users/123028477#2",
+		"type": "user",
+		"uri": "spotify:user:123028477TEST2",
+		"images": [
+		{
+			"height": null,
+			"url": "https://picsum.photos/id/237/200/300",
+			"width": null
+		}
+	],
+		"friend": true,
+		"x": 0,
+		"y": 0,
+		"width": 125,
+		"height": 97.5
+	}
+	let t2 = {
+		"display_name": "First Lastt2",
+		"id": "T2123028477",
+		"external_urls": {
+			"spotify": "https://open.spotify.com/user/123028477#2"
+		},
+		"href": "https://api.spotify.com/v1/users/123028477#2",
+		"type": "user",
+		"uri": "spotify:user:123028477TEST2",
+		"images": [
+			{
+				"height": null,
+				"url": "https://picsum.photos/id/237/200/300",
+				"width": null
+			}
+		],
+		"friend": true,
+		"x": 0,
+		"y": 0,
+		"width": 125,
+		"height": 97.5
+	}
+	items.push(t1)
+	items.push(t2)
+	items.push({...t1,"id": "T3123028477","display_name": "First Lastt3"})
+	items.push({...t1,"id": "T4123028477","display_name": "First Lastt4"})
+	items.push({...t1,"id": "T5123028477","display_name": "First Lastt5"})
 
 	var testQuery = (t) =>{
 		if(query === ""){return true}else{
@@ -46,6 +95,7 @@ function FriendsDisplay(props) {
 			})
 		return [heights, gridItems]
 	}, [columns, items, width])
+
 	// Hook6: Turn the static grid values into animated transitions, any addition, removal or change will be animated
 	const transitions = useTransition(
 		gridItems,

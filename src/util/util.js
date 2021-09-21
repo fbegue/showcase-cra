@@ -147,6 +147,7 @@ function chooseData(statcontrol,friendscontrol,tabcontrol,globalState,globalUI){
 	//console.log("guest:",friendscontrol.guest.id);
 
 	var contextFilter = function(key,rec) {
+
 		var t = rec['source'] === key
 		// if (key === 'top') {
 		// 	t = rec['term'] !== null
@@ -561,7 +562,7 @@ function chooseData(statcontrol,friendscontrol,tabcontrol,globalState,globalUI){
 		return valueArr.indexOf(item) != idx
 	});
 	if(isDuplicate){
-		//debugger;
+
 	}
 	data_user = _.uniqBy(data_user,'id')
 
@@ -638,7 +639,7 @@ function getFriendsMaps(data_user,data_guest){
 				}
 			}
 			else if(d.artists) {
-				debugger;
+
 				//todo: hard part is representing a playlist proportionately within itself
 				//I have the familyAgg for each artist - so just make a ranking of these then using the artistFreq
 				var rank = makeRank(d.artists, d.artistFreq, "familyAgg");
@@ -1186,7 +1187,6 @@ function useProduceData(){
 						// producePieData(_shared,'artists','shared')
 						if(objectType === 'album' ||objectType === 'track'){
 
-							debugger;
 							_tiles = _.uniqBy(data_user.concat(data_guest), 'id').filter(r => {return r.shared})
 							produceBubbleDataFriendsAlbums(makeCombinedMap(map_user, map_guest,'shared'))
 
@@ -1500,7 +1500,6 @@ function useProduceEvents(){
 						r.genres.forEach(g =>{
 							genreArtist[g.name] ? genreArtist[g.name].push(r):genreArtist[g.name] = [r]
 							// if(g.id===88){
-							// 	debugger;
 							// }
 							genres.push(g)
 						})
@@ -1513,7 +1512,6 @@ function useProduceEvents(){
 						r.artists.forEach(a =>{
 							familyArtist[a.familyAgg] ? familyArtist[a.familyAgg].push(r):familyArtist[a.familyAgg] = [r]
 
-							debugger;
 							//todo: someone is coming back without genres:[] when it has none
 							if(!a.genres){console.warn("problem record:",a)}
 							else{

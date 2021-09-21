@@ -23,7 +23,8 @@ function UserTile(props) {
 			 className={props.single ? null : props.selectedUser && props.selectedUser.id === props.item.id ? 'tile-selected':'tile-unselected'}>
 
 			<div >
-				{!(props.item.isUser) ? getInvite(props.item):""}
+				{/*testing:*/}
+				{/*{!(props.item.isUser) ? getInvite(props.item):""}*/}
 				{/* width="150px" height="150px"*/}
 				{/*114px | 80px*/}
 				<img   width={props.size[0]} height={props.size[1]}  src={props.item.images[0] && props.item.images[0].url ? props.item.images[0].url:'https://via.placeholder.com/150?text=?'}

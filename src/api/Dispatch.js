@@ -19,15 +19,76 @@ function Dispatch(props) {
 		console.log("START DISPATCH");
 		try{
 
+			//===============================================================
+			//events and users
+
+			console.log("ONE TIME EVENT FETCH");
+			var fer = await api.fetchEvents({metros:control.metro})
+			globalDispatch({type: 'update_events', payload: fer,context:'events', control:control});
+
+			// var NEVER =  function(){
+			// 	return new Promise(function(done, fail) {
+			// 		console.log("NEVER!!!!!!!");
+			// 		setTimeout(e =>{
+			// 			done()
+			// 		},1000000000000)
+			// 	})
+			// }
+			// await NEVER()
 
 			var friendsProms = [];
 			friendsProms.push(api.fetchSpotifyUsers({auth:globalUI}))
 
 			//===============================================================
+			//library
+
+			// var fpr = await api.fetchPlaylistsResolved(req)
+			// console.log("r.stat",fpr.stats);
+			// globalDispatch({type: 'init', payload: fpr,user: globalUI.user,context:'playlists'});
+
+
+			var userProms = [];
+			userProms.push(api.getTopArtists(req))
+			userProms.push(api.getMyFollowedArtists(req))
+			//userProms.push(api.getRecentlyPlayedTracks(req))
+			// userProms.push(api.getSavedTracks(req))
+			userProms.push(api.getMySavedAlbums(req))
+			var r = await Promise.all(userProms)
+
+			//all these artist's have 'sources' so they all end up in here together
+			//note: to keep init payload signatures consistent, I reconstruct it below
+			//note: stats:
+			//followedArtists: 			{stats:null,artists:[]}
+			//getTopArtists : 			none
+			//getRecentlyPlayedTracks:	none
+			//getSavedTracks:			{stats:{},tracks:[]}
+			//getSavedAlbums:			{stats:{},albums:[]}
+			var artistsPay = [];
+			artistsPay = artistsPay.concat(r[0]).concat(r[1].artists);
+
+			//todo: what is this getRecentlyPlayedTracks = {tracks:[],artists:[]} ARTISTS here?
+			//ignoring for now...
+
+			//var tracksPay = [];
+			// tracksPay = tracksPay.concat(r[2].tracks).concat(r[3].tracks);
+			//tracksPay = tracksPay.concat(r[3].tracks);
+
+			globalDispatch({type: 'init', payload:{artists:artistsPay,stats:null},user: globalUI.user,context:'artists'});
+			//globalDispatch({type: 'init', payload:{tracks:r[2].tracks,stats:null},user: globalUI.user,context:'tracks'});
+			globalDispatch({type: 'init', payload:r[2],user: globalUI.user,context:'albums'});
+			//control.setDataLoaded(true)
+
+
+			//===============================================================
+			//fetch friends profiles
 
 			globalUI.user.related_users.filter(r =>{return r.friend})
 				//testing: Dan only
-				.filter(r =>{return r.id === "123028477"})
+				// .filter(r =>{return r.id === "123028477"})
+
+				//.filter(r =>{return r.id !== "123028477"})
+				//.filter(r =>{return r.id !== "123028477#2"})
+			  .filter(r =>{return r.display_name !== "Dustin Reinhart"})
 				.forEach(f =>{
 					friendsProms.push(api.fetchStaticUser( {auth:globalUI,friend:f}))
 				})
@@ -52,76 +113,22 @@ function Dispatch(props) {
 				globalDispatch({type: 'init', user:{id:r.id},payload:r.albums,context:'albums'});
 			})
 
-			 console.log("setStatic users",users.length);
+			console.log("setStatic users",users.length);
 
 			//===============================================================
-			//events
-
-			console.log("ONE TIME EVENT FETCH");
-			var fer = await api.fetchEvents({metros:control.metro})
-			globalDispatch({type: 'update_events', payload: fer,context:'events', control:control});
-
-			// var NEVER =  function(){
-			// 	return new Promise(function(done, fail) {
-			// 		console.log("NEVER!!!!!!!");
-			// 		setTimeout(e =>{
-			// 			done()
-			// 		},1000000000000)
-			// 	})
-			// }
-			// await NEVER()
-
-			//===============================================================
-			//library
-
-			// var fpr = await api.fetchPlaylistsResolved(req)
-			// console.log("r.stat",fpr.stats);
-			// globalDispatch({type: 'init', payload: fpr,user: globalUI.user,context:'playlists'});
-
-
-			var userProms = [];
-			userProms.push(api.getTopArtists(req))
-			userProms.push(api.getMyFollowedArtists(req))
-			userProms.push(api.getRecentlyPlayedTracks(req))
-			userProms.push(api.getSavedTracks(req))
-			userProms.push(api.getMySavedAlbums(req))
-			var r = await Promise.all(userProms)
-
-			//all these artist's have 'sources' so they all end up in here together
-			//note: to keep init payload signatures consistent, I reconstruct it below
-			//note: stats:
-			//followedArtists: 			{stats:null,artists:[]}
-			//getTopArtists : 			none
-			//getRecentlyPlayedTracks:	none
-			//getSavedTracks:			{stats:{},tracks:[]}
-			//getSavedAlbums:			{stats:{},albums:[]}
-			var artistsPay = [];
-			artistsPay = artistsPay.concat(r[0]).concat(r[1].artists);
-			var tracksPay = [];
-
-			//todo: what is this getRecentlyPlayedTracks = {tracks:[],artists:[]} ARTISTS here?
-			//ignoring for now...
-
-			//testing: disable getMyRecentlyPlayedTracks until applied new genres bit in POC
-			// tracksPay = tracksPay.concat(r[2].tracks).concat(r[3].tracks);
-
-			tracksPay = tracksPay.concat(r[3].tracks);
-			globalDispatch({type: 'init', payload:{artists:artistsPay,stats:null},user: globalUI.user,context:'artists'});
-			globalDispatch({type: 'init', payload:{tracks:tracksPay,stats:r[3].stats},user: globalUI.user,context:'tracks'});
-			globalDispatch({type: 'init', payload:r[4],user: globalUI.user,context:'albums'});
-			//control.setDataLoaded(true)
-
 			//testing: call tracks after
-			// var userProms2 = [];
-			// userProms2.push(api.getRecentlyPlayedTracks(req))
-			// userProms2.push(api.getSavedTracks(req))
-			// Promise.all(userProms2)
-			// 	.then(r2 =>{
-			// 		var tracksPay = {tracks:[]};
-			// 		tracksPay.tracks = tracksPay.tracks.concat(r2[0].tracks);tracksPay.tracks = tracksPay.tracks.concat(r2[1].tracks);
-			// 		tracksPay.stats = r2[1].stats
-			// 		globalDispatch({type: 'init', payload:tracksPay,user: globalUI.user,context:'tracks'});
-			// 	})
+
+			var userProms2 = [];
+			userProms2.push(api.getRecentlyPlayedTracks(req))
+			userProms2.push(api.getSavedTracks(req))
+			let r2 = await Promise.all(userProms2)
+
+			var tracksPay = {tracks:[]};
+			tracksPay.tracks = tracksPay.tracks.concat(r2[0].tracks);tracksPay.tracks = tracksPay.tracks.concat(r2[1].tracks);
+			tracksPay.stats = r2[1].stats
+
+			globalDispatch({type: 'init', payload:tracksPay,user: globalUI.user,context:'tracks'});
+
 
 			return "asyncDispatch finished";
 		}catch(e){
@@ -129,18 +136,27 @@ function Dispatch(props) {
 		}
 	}
 
-		useEffect(() => {
-			//todo: somehow still don't understand how to call functional code w/out linkage to fucking render state
-			if(count === 0) {
-				setCount(1)
-				asyncDispatch()
-					.then(r => {
-						console.log(r);
-						return r
-					})
-			}
-			//else{console.log("SKIP DISPATCH");}
-		},[]);
+	useEffect(() => {
+		//todo: somehow still don't understand how to call functional code w/out linkage to fucking render state
+
+		if(globalState[globalUI.user.id + "_artists"].length === 0) {
+			//setCount(1)
+			asyncDispatch()
+				.then(r => {
+					console.log(r);
+					return r
+				})
+		}
+		// if(count === 0) {
+		// 	setCount(1)
+		// 	asyncDispatch()
+		// 		.then(r => {
+		// 			console.log(r);
+		// 			return r
+		// 		})
+		// }
+		//else{console.log("SKIP DISPATCH");}
+	},[]);
 
 
 	return <div></div>

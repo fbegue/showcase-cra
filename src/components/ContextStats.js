@@ -26,8 +26,12 @@ import BubbleFamilyGenreChips from "./chips/BubbleFamilyGenreChips";
 import SwipeRight from '../assets/swipe-right.png'
 import {tabMap} from "../Tabify";
 //import FilterGenreChips from "./chips/FilterGenreChips";
+import RotateSpring from "./springs/RotateSpring";
 import PlaylistCheckboxes from './tiles/PlaylistCheckboxes'
 import { GLOBAL_UI_VAR } from '../storage/withApolloProvider';
+import Paper from "@material-ui/core/Paper";
+import InputIcon from "@material-ui/icons/Input";
+import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
 
 function TabPanel(props) {
 	const { children, value, index, ...other } = props;
@@ -328,7 +332,7 @@ function ContextStats(props) {
 		}
 
 
-
+	const [fstate, toggle] = useState(true)
 	return(
 		<div>
 			<div>
@@ -343,14 +347,19 @@ function ContextStats(props) {
 					{/*	<div ><FilterListIcon/> </div>*/}
 					{/*</button>*/}
 
+					{/*todo: thought Paper would give me some free box shadowing?*/}
+					{/*<Paper elevation={3}>*/}
 					<button
-						style={{ border: "1px solid red", position: "absolute", zIndex: "2",transform:"rotate(90deg)",marginTop:"10em" }}
+						//note: zindex - huh
+						style={{ border: "1px solid red", position: "absolute", zIndex: "10000",transform:"rotate(90deg)",marginTop:"30em",
+							boxShadow: "0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23)"}}
 						onClick={() => {
 							toggleDrawer();
 						}}
 					>
-						<div ><FilterListIcon/> </div>
+						<RotateSpring toggle={toggle} state={fstate} target={<FilterListIcon fontSize={'inherit'} style={{fontSize:"30px"}} color={'secondary'} />}/>
 					</button>
+					{/*</Paper>*/}
 				</div>
 
 				{/*note: drawer instantiation*/}
@@ -370,8 +379,12 @@ function ContextStats(props) {
 
 				{/*note: tiles*/}
 				<div>
-					<div style={{"width":"100%","height":"2em","backgroundColor":"lightblue","display":"flex","alignItems":"center",justifyContent:"flex-end"}}>
-						<div style={{marginRight:"1em"}}>View {events.length} Events</div>  <div> <img style={{height:"3em",marginRight:".5em"}} src={SwipeRight}/> </div>
+					<div style={{"width":"100%","height":"2em","backgroundColor":"lightblue","display":"flex","alignItems":"center",justifyContent:"space-between"}}>
+						<div style={{marginLeft:"1em"}}>{tiles.length} Items </div>
+						<div style={{marginRight:"1em",display:"flex"}}>
+							<div style={{lineHeight:"3em",marginRight:".5em"}}>View {events.length} Events </div>
+							<div> <img style={{height:"3em",marginRight:".5em"}} src={SwipeRight}/> </div>
+						</div>
 					</div>
 
 					{tabcontrol.section === 2 &&
@@ -431,7 +444,7 @@ function ContextStats(props) {
 			</div>
 
 			{/*note: drawer content*/}
-			<Drawer
+			<SwipeableDrawer
 				open={gridControl.tileFilterOpen}
 				onClose={() => {}}
 				PaperProps={{ style: { position: "absolute"} }}
@@ -443,14 +456,14 @@ function ContextStats(props) {
 				variant="temporary"
 			>
 
-				<button
-					style={{"border":"1px solid red","position":"absolute","zIndex":"2","marginTop":"50%","right":"0px","transform":"rotate(90deg)"}}
-					onClick={() => {
-						toggleDrawer();
-					}}
-				>
-					<FilterListIcon/>
-				</button>
+				{/*<button*/}
+				{/*	style={{"border":"1px solid red","position":"absolute","zIndex":"2","marginTop":"50%","right":"0px","transform":"rotate(90deg)"}}*/}
+				{/*	onClick={() => {*/}
+				{/*		toggleDrawer();*/}
+				{/*	}}*/}
+				{/*>*/}
+				{/*	<FilterListIcon/>*/}
+				{/*</button>*/}
 				<div className={'filterItems'} style={{display:"flex",flexDirection:"column"}}>
 					<div style={{display:'flex',flexDirection:"column"}}>
 						<div>
@@ -498,7 +511,7 @@ function ContextStats(props) {
 					</div>
 				</div>
 
-			</Drawer>
+			</SwipeableDrawer>
 
 			{/*}*/}
 

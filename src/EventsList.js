@@ -298,7 +298,9 @@ function EventsList() {
 			t = t + m.displayName;
 			control.metro.length - 1 > i ? t = t  + "|":{};
 		})
-		return t
+
+
+		return t + " | " + 	DateTime.fromISO(control.startDate).toFormat('LLL d') + " - " + DateTime.fromISO(control.endDate)
 	}
 
 	var classes = {menuHeader:"menuHeader",list:"list",root:"root",nested:"nested"};
@@ -596,7 +598,7 @@ function EventsList() {
 					{/*	<Stats></Stats>*/}
 					{/*</Collapse>*/}
 					<ListItem button divider key={'locdate'} onClick={handleClickConfig}>
-						<ListItemText primary={<div>Location & Date <div style={{background:'#80808026',display:"inline-block"}}>{getTitle()}</div></div>} />
+						<ListItemText primary={<div style={{background:'#80808026',display:"inline-block"}}>{getTitle()}</div>} />
 						{open ? <ExpandLess /> : <ExpandMore />}
 					</ListItem>
 					<Collapse key={'locdate-collapse'}  in={open} timeout="auto" unmountOnExit>
@@ -617,7 +619,7 @@ function EventsList() {
 						{/*<ListItemText primary={<div>Events ({events.length})*/}
 						{/*	/!*{getCoverage(events)}*!/*/}
 						{/*</div>} />*/}
-						<div style={{"marginLeft":"93%"}}>{open2 ? <ExpandLess /> : <ExpandMore />}</div>
+						{/*<div style={{"marginLeft":"93%"}}>{open2 ? <ExpandLess /> : <ExpandMore />}</div>*/}
 					</ListItem>
 					<Collapse  key={'events-collapse'}  in={open2} timeout="auto" unmountOnExit>
 						<div style={{marginTop:"1em",marginBottom:"1em"}} key={'special'}><CreatePlay/></div>

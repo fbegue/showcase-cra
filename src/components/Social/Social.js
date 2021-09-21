@@ -3,7 +3,7 @@ import TextField from '@material-ui/core/TextField';
 import _ from "lodash";
 import api from "../../api/api";
 import {Context, initUser} from "../../storage/Store";
-import {StatControl, Control, FriendsControl,PaneControl} from "../../index";
+import {StatControl, Control, FriendsControl, PaneControl, TabControl} from "../../index";
 import {useReactiveVar} from "@apollo/react-hooks";
 import {CHIPFAMILIESRANKED, CHIPGENRESRANKED, GLOBAL_UI_VAR, STATS, TILES} from "../../storage/withApolloProvider";
 import { makeStyles } from '@material-ui/core/styles';
@@ -13,6 +13,7 @@ import CustomizedInputBase from "../utility/CustomizedInputBase";
 import UserTile from "../utility/UserTile";
 import FriendsDisplay from "./FriendsDisplay";
 import InputIcon from '@material-ui/icons/Input';
+import RotateSpring from '../springs/RotateSpring.js'
 
 //import util from "../util/util";
 import BackdropParent from "../utility/BackdropParent";
@@ -31,6 +32,7 @@ import CardContent from "@material-ui/core/CardContent";
 import Typography from "@material-ui/core/Typography";
 import BubbleFamilyGenreChips from "../chips/BubbleFamilyGenreChips";
 import Paper from "@material-ui/core/Paper";
+import {tabMap} from "../../Tabify";
 
 const useStyles = makeStyles((theme) => ({
 	root: {
@@ -85,6 +87,7 @@ function Social(props) {
 
 
 	let statcontrol = StatControl.useContainer();
+	let tabcontrol = TabControl.useContainer()
 
 	//testing: need to hookup selection
 	var guest = {id:"123028477",display_name:"Daniel Niemiec"};
@@ -112,7 +115,7 @@ function Social(props) {
 	// 			globalDispatch({type: 'init', payload:results[0],user: globalUI.user,context:'spotifyusers'});
 	//
 	// 			// console.log(results.length);
-	// 			// debugger;
+
 	// 			var users = results.slice(1,results.length)
 	// 			//var users =[]
 	// 				users.forEach(r =>{
@@ -294,8 +297,21 @@ function Social(props) {
 	const [isDrawerShowing, setDrawerShowing] = useState(true);
 
 	const selectUser = (item) =>{
+
 		statcontrol.setStats({name:"friends",user:item});setSelectedUser(item);clearForm();
 		setDrawerShowing(false);
+		friendscontrol.setGuest(item)
+
+		const handleTabChange = (event, tabindex) => {
+			console.log(tabindex);
+			console.log("handleTabChange",tabMap[tabcontrol.section][tabindex]);
+			tabcontrol.setActiveTab(tabindex);
+			statcontrol.setStats({name:Object.keys(tabMap[tabcontrol.section][tabindex])[0]})
+		};
+
+		handleTabChange(null,0);
+
+		//friendscontrol.setGuest(item)
 		// setShowBackdrop(true)
 
 	}
@@ -309,15 +325,37 @@ function Social(props) {
 	const drawerSpringStyle = useSpring({
 		// top: show ? 200 : 0,
 		position: "absolute",
-		left: 0,
+		// left: 0,
+		right:0,
 		backgroundColor: "#806290",
-		height: "100%",
+		// height: "100%",
+		height: "2.2em",
 		margin:"0px",
-		// width: "300px",
-		width: isDrawerShowing ? "100%" : "8%"
+		// to: [
+		// 	{ opacity: 1, color: '#ffaaee' },
+		// 	// { opacity: 0, color: 'rgb(14,26,19)' },
+		// ],
+		// from: { opacity: 0, color: 'red' },
+		opacity:  isDrawerShowing ? 1 : .5,
+		// "filter": isDrawerShowing ? "brightness(.5)" : "brightness(1)",
+		 width: isDrawerShowing ? "22.5em" : "2.2em"
+		// width: isDrawerShowing ? "2.2em":"22.5em"
 	});
 
 
+
+	//todo: see IconStyle comp
+	// const IconStyle = (props) =>{
+	// 	//setTogglePressed(!(togglePressed)
+	// 	return (
+	// 	//	testing: just darken on press?
+	// 	// <div style={togglePressed ? {"filter":"brightness(.8)"}:{}}>
+	// 		<div style={props.reverse ? {transform: "rotateY(180deg)"}:{}}>
+	// 		<InputIcon fontSize={'large'} color={'secondary'} />
+	// 	</div>
+	// 	)
+	// }
+	const [tstate, toggle] = useState(true);
 	return(
 		<div>
 			<div
@@ -330,20 +368,14 @@ function Social(props) {
 				}}
 			>
 				<animated.div style={drawerSpringStyle}>
-					{!(isDrawerShowing) &&
-						<div onClick={handleToggleDrawer}>
-							<div style={{"position":"absolute"}}>
-								<InputIcon fontSize={'large'} />
-							</div>
 
-						</div>
-
-					// <button className="openButton" onClick={handleToggleDrawer}>
-					// 	{isDrawerShowing ? "Close" : "Open"}
-					// </button>
-					}
+					{/*// <button className="openButton" onClick={handleToggleDrawer}>*/}
+					{/*// 	{isDrawerShowing ? "Close" : "Open"}*/}
+					{/*// </button>*/}
+					{/*}*/}
 					<div className="drawer">
-						<div style={{ width: "40em", border: "blue 1px solid",display:isDrawerShowing ? 'initial':'none'}}>
+						{/*style={{display:isDrawerShowing ? 'initial':'none'}}*/}
+						<div>
 							<div >
 								{/*<button onClick={changeData}>changeData</button>*/}
 								{/*<button onClick={st}>trigger</button>*/}
@@ -352,16 +384,11 @@ function Social(props) {
 								{/*todo: I thiiiink the backdrop is preventing me from auto pushing / assigning a width that works to anything inside it?
 				simply b/c I can modify it here... still an issue b/c then I have to go modify width of everything else .... :/ */}
 								<div>
-									<div style={{display:"flex",flexDirection:"column"}}>
+									<div style={{display:"flex",flexDirection:"column",marginLeft:".5em"}}>
 										<div  style={{display:"flex"}}>
 											{/*<TextField id="standard-basic" placeholder="search" value={query} onChange={handleChange} onClick={handleClick} />*/}
-											<div style={{flexGrow:"1"}}>
+											<div style={{flexGrow:"1",marginTop:".5em"}}>
 												<CustomizedInputBase value={query} onChange={handleChange} onClick={handleClick} clearForm={() =>{clearForm()}} placeholder={'search for friends'}/>
-											</div>
-											<div onClick={handleToggleDrawer}>
-												<div style={{"transform":"scaleX(-1)",marginRight:".5em"}}>
-													<InputIcon fontSize={'large'} />
-												</div>
 											</div>
 										</div>
 										{/*<div> <button onClick={() =>{setShowBackdrop(false)}}>return</button></div>*/}
@@ -440,15 +467,25 @@ function Social(props) {
 								</div>
 							</div>
 						</div>
+						<div style={{position:"absolute",right:0,zIndex:"2",marginLeft:".1em"}} onClick={handleToggleDrawer}>
+							{/*<IconStyle reverse={true}/>*/}
+							<RotateSpring toggle={toggle} state={tstate} target={<InputIcon fontSize={'inherit'} style={{fontSize:"30px"}} color={'secondary'} />}/>
+							{/*<div style={{"transform":"scaleX(-1)",marginRight:".5em"}}>*/}
+							{/*	<InputIcon fontSize={'large'} color={'secondary'} />*/}
+							{/*</div>*/}
+						</div>
+						{/*,border: "blue 1px solid"*/}
+
 					</div>
 				</animated.div>
 
 				{selectedUser && !(isDrawerShowing) &&
 				// <Paper>
-				<div style={{display:"flex",flexDirection:"row",marginLeft:"3em"}}>
+				<div style={{display:"flex",flexDirection:"row",marginLeft:".2em",marginTop:".5em"}}>
 					{/*<div><UserTile item={selectedUser} single={true} size={["200px","200px"]} /> </div>*/}
-					<div style={{"position":"absolute","zIndex":"1"}}><UserTile item={selectedUser} single={true} size={["auto","auto"]} /> </div>
-					<div style={{"display":"flex","flexDirection":"column","zIndex":"2"}}>
+					{/* style={{"position":"absolute","zIndex":"1"}}*/}
+					<div><UserTile item={selectedUser} single={true} size={["auto","auto"]} /> </div>
+					<div style={{"display":"flex","flexDirection":"column","zIndex":"2","marginLeft":".5em"}}>
 						<div style={{display:"flex", flexWrap:"wrap"}}>
 							{statCards.map((item,i) => (
 								<div key={item.label} style={{width:item.width, padding:"5px"}}>
