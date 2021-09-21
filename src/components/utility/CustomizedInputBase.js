@@ -42,6 +42,7 @@ export default function CustomizedInputBase(props) {
 					placeholder={props.placeholder}
 					value={props.value} onChange={props.onChange} onClick={props.onClick}
 					fullWidth={true}
+					size={'medium'}
 				/>
 				<Divider className={classes.divider} orientation="vertical" />
 				<IconButton onClick={props.clearForm} color="primary" className={classes.iconButton} >

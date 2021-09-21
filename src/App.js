@@ -240,7 +240,6 @@ function App(props) {
                         {/*<button onClick={() =>{setStatCollapse(!(statCollapse))}}>statCollapse {statCollapse.toString()}</button>*/}
                         <div style={{marginRight:"1em"}}>
                             <Profile/>
-
                         </div>
                         {/*<div><ControlTest/></div>*/}
                         {/*<input value={code} onChange={(event) =>{setCode(event.target.value)}}  />*/}
@@ -261,10 +260,9 @@ function App(props) {
 
                         {/*<Delayed waitBeforeShow={2000}>*/}
                             {globalUI.access_token  &&
-                            <div style={control.play ? {opacity:1,flexGrow:2}: {opacity:.4,flexGrow:2}}>
-                                {/*todo:*/}
-                                {/*<Player token={globalUI.access_token} id={control.id} play={control.play}/>*/}
-                                <div>PLAYER</div>
+                            <div >
+                                <Player token={globalUI.access_token} id={control.id} play={control.play}/>
+                                {/*<div>PLAYER</div>*/}
                             </div>
                             }
                         {/*</Delayed>*/}

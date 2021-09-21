@@ -33,6 +33,7 @@ import Typography from "@material-ui/core/Typography";
 import BubbleFamilyGenreChips from "../chips/BubbleFamilyGenreChips";
 import Paper from "@material-ui/core/Paper";
 import {tabMap} from "../../Tabify";
+import FilterListIcon from "@material-ui/icons/FilterList";
 
 const useStyles = makeStyles((theme) => ({
 	root: {
@@ -146,9 +147,9 @@ function Social(props) {
 	}
 
 	//----------------------------------------------------------------------
-	const columns = 4;
+	const columns = 3;
 	//note: this width divided by # of columns = the width of one item
-	const width = 550;
+	const width = 350;
 	//note: replaced all references to data-height (designed to be unique values 300-500) with uHeight
 	// const uHeight = 480;
 	// const uHeight = 370;
@@ -327,9 +328,9 @@ function Social(props) {
 		position: "absolute",
 		// left: 0,
 		right:0,
-		backgroundColor: "#806290",
-		// height: "100%",
-		height: "2.2em",
+		backgroundColor: "#f0f0f0",
+		 height: "100%",
+		//height: "2.2em",
 		margin:"0px",
 		// to: [
 		// 	{ opacity: 1, color: '#ffaaee' },
@@ -341,6 +342,18 @@ function Social(props) {
 		 width: isDrawerShowing ? "22.5em" : "2.2em"
 		// width: isDrawerShowing ? "2.2em":"22.5em"
 	});
+
+	const drawerToggleStyle = useSpring({
+		position:"absolute",
+		right:isDrawerShowing ? 0 :-15,
+		top:2,zIndex:"3",margin:".2em",
+		 opacity:  isDrawerShowing ? 1 : .8,
+		// "filter": isDrawerShowing ? "brightness(.5)" : "brightness(1)",
+		// width: isDrawerShowing ? "22.5em" : "2.2em"
+		// width: isDrawerShowing ? "2.2em":"22.5em"
+	});
+
+
 
 
 
@@ -367,6 +380,18 @@ function Social(props) {
 					position: "relative"
 				}}
 			>
+				<animated.div style={drawerToggleStyle} onClick={handleToggleDrawer}>
+					{/*<IconStyle reverse={true}/>*/}
+					<button
+						//todo: reconcile this style w/ ContextStat's RotateSpring
+						//(for some reason, transform: rotate over in that one gives lighter border?)
+						//note: zindex - huh
+						style={{ border: "1px solid #ff000094", zIndex: "10000",
+							boxShadow: "0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23)"}}
+					>
+						<RotateSpring toggle={toggle} state={tstate} target={<InputIcon fontSize={'inherit'} style={{fontSize:"32px"}} color={'secondary'} />}/>
+					</button>
+				</animated.div>
 				<animated.div style={drawerSpringStyle}>
 
 					{/*// <button className="openButton" onClick={handleToggleDrawer}>*/}
@@ -385,9 +410,10 @@ function Social(props) {
 				simply b/c I can modify it here... still an issue b/c then I have to go modify width of everything else .... :/ */}
 								<div>
 									<div style={{display:"flex",flexDirection:"column",marginLeft:".5em"}}>
-										<div  style={{display:"flex"}}>
+										{/*todo: had issues changing size of InputBase*/}
+										<div  style={{transform:"scale(.9)",marginLeft:"-.8em"}}>
 											{/*<TextField id="standard-basic" placeholder="search" value={query} onChange={handleChange} onClick={handleClick} />*/}
-											<div style={{flexGrow:"1",marginTop:".5em"}}>
+											<div style={{flexGrow:"1"}}>
 												<CustomizedInputBase value={query} onChange={handleChange} onClick={handleClick} clearForm={() =>{clearForm()}} placeholder={'search for friends'}/>
 											</div>
 										</div>
@@ -409,8 +435,7 @@ function Social(props) {
 											anchorEl={anchorEl}
 											container={tref}
 											transition
-											//todo :does no one give a shit about placement??
-											placement={'bottom-start'}
+											placement={'bottom-end'}
 										>
 											{({ TransitionProps }) => (
 												<Fade {...TransitionProps}>
@@ -429,53 +454,9 @@ function Social(props) {
 										</Popper>
 									</div>
 									}
-
-									{/*todo: deprecated backdrop fader (always giving me width adjustment troubles  -possibly not it's fault*/}
-
-									{/*<BackdropParent defaultContent={*/}
-									{/*	<div style={{display:"flex",flexDirection:"row"}}>*/}
-									{/*		/!*	//	todo: why was this 480px? it covers stats panel beside it*!/*/}
-									{/*		<div style={{display:"flex", flexWrap:"wrap",width:"13em"}}>*/}
-									{/*			<FriendsDisplay onClick={selectUser} users={globalState['spotifyusers'].filter(myFriendsFilter)}/>*/}
-									{/*		</div>*/}
-									{/*	</div>*/}
-									{/*} setShowBackdrop={setShowBackdrop} showBackdrop={showBackdrop} shownContent={*/}
-									{/*	<div style={{"position":"absolute","top":"0px","left":"0px"}}>*/}
-									{/*		{selectedUser &&*/}
-									{/*		// <Paper>*/}
-									{/*		<div style={{display:"flex",flexDirection:"row"}}>*/}
-									{/*			<div><UserTile item={selectedUser} single={true} size={["200px","200px"]} /> </div>*/}
-									{/*			<div style={{display:"flex", flexWrap:"wrap"}}>*/}
-									{/*				{statCards.map((item,i) => (*/}
-									{/*					<div key={item.label} style={{width:item.width, padding:"5px"}}>*/}
-									{/*						<Card>*/}
-									{/*							<CardContent>*/}
-									{/*								<Typography variant="subtitle1" component={'span'} >{item.label}:{'\u00A0'}</Typography>*/}
-									{/*								/!*todo: color should be typo color prop set in MUI theme*!/*/}
-									{/*								<Typography variant="subtitle1" component={'span'} ><span style={{color:'#3f51b5'}}>{item.value}</span></Typography>*/}
-									{/*							</CardContent>*/}
-									{/*						</Card>*/}
-									{/*					</div>*/}
-									{/*				))}*/}
-									{/*			</div>*/}
-									{/*		</div>*/}
-									{/*			// </Paper>*/}
-									{/*		}*/}
-									{/*	</div>*/}
-									{/*}/>*/}
-
 								</div>
 							</div>
 						</div>
-						<div style={{position:"absolute",right:0,zIndex:"2",marginLeft:".1em"}} onClick={handleToggleDrawer}>
-							{/*<IconStyle reverse={true}/>*/}
-							<RotateSpring toggle={toggle} state={tstate} target={<InputIcon fontSize={'inherit'} style={{fontSize:"30px"}} color={'secondary'} />}/>
-							{/*<div style={{"transform":"scaleX(-1)",marginRight:".5em"}}>*/}
-							{/*	<InputIcon fontSize={'large'} color={'secondary'} />*/}
-							{/*</div>*/}
-						</div>
-						{/*,border: "blue 1px solid"*/}
-
 					</div>
 				</animated.div>
 
@@ -501,7 +482,7 @@ function Social(props) {
 							))}
 						</div>
 						<div>
-							<div style={{padding:"2px",color:"white",height:"20px",width:"9.2em",marginBottom:"1em"}}>
+							<div style={{padding:"2px",color:"white",height:"20px",width:friendscontrol.families.length > 0? "9.2em":"5.3em",marginBottom:"1em"}}>
 								<Paper elevation={3}>
 									<Typography variant="subtitle1">
 										{friendscontrol.families.length > 0 ? 'Selected Family':"Top Family"}

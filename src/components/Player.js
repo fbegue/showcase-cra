@@ -1,7 +1,17 @@
 /* eslint-disable no-unused-expressions */
 import React, {useEffect,useState} from 'react';
 import SpotifyPlayer from 'react-spotify-web-playback';
+import Drawer from "@material-ui/core/Drawer";
 import {Control} from "../index";
+import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
+import {a, animated, useSpring} from "react-spring";
+import RotateSpring from "./springs/RotateSpring";
+import InputIcon from "@material-ui/icons/Input";
+import CustomizedInputBase from "./utility/CustomizedInputBase";
+import FriendsDisplay from "./Social/FriendsDisplay";
+import Popper from "@material-ui/core/Popper";
+import styles from "./Social/Social.tiles.module.css";
+import UserTile from "./utility/UserTile";
 
 function Main(props) {
 	console.log("$player",props);
@@ -44,9 +54,62 @@ function Main(props) {
 	const params = JSON.parse(localStorage.getItem('params'));
 	console.log("$player",params);
 
+	//-------------------------------------------------
+	const [pstate, toggle] = useState(false)
+
+	const drawerSpringStyle = useSpring({
+		// top: show ? 200 : 0,
+		position: "absolute",
+		top:5,
+		right:0,
+		backgroundColor: "#f0f0f0",
+		height: "90%",
+		//height: "2.2em",
+		margin:"0px",
+		// to: [
+		// 	{ opacity: 1, color: '#ffaaee' },
+		// 	// { opacity: 0, color: 'rgb(14,26,19)' },
+		// ],
+		// from: { opacity: 0, color: 'red' },
+		opacity:  pstate ? 1 : .5,
+		// "filter": isDrawerShowing ? "brightness(.5)" : "brightness(1)",
+		width: pstate ? "22.5em" : "3em"
+		// width: isDrawerShowing ? "2.2em":"22.5em"
+	});
+
+	const drawerToggleStyle = useSpring({
+		position:"absolute",
+		right:pstate ? 0 :-15,
+		top:10,zIndex:"3",margin:".2em",
+		opacity:  pstate ? 1 : .8,
+		// "filter": isDrawerShowing ? "brightness(.5)" : "brightness(1)",
+		// width: isDrawerShowing ? "22.5em" : "2.2em"
+		// width: isDrawerShowing ? "2.2em":"22.5em"
+	});
+
 	return(params ?
-		<SpotifyPlayer token={params.access_token} uris={['spotify:track:' + props.id]} callback={callback} play={props.play}
-					   magnifySliderOnHover={false}/>
+		<div>
+			<animated.div style={drawerToggleStyle}>
+				{/*<IconStyle reverse={true}/>*/}
+				<button
+					//todo: reconcile this style w/ ContextStat's RotateSpring
+					//(for some reason, transform: rotate over in that one gives lighter border?)
+					//note: zindex - huh
+					style={{ border: "1px solid #ff000094", zIndex: "10000",
+						boxShadow: "0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23)"}}
+				>
+					<RotateSpring toggle={toggle} state={pstate} target={<InputIcon fontSize={'inherit'} style={{fontSize:"32px"}} color={'secondary'} />}/>
+					{/*testing:*/}
+					{/*<PlayCircleOutlineIcon fontSize={'inherit'} style={{fontSize:"30px"}} color={'secondary'}/>*/}
+				</button>
+			</animated.div>
+			<animated.div style={drawerSpringStyle}>
+				<div className="drawer">
+					<SpotifyPlayer token={params.access_token} uris={['spotify:track:' + props.id]} callback={callback} play={props.play}
+								   magnifySliderOnHover={false}/>
+				</div>
+			</animated.div>
+		</div>
 		:<div></div>)
 	//return(<div></div>)
 }

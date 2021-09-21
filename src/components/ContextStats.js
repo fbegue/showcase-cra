@@ -444,9 +444,10 @@ function ContextStats(props) {
 			</div>
 
 			{/*note: drawer content*/}
-			<SwipeableDrawer
+			<Drawer
 				open={gridControl.tileFilterOpen}
 				onClose={() => {}}
+				onOpen={() => {}}
 				PaperProps={{ style: { position: "absolute"} }}
 				BackdropProps={{ style: { position: "absolute" } }}
 				ModalProps={{
@@ -511,7 +512,7 @@ function ContextStats(props) {
 					</div>
 				</div>
 
-			</SwipeableDrawer>
+			</Drawer>
 
 			{/*}*/}
 
