@@ -7,14 +7,16 @@ import api from "../api/api";
 import CustomizedInputBase from "./utility/CustomizedInputBase";
 import {Context} from "../storage/Store";
 
-const api_address = "http://localhost:8888"
-//const api_address = "https://api.soundfound.io"
-const redirect_address = "http://localhost:3000"
-//const redirect_address = 'https://soundfound.io'
-//const t = window.location
+let api_address = "https://api.soundfound.io"
+let redirect_address = 'https://soundfound.io'
 //const redirect_address = "https://master.d267e964bph18g.amplifyapp.com"
 
 function Profile(props) {
+	const t = window.location.toString();
+	if( t.includes('3000')){
+		api_address = "http://localhost:8888"
+		redirect_address = "http://localhost:3000"
+	}
 
 	const globalUI = useReactiveVar(GLOBAL_UI_VAR);
 	//testing: hide in .env
