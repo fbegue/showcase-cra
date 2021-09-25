@@ -36,8 +36,7 @@ function Dispatch(props) {
 			// }
 			// await NEVER()
 
-			var friendsProms = [];
-			friendsProms.push(api.fetchSpotifyUsers({auth:globalUI}))
+
 
 			//===============================================================
 			//library
@@ -80,7 +79,10 @@ function Dispatch(props) {
 
 
 			//===============================================================
-			//fetch friends profiles
+			//fetch friends profiles + global users
+
+			var friendsProms = [];
+			friendsProms.push(api.fetchSpotifyUsers({auth:globalUI}))
 
 			globalUI.user.related_users.filter(r =>{return r.friend})
 				//testing: Dan only

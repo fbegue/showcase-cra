@@ -81,17 +81,12 @@ function ChipsArray_dep(props) {
 	);
 }
 
-const useStyles = makeStyles({
-	root: {
-
-	},
-});
 var oldId = null;
 
 const useStylesFamilies = makeStyles(familyStyles);
 
 function EventsList() {
-	const classesPlay = useStyles();
+	//const classesPlay = useStyles();
 
 	// this method sets the current state of a menu item i.e whether
 	// it is in expanded or collapsed or a collapsed state
@@ -590,13 +585,6 @@ function EventsList() {
 					<div style={{"transform":"rotate(180deg)"}}> <img style={{height:"3em",marginRight:".5em"}} src={SwipeRight}/> </div> <div style={{marginLeft:"1em"}}>View {tiles.length} Items </div>
 				</div>
 				<List>
-					{/*<ListItem button divider key={'stats'} style={{zIndex:10}} onClick={handleClickConfig3}>*/}
-					{/*	Analysis*/}
-					{/*	{open3 ? <ExpandLess /> : <ExpandMore />}*/}
-					{/*</ListItem>*/}
-					{/*<Collapse key={'stats-collapse'}  in={open3} timeout="auto" unmountOnExit>*/}
-					{/*	<Stats></Stats>*/}
-					{/*</Collapse>*/}
 					<ListItem button divider key={'locdate'} onClick={handleClickConfig}>
 						<ListItemText primary={<div style={{background:'#80808026',display:"inline-block"}}>{getTitle()}</div>} />
 						{open ? <ExpandLess /> : <ExpandMore />}
@@ -604,17 +592,6 @@ function EventsList() {
 					<Collapse key={'locdate-collapse'}  in={open} timeout="auto" unmountOnExit>
 						<Map default={{"displayName":"Columbus", "id":9480}}></Map>
 					</Collapse>
-					{/*<ListItem button divider onClick={handleClickConfig}>*/}
-					{/*	<ListItemText primary="Inbox" />*/}
-					{/*	{open ? <ExpandLess /> : <ExpandMore />}*/}
-					{/*</ListItem>*/}
-					{/*<Collapse in={open} timeout="auto" unmountOnExit>*/}
-					{/*	<List component="div" disablePadding>*/}
-					{/*		<ListItem button className={classes.nested}>*/}
-					{/*			<ListItemText primary="Starred" />*/}
-					{/*		</ListItem>*/}
-					{/*	</List>*/}
-					{/*</Collapse>*/}
 					<ListItem id={'events-collapse'} key={'events'} button divider onClick={handleClickConfig2}>
 						{/*<ListItemText primary={<div>Events ({events.length})*/}
 						{/*	/!*{getCoverage(events)}*!/*/}
@@ -626,7 +603,6 @@ function EventsList() {
 						{/*{handler(globalState.events)}*/}
 						{handler(events)}
 					</Collapse>
-
 				</List>
 			</div>
 		</div>

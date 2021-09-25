@@ -1411,12 +1411,19 @@ function useProduceEvents(){
 
 	useEffect(() => {
 
-			//true = context mode
+
+			function jstr(a){return JSON.parse(JSON.stringify(a))}
+			let  {data_user,data_guest} = chooseData(statcontrol,friendscontrol,tabcontrol,globalState,globalUI)
+
 			if(!(statcontrol.mode)){
 				console.log("useProduceEvents skips b/c we're in custom mode");
-			}else{
-
-				function jstr(a){return JSON.parse(JSON.stringify(a))}
+			}
+			else if(data_user.length ===0 || data_guest.length ===0 ){
+				var events = jstr(tables['events']);
+				console.log("$$events init",events.length);
+				EVENTS_VAR(events)
+			}
+			else{
 				var events = jstr(tables['events']);
 
 				//console.log("$$events previous",events);
@@ -1427,7 +1434,7 @@ function useProduceEvents(){
 
 				//note: chooose data based on tab
 				//todo: used above, should combine
-				let  {data_user,data_guest} = chooseData(statcontrol,friendscontrol,tabcontrol,globalState,globalUI)
+
 				//console.log("$$data_user",data_user);
 				//console.log("$$data_guest",data_guest);
 
@@ -1438,7 +1445,8 @@ function useProduceEvents(){
 				if(data_guest.length === 0){
 					dataset = data_user
 					console.log("$$dataset is just data_user");
-				}else{
+				}
+				else{
 
 					//todo: both used above, should combine
 					let {map_user,map_guest} = getFriendsMaps(data_user,data_guest)

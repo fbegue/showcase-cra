@@ -204,7 +204,9 @@ var getMySavedTracksLast =  function(req){
 }
 
 var getTopArtists =  function(req){
+
     return new Promise(function(done, fail) {
+
         fetch(api_address + '/getTopArtists', {
             method: 'POST', // *GET, POST, PUT, DELETE, etc.
             mode: 'cors', // no-cors, *cors, same-origin

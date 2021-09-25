@@ -26,6 +26,10 @@ const pages = [
 			<div className="tiles">
 				<ContextStats/>
 			</div>
+		//testing:
+		// 	<div style={{background:"blue",width:"20em",height:"70em"}}>
+		// 		TESTESTTEST
+		// 	</div>
 		//  <MyContent />
 		,
 		background:'gray'
