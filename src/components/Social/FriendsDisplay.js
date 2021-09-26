@@ -1,7 +1,10 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useContext, useEffect, useMemo, useState} from 'react';
 import UserTile from "../utility/UserTile";
 import {a, useTransition} from "react-spring";
 import styles from "./FriendsDisplay.tiles.module.css";
+import PulseSpinnerSpring from '../springs/PulseSpinnerSpring'
+import {Context} from "../../storage/Store";
+
 function FriendsDisplay(props) {
 	//console.log("FriendsDisplay | users",props.users);
 
@@ -64,9 +67,9 @@ function FriendsDisplay(props) {
 	}
 	items.push(t1)
 	items.push(t2)
-	items.push({...t1,"id": "T3123028477","display_name": "First Lastt3"})
-	items.push({...t1,"id": "T4123028477","display_name": "First Lastt4"})
-	items.push({...t1,"id": "T5123028477","display_name": "First Lastt5"})
+	// items.push({...t1,"id": "T3123028477","display_name": "First Lastt3"})
+	// items.push({...t1,"id": "T4123028477","display_name": "First Lastt4"})
+	// items.push({...t1,"id": "T5123028477","display_name": "First Lastt5"})
 
 	var testQuery = (t) =>{
 		if(query === ""){return true}else{
@@ -110,12 +113,15 @@ function FriendsDisplay(props) {
 		})
 
 
+	const [globalState, globalDispatch] = useContext(Context);
 
 	return(<div>
 		<div className={styles.list} style={{ height: Math.max(...heights) }}>
 			{/*<div className={styles.list} style={{ height:"20em" }}>*/}
 			{transitions((style, item) => (
 				<a.div style={style} onClick={() =>{props.onClick(item)}}>
+					{/*todo: just looking at artists rn*/}
+					{!(globalState[item.id + "_artists"]) && <PulseSpinnerSpring fontSize={'50px'}/>}
 					<UserTile item={item}/>
 				</a.div>
 			))}

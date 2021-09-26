@@ -43,6 +43,7 @@ import {useImage} from 'react-image'
 
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import SwipeRight from "./assets/swipe-right.png";
+import DragHand from "./assets/noun_Drag Hand_230196.png";
 //import GenreChipsDumb from './components/chips/GenreChipsDumb.js'
 function ChipsArray_dep(props) {
 	//const classes = useStyles();
@@ -581,8 +582,15 @@ function EventsList() {
 			{/*</div>*/}
 
 			<div>
+				{/*todo: componentize w/ reverse on in ContextStats */}
 				<div style={{"width":"100%","height":"2em","backgroundColor":"lightblue","display":"flex","alignItems":"center",justifyContent:"flex-start"}}>
-					<div style={{"transform":"rotate(180deg)"}}> <img style={{height:"3em",marginRight:".5em"}} src={SwipeRight}/> </div> <div style={{marginLeft:"1em"}}>View {tiles.length} Items </div>
+					<div style={{"transform":"rotate(180deg)"}}>
+						<img style={{height:"3em",marginRight:".5em"}} src={SwipeRight}/>
+					</div>
+					<div style={{position: "relative",zIndex:"2"}}>
+						<img style={{"height":"2.5em","marginTop":"0.3em","marginRight":"0.5em","marginLeft":"-0.3em"}} src={DragHand}/>
+					</div>
+					<div style={{marginLeft:"1em"}}>View {tiles.length} Items </div>
 				</div>
 				<List>
 					<ListItem button divider key={'locdate'} onClick={handleClickConfig}>

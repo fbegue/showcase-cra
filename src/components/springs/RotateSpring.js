@@ -17,7 +17,7 @@ export default function RotateSpring(props) {
 	})
 
 	//no...
-	//todo: I cna't find a list of properties that work here
+	//todo: I can't find a list of properties that work here
 	// const discreteProps = useSpring({
 	// 	//from: {rotation: "0deg" },
 	// 	// to:{rotation: shrink ? "0" : "90%" }
@@ -34,14 +34,13 @@ export default function RotateSpring(props) {
 	})
 
 	return (
-
 		<div className={styles.container} onClick={() => props.toggle(!props.state)}
 			//note: hover only applies to web app
 			// onMouseOver={() =>{setShrink(true)}}
 			// onMouseOut={() =>{setShrink(false)}}
-			//note: press down more applicable to mobile
-			 onMouseDown ={() =>{setShrink(true)}}
-			 onMouseUp={() =>{setShrink(false)}}
+			//note: Touch instead of Mouse events for mobile
+			 onTouchStart ={() =>{setShrink(true)}}
+			 onTouchEnd={() =>{setShrink(false)}}
 		>
 			{/*shrink{shrink.toString()}*/}
 			<animated.div style={sprops} >

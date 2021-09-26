@@ -34,6 +34,9 @@
   top: 5em;
 }
 
+
+/*https://css-tricks.com/custom-scrollbars-in-webkit/*/
+
 /*hide scroll on top level*/
 ::-webkit-scrollbar {
   /*width: 12px;*/
