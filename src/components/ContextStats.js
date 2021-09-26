@@ -109,7 +109,7 @@ function ContextStats(props) {
 	//const columns = useMedia([ '(min-width: 1500px)', '(min-width: 1400px)'], [ 4, 3], 2)
 	const columns = 3;
 	//note: this width divided by # of columns = the width of one item
-	const width = 350;
+	const width = 340;
 
 	//note: replaced all references to data-height (designed to be unique values 300-500) with uHeight
 
@@ -420,7 +420,7 @@ function ContextStats(props) {
 
 					{/*<div className={styles.list} style={{ height: "37em",minWidth:gridControl.gridClass === 'defaultGrid' ? '64em':'57em'}}>*/}
 					{/*minWidth:gridControl.gridClass === 'defaultGrid' ? '64em':'57em'*/}
-					<div className={styles.list} style={{ height: "37em",width:"30em"}}>
+					<div className={styles.list} >
 						{transitions((style, item) => (
 							<a.div style={style} onClick={() =>{handleTileSelect(item)}}>
 								{item.type === "track" &&

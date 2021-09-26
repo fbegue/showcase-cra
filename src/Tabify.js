@@ -40,6 +40,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import InfoPanel from "./components/InfoPanel";
 import Spinner from './components/utility/Spinner';
 import './Tabify.css'
+import PulseSpinnerSpring from './components/springs/PulseSpinnerSpring'
 
 
 // const styles = {
@@ -519,6 +520,8 @@ export default function Tabify() {
 			return <div style={{display:"flex"}}>
 				<div>{tab[Object.keys(tab)[0]]}</div>
 				{!(isLoaded(tab)) && <Spinner/>}
+				{/*todo: not loading in?*/}
+				<PulseSpinnerSpring/>
 			</div>
 		}
 

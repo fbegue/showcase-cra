@@ -233,7 +233,7 @@ function App(props) {
                         </Switch>
                     </div>
                 </BrowserRouter>
-                <div>
+                <div className={'app'}>
                     <div  style={{position: "sticky",top: "-16px", padding:"1em 1em 0em 1em", borderBottom: "1px solid black", zIndex: "20",display:'flex',background:"#f0f0f0"}}>
                         <div><img style={{height:"4em"}} src={logo}/> </div>
                         {/*testing:*/}
@@ -269,79 +269,41 @@ function App(props) {
 
                     </div>
                     {/* className={gridControl.gridClass}*/}
+                    {globalUI.access_token ?
+                        <div className={'defaultGrid'}>
+
+                            {/*testing: messed up width of tabs and stats, so disabled this transition for now */}
+                            {/*- is this gridClass changing here affecting responsive collapsing?*/}
+                            {/*<div className="tabs" style={{width:gridControl.gridClass === 'defaultGrid' ? "44em":"35em"}} >*/}
+                            <div className="tabs">
+                                {globalUI.access_token &&
+                                <Tabify></Tabify>
+                                }
+                            </div>
+
+                            {/*todo: hiding for now - but ContextStats doesn't function without something that's happening in there*/}
+                            {/* style={{minWidth:"40em"}}*/}
+                            <div style={{display: "none"}}
+                                 className={gridControl.statCollapse ? 'stats-collapse' : 'stats'}>
+                                <Stats />
+                            </div>
 
 
+                            <ViewPager />
 
+                            {/*<div className="tiles" >*/}
+                            {/*    <ContextStats/>*/}
+                            {/*</div>*/}
+                            {/*/!*style={{minWidth:"30em"}}*!/*/}
 
-                    <div className={'defaultGrid'}>
+                            {/*<div className="events" >*/}
+                            {/*    <EventsList data={[]} />*/}
+                            {/*</div>*/}
 
-                        {/*testing: messed up width of tabs and stats, so disabled this transition for now */}
-                        {/*- is this gridClass changing here affecting responsive collapsing?*/}
-                        {/*<div className="tabs" style={{width:gridControl.gridClass === 'defaultGrid' ? "44em":"35em"}} >*/}
-                        <div className="tabs">
-                            {globalUI.access_token &&
-                            <Tabify></Tabify>
-                            }
                         </div>
+                        : <div>splash</div>
+                    }
 
-                        {/*todo: hiding for now - but ContextStats doesn't function without something that's happening in there*/}
-                        {/* style={{minWidth:"40em"}}*/}
-                        <div style={{display:"none"}} className={gridControl.statCollapse ? 'stats-collapse':'stats'} >
-                           <Stats/>
-                        </div>
-
-
-                        <ViewPager/>
-
-                        {/*<div className="tiles" >*/}
-                        {/*    <ContextStats/>*/}
-                        {/*</div>*/}
-                        {/*/!*style={{minWidth:"30em"}}*!/*/}
-
-                        {/*<div className="events" >*/}
-                        {/*    <EventsList data={[]} />*/}
-                        {/*</div>*/}
-
-                    </div>
-
-                    {/*testing: flex version*/}
-                    {/*<div className={classes.root} style={{display:"flex",flexDirection:"row",flexWrap: "nowrap"}}>*/}
-                    {/*    <div style={{width:"40em",height:"30em"}}>*/}
-                    {/*        {globalUI.access_token &&*/}
-                    {/*        <Tabify></Tabify>*/}
-                    {/*        }*/}
-                    {/*    </div>*/}
-                    {/*    <div style={{width:"70em"}}>*/}
-                    {/*        <Stats/>*/}
-                    {/*    </div>*/}
-                    {/*    <div>*/}
-                    {/*        <EventsList data={[]} />*/}
-                    {/*    </div>*/}
-                    {/*</div>*/}
-
-                    {/*testing: panes implementation*/}
-                    {/*<div className={"Resizer"}>*/}
-                    {/*    <SplitPane split="vertical" defaultSize={paner.pane["tabs"]}>*/}
-                    {/*        /!*note: for overflow to work, you need a height restriction of some type *!/*/}
-                    {/*        /!*todo: fixed height on over flow (more about the Social component then here, exactly)*!/*/}
-                    {/*        <div >*/}
-                    {/*            {globalUI.access_token &&*/}
-                    {/*        <Tabify></Tabify>*/}
-                    {/*            // <MatTableTreeTest/>*/}
-                    {/*        }*/}
-                    {/*        </div>*/}
-                    {/*            <SplitPane  defaultSize={paner.pane["stats"]}   split="vertical">*/}
-                    {/*                <div style={{ border: "1px solid green",height:"20em" }}>*/}
-
-                    {/*                 <Stats/>*/}
-
-                    {/*                </div>*/}
-                    {/*                <div style={{ border: "1px solid blue" }}>*/}
-                    {/*                    <EventsList data={[]} />*/}
-                    {/*                </div>*/}
-                    {/*            </SplitPane>*/}
-                    {/*    </SplitPane>*/}
-                    {/*</div>*/}
                 </div>
             </Store>
         </MuiThemeProvider>

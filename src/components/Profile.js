@@ -12,9 +12,11 @@ let redirect_address = 'https://soundfound.io'
 //const redirect_address = "https://master.d267e964bph18g.amplifyapp.com"
 
 function Profile(props) {
+	//testing: detect origin and adjust redirect/api request off that
 	const t = window.location.toString();
 	if( t.includes('3000')){
-		api_address = "http://localhost:8888"
+
+		//api_address = "http://localhost:8888"
 		redirect_address = "http://localhost:3000"
 	}
 
