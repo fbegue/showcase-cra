@@ -24,6 +24,9 @@ function Dispatch(props) {
 
 			console.log("ONE TIME EVENT FETCH");
 			var fer = await api.fetchEvents({metros:control.metro})
+
+			//testing:
+			fer = fer.slice(0,50)
 			globalDispatch({type: 'update_events', payload: fer,context:'events', control:control});
 
 			// var NEVER =  function(){

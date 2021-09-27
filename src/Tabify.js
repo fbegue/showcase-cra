@@ -519,8 +519,8 @@ export default function Tabify() {
 		const getTabLabel = (tab) =>{
 			return <div style={{display:"flex"}}>
 				<div>{tab[Object.keys(tab)[0]]}</div>
-				{/*{!(isLoaded(tab)) && <PulseSpinnerSpring fontSize={'20px'} top={".1em"} left={".1em"}/>}*/}
-				<PulseSpinnerSpring fontSize={'20px'} top={".1em"} left={".1em"}/>
+				{!(isLoaded(tab)) && <PulseSpinnerSpring fontSize={'20px'} top={".1em"} left={".1em"}/>}
+				{/*<PulseSpinnerSpring fontSize={'20px'} top={".1em"} left={".1em"}/>*/}
 			</div>
 		}
 

@@ -1240,7 +1240,7 @@ function useProduceData(){
 		bubbleData = bubbleData.filter(r =>{return !(r.data.length === 0)})
 
 		//bubbleData.forEach(s =>{s.animationLimit = 5})
-		console.log("$bubbleData",bubbleData);
+		//console.log("$bubbleData",bubbleData);
 
 		//venn
 		var series_sample = [
@@ -1270,7 +1270,7 @@ function useProduceData(){
 		if(friendscontrol.families.length > 0){
 			console.log("skip setPieData with familiies selected");
 		}else{
-			console.log("setPieData",tempPieData);
+			// console.log("setPieData",tempPieData);
 			setPieData(tempPieData);
 		}
 
@@ -1538,11 +1538,11 @@ function useProduceEvents(){
 				});
 
 
-				console.log("friendscontrol",friendscontrol);
+				//console.log("friendscontrol",friendscontrol);
 
-				console.log("$$set new chip families/genres");
+				//console.log("$$set new chip families/genres");
 				// console.log("CHIPFAMILIES",Object.keys(familyArtist));
-				console.log("CHIPFAMILIES",Object.keys(familyArtist).length);
+				//console.log("CHIPFAMILIES",Object.keys(familyArtist).length);
 
 				function makeGenreRank(genres){
 					//note: think I overmapped this guy but its fine!
@@ -1592,9 +1592,9 @@ function useProduceEvents(){
 				};
 
 				let {arrGenresSorted:newRank,arrFamiliesSorted:newFamRank} = makeGenreRank(genres)
-				console.log("makeGenreRank",newRank);
+				//console.log("makeGenreRank",newRank);
 				CHIPGENRESRANKED(newRank)
-				console.log("makeFamRank",newFamRank);
+				//console.log("makeFamRank",newFamRank);
 				CHIPFAMILIESRANKED(newFamRank)
 
 				genres = _.uniqBy(genres,'id')

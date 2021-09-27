@@ -130,7 +130,7 @@ function Stats(props) {
 	let friendscontrol = FriendsControl.useContainer()
 	let gridControl = GridControl.useContainer();
 	let tileSelectControl = TileSelectControl.useContainer();
-	console.log("Stats | tileSelectControl",tileSelectControl);
+	//console.log("Stats | tileSelectControl",tileSelectControl);
 
 	const chipFamilies = useReactiveVar(CHIPFAMILIES);
 	const chipGenres = useReactiveVar(CHIPGENRES);
