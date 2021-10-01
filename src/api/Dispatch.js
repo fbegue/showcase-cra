@@ -4,7 +4,7 @@ import {useReactiveVar} from "@apollo/react-hooks";
 import {GLOBAL_UI_VAR} from "../storage/withApolloProvider";
 import {Context, initUser} from "../storage/Store";
 import {Control} from "../index";
-
+import exampleFetchEvents from '../data/example/fetchEvents'
 function Dispatch(props) {
 
 	const globalUI = useReactiveVar(GLOBAL_UI_VAR);
@@ -22,11 +22,14 @@ function Dispatch(props) {
 			//===============================================================
 			//events and users
 
-			console.log("ONE TIME EVENT FETCH");
-			var fer = await api.fetchEvents({metros:control.metro})
 
+
+			console.log("ONE TIME EVENT FETCH");
+			//testing: wtf is wrong with this now
+			//var fer = await api.fetchEvents({metros:control.metro})
+			var fer = exampleFetchEvents;
 			//testing:
-			fer = fer.slice(0,50)
+			//fer = fer.slice(0,50)
 			globalDispatch({type: 'update_events', payload: fer,context:'events', control:control});
 
 			// var NEVER =  function(){
@@ -54,7 +57,9 @@ function Dispatch(props) {
 			userProms.push(api.getMyFollowedArtists(req))
 			//userProms.push(api.getRecentlyPlayedTracks(req))
 			// userProms.push(api.getSavedTracks(req))
-			userProms.push(api.getMySavedAlbums(req))
+
+			//todo: testing albums back
+			// userProms.push(api.getMySavedAlbums(req))
 			var r = await Promise.all(userProms)
 
 			//all these artist's have 'sources' so they all end up in here together
@@ -77,7 +82,7 @@ function Dispatch(props) {
 
 			globalDispatch({type: 'init', payload:{artists:artistsPay,stats:null},user: globalUI.user,context:'artists'});
 			//globalDispatch({type: 'init', payload:{tracks:r[2].tracks,stats:null},user: globalUI.user,context:'tracks'});
-			globalDispatch({type: 'init', payload:r[2],user: globalUI.user,context:'albums'});
+			// globalDispatch({type: 'init', payload:r[2],user: globalUI.user,context:'albums'});
 			//control.setDataLoaded(true)
 
 

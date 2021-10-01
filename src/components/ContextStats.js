@@ -33,6 +33,19 @@ import Paper from "@material-ui/core/Paper";
 import InputIcon from "@material-ui/icons/Input";
 import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
 
+//todo: for some wild reason, after c/p customScroll.css",firstComp.scss  out to above FirstComp for gen use
+//that don't work - but importing them from another comp that uses them...works?
+//import {FirstComp} from './utility/CustomScroll/FirstComp/FirstComp'
+
+//literally the same
+// import './utility/CustomScroll/FirstComp/firstComp.scss'
+// import "./utility/CustomScroll/FirstComp/customScroll.css";
+
+// c/p new dir w/ name change
+import './utility/CustomScroll/contextStats.scss'
+import "./utility/CustomScroll/FirstComp/customScroll.css";
+import CustomScroll from "react-custom-scroll";
+
 function TabPanel(props) {
 	const { children, value, index, ...other } = props;
 
@@ -335,6 +348,10 @@ function ContextStats(props) {
 	const [fstate, toggle] = useState(true)
 	return(
 		<div>
+			{/*testing:*/}
+			<div>
+
+			</div>
 			<div>
 				{/*note: floating filter buttons*/}
 				<div>
@@ -391,7 +408,7 @@ function ContextStats(props) {
 					<div>
 						<div style={{"marginLeft":"0em","border":"#e2e2e2 1px solid","borderRadius":"5px",display:"flex",alignItems: "center"}}>
 							{getTabs()}
-							<div style={{flexGrow:"1"}}>{'\u00A0'}</div>
+							{/*<div style={{flexGrow:"1"}}>{'\u00A0'}</div>*/}
 							<div style={{display:'flex',flexDirection:"row",position:"relative"}}>
 								{/*testing :disabled total length for now*/}
 								{/*<div>{items.length}/{tiles.length}</div>*/}
@@ -420,6 +437,9 @@ function ContextStats(props) {
 
 					{/*<div className={styles.list} style={{ height: "37em",minWidth:gridControl.gridClass === 'defaultGrid' ? '64em':'57em'}}>*/}
 					{/*minWidth:gridControl.gridClass === 'defaultGrid' ? '64em':'57em'*/}
+
+					<div className={'crazy-scroll'}>
+					<CustomScroll>
 					<div className={styles.list} >
 						{transitions((style, item) => (
 							<a.div style={style} onClick={() =>{handleTileSelect(item)}}>
@@ -438,6 +458,8 @@ function ContextStats(props) {
 
 							</a.div>
 						))}
+					</div>
+					</CustomScroll>
 					</div>
 				</div>
 

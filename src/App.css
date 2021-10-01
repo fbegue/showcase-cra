@@ -34,35 +34,36 @@
   top: 5em;
 }
 
-
+/*testing: my own attempts to customize scrollbar*/
 /*https://css-tricks.com/custom-scrollbars-in-webkit/*/
 
 /*hide scroll on top level*/
-::-webkit-scrollbar {
-  /*width: 12px;*/
-  width: 0px;
-  background: transparent;
-}
+/*::-webkit-scrollbar {*/
+/*  !*width: 12px;*!*/
+/*  width: 0px;*/
+/*  background: transparent;*/
+/*}*/
 
-/*customize at all other levels*/
-.app ::-webkit-scrollbar {
-  width: 17px;
+/*!*customize at all other levels*!*/
+/*.app ::-webkit-scrollbar {*/
+/*  width: 17px;*/
+/*}*/
 
-}
 /*body{*/
 /*  overflow-y:scroll;*/
 /*}*/
 
 /* Handle */
-.app ::-webkit-scrollbar-thumb {
-  -webkit-border-radius: 10px;
-  border-radius: 10px;
-  background: rgba(255,0,0,0.8);
-  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
-}
-.app ::-webkit-scrollbar-thumb:window-inactive {
-  background: rgba(255,0,0,0.4);
-}
+
+/*.app ::-webkit-scrollbar-thumb {*/
+/*  -webkit-border-radius: 10px;*/
+/*  border-radius: 10px;*/
+/*  background: rgba(255,0,0,0.8);*/
+/*  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);*/
+/*}*/
+/*.app ::-webkit-scrollbar-thumb:window-inactive {*/
+/*  background: rgba(255,0,0,0.4);*/
+/*}*/
 
 /*=================================================*/
 /*todo: transition is laggy - could be a state/rendering issue tho?*/
