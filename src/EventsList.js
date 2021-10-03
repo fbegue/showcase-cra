@@ -45,6 +45,10 @@ import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import SwipeRight from "./assets/swipe-right.png";
 import DragHand from "./assets/noun_Drag Hand_230196.png";
 //import GenreChipsDumb from './components/chips/GenreChipsDumb.js'
+import './components/utility/CustomScroll/contextStats.scss'
+import "./components/utility/CustomScroll/FirstComp/customScroll.css";
+import CustomScroll from "react-custom-scroll";
+
 function ChipsArray_dep(props) {
 	//const classes = useStyles();
 	//todo: implement useStyles
@@ -399,157 +403,165 @@ function EventsList() {
 			// </Suspense>
 		}
 
-		return children.map(subOption => {
-			if (!subOption.childrenKey) {
-				return (
-					// <div key={subOption.id} >{subOption.id}</div>
-					<div key={subOption.id}>
-						<ListItemText
-							style={{marginLeft:"2em"}}
-							inset
-							disableTypography
-							primary={ showPlay(subOption)}
-							secondary={
-								<React.Fragment>
+		return(
+			<div className={'crazy-scroll'} style={{maxHeight:"33em"}}>
+			<CustomScroll>
+				{
+					children.map(subOption => {
+						if (!subOption.childrenKey) {
+							return (
+								// <div key={subOption.id} >{subOption.id}</div>
+								<div key={subOption.id}>
+									<ListItemText
+										style={{marginLeft:"2em"}}
+										inset
+										disableTypography
+										primary={ showPlay(subOption)}
+										secondary={
+											<React.Fragment>
 
-									{/*<div style={{display:"flex"}}>*/}
-									{/*	<div>*/}
-									{/*	</div>*/}
-									{/*	<div>*/}									{/*<div>{subOption.id}</div>*/}
+												{/*<div style={{display:"flex"}}>*/}
+												{/*	<div>*/}
+												{/*	</div>*/}
+												{/*	<div>*/}									{/*<div>{subOption.id}</div>*/}
 
-									{/*<GenreChipsDumb familyAgg={subOption.artist.familyAgg} chipData={subOption.artist.genres}>*/}
-									{/*</GenreChipsDumb>*/}
-									<BubbleFamilyGenreChips families={[]} familyDisabled={true} varied={true} genres={subOption.artist.genres} genresFilter={chipGenres}>
-									</BubbleFamilyGenreChips>
+												{/*<GenreChipsDumb familyAgg={subOption.artist.familyAgg} chipData={subOption.artist.genres}>*/}
+												{/*</GenreChipsDumb>*/}
+												<BubbleFamilyGenreChips families={[]} familyDisabled={true} varied={true} genres={subOption.artist.genres} genresFilter={chipGenres}>
+												</BubbleFamilyGenreChips>
 
-									{/*	</div>*/}
-									{/*</div>*/}
+												{/*	</div>*/}
+												{/*</div>*/}
 
-									{/*{subOption.venue.displayName} -*/}
-									{/*{subOption.location.city.toString().replace(", US","")}*/}
-								</React.Fragment>
-							}
-						/>
-					</div>
-				);
-			}
-			return (
-				<div className={getFamilyClass(subOption)}>
-					{/*<div>ListItem  key={subOption.id}  </div>*/}
-					<ListItem  key={subOption.id}  button onClick={() => handleClick(subOption.id)}>
-						<div style={{marginRight:"5em",marginBottom:"4em"}}>
-							{unHolyDrill(subOption) && <img src={spotifyLogo} style={{"position":"absolute","left":"62px","top":"2px",zIndex:"10",height:"1em",width:"1em"}} />}
-							<EventImageFader item={subOption}/>
-						</div>
-						<ListItemText
-							// inset
-							disableTypography
-							primary={ formatEventName(subOption)}
-							secondary={
-								<React.Fragment>
-									<Typography
-										component={'span'}
-										variant="body2"
-										color="textPrimary"
-									>
+												{/*{subOption.venue.displayName} -*/}
+												{/*{subOption.location.city.toString().replace(", US","")}*/}
+											</React.Fragment>
+										}
+									/>
+								</div>
+							);
+						}
+						return (
+							<div className={getFamilyClass(subOption)}>
+								{/*<div>ListItem  key={subOption.id}  </div>*/}
+								<ListItem  key={subOption.id}  button onClick={() => handleClick(subOption.id)}>
+									<div style={{marginRight:"5em",marginBottom:"4em"}}>
+										{unHolyDrill(subOption) && <img src={spotifyLogo} style={{"position":"absolute","left":"62px","top":"2px",zIndex:"10",height:"1em",width:"1em"}} />}
+										<EventImageFader item={subOption}/>
+									</div>
+									<ListItemText
+										// inset
+										disableTypography
+										primary={ formatEventName(subOption)}
+										secondary={
+											<React.Fragment>
+												<Typography
+													component={'span'}
+													variant="body2"
+													color="textPrimary"
+												>
 
-										<div style={{display:"flex",justifyContent:"space-between"}}>
-											<div>
-												<div>
-													{/*https://moment.github.io/luxon/docs/manual/formatting.html*/}
-													{DateTime.fromISO(subOption.start.datetime).toFormat('LLL d')},{'\u00A0'}
-													{DateTime.fromISO(subOption.start.datetime).toFormat('t')}{'\u00A0'}
-												</div>
+													<div style={{display:"flex",justifyContent:"space-between"}}>
+														<div>
+															<div>
+																{/*https://moment.github.io/luxon/docs/manual/formatting.html*/}
+																{DateTime.fromISO(subOption.start.datetime).toFormat('LLL d')},{'\u00A0'}
+																{DateTime.fromISO(subOption.start.datetime).toFormat('t')}{'\u00A0'}
+															</div>
 
-												<div> {subOption.venue.displayName} -
-													<span style={{display:"inline-block"}}>{subOption.location.city.toString().replace(", US","")}</span>
-												</div>
-											</div>
+															<div> {subOption.venue.displayName} -
+																<span style={{display:"inline-block"}}>{subOption.location.city.toString().replace(", US","")}</span>
+															</div>
+														</div>
 
-											{/*todo: space between isn't working like I think it should here
+														{/*todo: space between isn't working like I think it should here
 											so just put the margin here for now*/}
-											{subOption.friends && subOption.friends.length > 0 &&
-											<div style={{display:"flex",justifyContent:"flex-start",marginLeft:"2em"}}>
-												{subOption.friends.map((rec,i) =>
-													<div key={i}>
-														<MyImageComponent rec={rec}/>
-														{/*<Tooltip title="likes this artist">*/}
-														{/*	<MyImageComponent user={f}/>*/}
-														{/*	/!*<img src={f.images[0].url}*!/*/}
-														{/*	/!*	 style={{width: "50px",borderRadius: "50%"}} alt={f.display_name}/>*!/*/}
-														{/*</Tooltip>*/}
+														{subOption.friends && subOption.friends.length > 0 &&
+														<div style={{display:"flex",justifyContent:"flex-start",marginLeft:"2em"}}>
+															{subOption.friends.map((rec,i) =>
+																<div key={i}>
+																	<MyImageComponent rec={rec}/>
+																	{/*<Tooltip title="likes this artist">*/}
+																	{/*	<MyImageComponent user={f}/>*/}
+																	{/*	/!*<img src={f.images[0].url}*!/*/}
+																	{/*	/!*	 style={{width: "50px",borderRadius: "50%"}} alt={f.display_name}/>*!/*/}
+																	{/*</Tooltip>*/}
+
+																</div>
+															)}
+														</div>
+														}
+
+
+														<div onClick={() =>{openSongkickExt(subOption)}}
+															 onMouseEnter={() =>{setOpenNew({...openNew,[subOption.id]:!openNew[subOption.id]})}}
+															 onMouseOut={() =>{setOpenNew({})}} className={'songkickExt'}>
+															<img src={songkick_badge_pink} style={{height:"3em",width:"3em"}} />
+															{openNew[subOption.id] && <OpenInNewIcon
+																style={{"fontSize":"1rem","position":"absolute","right":"50px","top":"30px","visibility":openNew[subOption.id] ?'visible':"hidden"}} fontSize={'inherit'}/>}
+														</div>
+
+														<div style={{width:"1em"}}>{'\u00A0'}</div>
+
 
 													</div>
-												)}
-											</div>
-											}
 
 
-											<div onClick={() =>{openSongkickExt(subOption)}}
-												 onMouseEnter={() =>{setOpenNew({...openNew,[subOption.id]:!openNew[subOption.id]})}}
-												 onMouseOut={() =>{setOpenNew({})}} className={'songkickExt'}>
-												<img src={songkick_badge_pink} style={{height:"3em",width:"3em"}} />
-												{openNew[subOption.id] && <OpenInNewIcon
-													style={{"fontSize":"1rem","position":"absolute","right":"50px","top":"30px","visibility":openNew[subOption.id] ?'visible':"hidden"}} fontSize={'inherit'}/>}
-											</div>
+													{/*testing: user avatars under songkick linkout*/}
+													{/*<div style={{display:"flex",justifyContent:"space-between"}}>*/}
+													{/*	<div>*/}
+													{/*		<div>*/}
+													{/*			/!*https://moment.github.io/luxon/docs/manual/formatting.html*!/*/}
+													{/*			{DateTime.fromISO(subOption.start.datetime).toFormat('LLL d')},{'\u00A0'}*/}
+													{/*			{DateTime.fromISO(subOption.start.datetime).toFormat('t')}{'\u00A0'}*/}
+													{/*		</div>*/}
 
-											<div style={{width:"1em"}}>{'\u00A0'}</div>
+													{/*		<div> {subOption.venue.displayName} -*/}
+													{/*			<span style={{display:"inline-block"}}>{subOption.location.city.toString().replace(", US","")}</span>*/}
+													{/*		</div>*/}
+													{/*	</div>*/}
 
+													{/*	<div style={{display:"flex",flexDirection:"column"}}>*/}
+													{/*		<div onClick={() =>{openSongkickExt(subOption)}}*/}
+													{/*			 onMouseEnter={() =>{setOpenNew({...openNew,[subOption.id]:!openNew[subOption.id]})}}*/}
+													{/*			 onMouseOut={() =>{setOpenNew({})}} className={'songkickExt'}>*/}
+													{/*			<img src={songkick_badge_pink} style={{height:"3em",width:"3em"}} />*/}
+													{/*			{openNew[subOption.id] && <OpenInNewIcon*/}
+													{/*				style={{"fontSize":"1rem","position":"absolute","right":"50px","top":"30px","visibility":openNew[subOption.id] ?'visible':"hidden"}} fontSize={'inherit'}/>}*/}
+													{/*		</div>*/}
+													{/*		<div style={{display:"flex",justifyContent:"flex-start"}}>*/}
+													{/*			<div><img src="https://scontent.fmaa10-1.fna.fbcdn.net/v/t1.6435-1/p320x320/44591294_1856692227700100_9156849281271857152_n.jpg?_nc_cat=107&amp;ccb=1-3&amp;_nc_sid=0c64ff&amp;_nc_ohc=fhTFjKhIs4UAX8NP7RA&amp;_nc_ht=scontent.fmaa10-1.fna&amp;tp=6&amp;oh=4a350b25a2558a55755f396503445282&amp;oe=60E0867D"*/}
+													{/*					  style={{width: "50px",borderRadius: "50%"}}/>*/}
+													{/*			</div>*/}
+													{/*			<div><img src="https://scontent.fmaa10-1.fna.fbcdn.net/v/t1.6435-1/p320x320/44591294_1856692227700100_9156849281271857152_n.jpg?_nc_cat=107&amp;ccb=1-3&amp;_nc_sid=0c64ff&amp;_nc_ohc=fhTFjKhIs4UAX8NP7RA&amp;_nc_ht=scontent.fmaa10-1.fna&amp;tp=6&amp;oh=4a350b25a2558a55755f396503445282&amp;oe=60E0867D"*/}
+													{/*					  style={{width: "50px",borderRadius: "50%"}}/>*/}
+													{/*			</div>*/}
+													{/*		</div>*/}
+													{/*		<div style={{width:"1em"}}>{'\u00A0'}</div>*/}
+													{/*	</div>*/}
 
-										</div>
-
-
-										{/*testing: user avatars under songkick linkout*/}
-										{/*<div style={{display:"flex",justifyContent:"space-between"}}>*/}
-										{/*	<div>*/}
-										{/*		<div>*/}
-										{/*			/!*https://moment.github.io/luxon/docs/manual/formatting.html*!/*/}
-										{/*			{DateTime.fromISO(subOption.start.datetime).toFormat('LLL d')},{'\u00A0'}*/}
-										{/*			{DateTime.fromISO(subOption.start.datetime).toFormat('t')}{'\u00A0'}*/}
-										{/*		</div>*/}
-
-										{/*		<div> {subOption.venue.displayName} -*/}
-										{/*			<span style={{display:"inline-block"}}>{subOption.location.city.toString().replace(", US","")}</span>*/}
-										{/*		</div>*/}
-										{/*	</div>*/}
-
-										{/*	<div style={{display:"flex",flexDirection:"column"}}>*/}
-										{/*		<div onClick={() =>{openSongkickExt(subOption)}}*/}
-										{/*			 onMouseEnter={() =>{setOpenNew({...openNew,[subOption.id]:!openNew[subOption.id]})}}*/}
-										{/*			 onMouseOut={() =>{setOpenNew({})}} className={'songkickExt'}>*/}
-										{/*			<img src={songkick_badge_pink} style={{height:"3em",width:"3em"}} />*/}
-										{/*			{openNew[subOption.id] && <OpenInNewIcon*/}
-										{/*				style={{"fontSize":"1rem","position":"absolute","right":"50px","top":"30px","visibility":openNew[subOption.id] ?'visible':"hidden"}} fontSize={'inherit'}/>}*/}
-										{/*		</div>*/}
-										{/*		<div style={{display:"flex",justifyContent:"flex-start"}}>*/}
-										{/*			<div><img src="https://scontent.fmaa10-1.fna.fbcdn.net/v/t1.6435-1/p320x320/44591294_1856692227700100_9156849281271857152_n.jpg?_nc_cat=107&amp;ccb=1-3&amp;_nc_sid=0c64ff&amp;_nc_ohc=fhTFjKhIs4UAX8NP7RA&amp;_nc_ht=scontent.fmaa10-1.fna&amp;tp=6&amp;oh=4a350b25a2558a55755f396503445282&amp;oe=60E0867D"*/}
-										{/*					  style={{width: "50px",borderRadius: "50%"}}/>*/}
-										{/*			</div>*/}
-										{/*			<div><img src="https://scontent.fmaa10-1.fna.fbcdn.net/v/t1.6435-1/p320x320/44591294_1856692227700100_9156849281271857152_n.jpg?_nc_cat=107&amp;ccb=1-3&amp;_nc_sid=0c64ff&amp;_nc_ohc=fhTFjKhIs4UAX8NP7RA&amp;_nc_ht=scontent.fmaa10-1.fna&amp;tp=6&amp;oh=4a350b25a2558a55755f396503445282&amp;oe=60E0867D"*/}
-										{/*					  style={{width: "50px",borderRadius: "50%"}}/>*/}
-										{/*			</div>*/}
-										{/*		</div>*/}
-										{/*		<div style={{width:"1em"}}>{'\u00A0'}</div>*/}
-										{/*	</div>*/}
-
-										{/*</div>*/}
+													{/*</div>*/}
 
 
 
-										{/*<span> | {whyMatch(subOption)}</span>*/}
-									</Typography>
+													{/*<span> | {whyMatch(subOption)}</span>*/}
+												</Typography>
 
-								</React.Fragment>
-							}
-						/>
-						{state[subOption.name] ? <ExpandLess /> : <ExpandMore />}
-					</ListItem>
-					<Collapse key={'single-item-collapse' + subOption.id} in={state[subOption.id]} timeout="auto" unmountOnExit>
-						{handler( subOption[subOption.childrenKey],subOption.childrenKey, ) }
-					</Collapse>
-				</div>
-			);
-		});
+											</React.Fragment>
+										}
+									/>
+									{state[subOption.name] ? <ExpandLess /> : <ExpandMore />}
+								</ListItem>
+								<Collapse key={'single-item-collapse' + subOption.id} in={state[subOption.id]} timeout="auto" unmountOnExit>
+									{handler( subOption[subOption.childrenKey],subOption.childrenKey, ) }
+								</Collapse>
+							</div>
+						);
+					})
+				}
+			</CustomScroll>
+			</div>
+		)
 	}
 
 	function getCoverage(events){

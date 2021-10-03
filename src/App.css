@@ -77,6 +77,10 @@
 }
 
 .defaultGrid {
+  /*testing: disabling scrollbars here*/
+  height: 28em;
+  overflow-y: hidden;
+
   display: grid;
   overflow-x:hidden;
   background-color:#8080803b;

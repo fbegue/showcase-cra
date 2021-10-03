@@ -11,11 +11,13 @@
   segoe ui, arial, sans-serif;
   /*width: 100%;*/
   /*height: 100%;*/
-  height:16em !important;
+  /*height:16em !important;*/
+
   /*todo: when using scroll here, I have to explicitly set a width? idk*/
   /*width:41em;*/
   width:36em;
-  overflow:auto;
+  height:18em;
+  overflow:hidden;
   background-color:white;
   margin-top: .5em;
   /*margin-left:-2em;*/

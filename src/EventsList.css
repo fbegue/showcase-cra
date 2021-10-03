@@ -62,7 +62,7 @@ cursor:pointer;
   min-height: 0px !important;
   height: 39em !important;
   overflow: scroll !important;
-'&::-webkit-scrollbar': width: '0.4em';
+/*'&::-webkit-scrollbar': width: '0.4em';*/
 }
 
 /*::-webkit-scrollbar {*/
