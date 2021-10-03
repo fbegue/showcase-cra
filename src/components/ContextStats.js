@@ -342,7 +342,7 @@ function ContextStats(props) {
 
 		// return "filter on" + tiles.length + " items"
 		return "filter"
-		}
+	}
 
 
 	const [fstate, toggle] = useState(true)
@@ -409,18 +409,22 @@ function ContextStats(props) {
 						<div style={{"marginLeft":"0em","border":"#e2e2e2 1px solid","borderRadius":"5px",display:"flex",alignItems: "center"}}>
 							{getTabs()}
 							<div style={{flexGrow:"1"}}>{'\u00A0'}</div>
-							<div style={{display:'flex',flexDirection:"row",position:"relative",width:"6em",height:"1em"}}>
+							<div style={{display:'flex',flexDirection:"column",position:"relative",width:"6em",height:"1em"}}>
 								{/*testing :disabled total length for now*/}
 								{/*<div>{items.length}/{tiles.length}</div>*/}
-								<div>
-									<NavigateBeforeIcon fontSize={'large'} onClick={() =>{setPage((prevState => {
-										return prevState !== 1 ? prevState - 1:prevState
-									}))}}/>
-									<div style={{"display":"inline-block","top":"-11px","position":"relative"}}> {page}/{Math.ceil(tiles.length/pageSize)}</div>
-									<NavigateNextIcon fontSize={'large'} onClick={() =>{setPage((prevState => {
-										return prevState <= tiles.length/pageSize ? prevState + 1:prevState
-									}))}}/>
+								<div style={{display:'flex',flexDirection:"row"}}>
+									<div>
+										<NavigateBeforeIcon fontSize={'large'} onClick={() =>{setPage((prevState => {
+											return prevState !== 1 ? prevState - 1:prevState
+										}))}}/>
+									</div>
+									<div>
+										<NavigateNextIcon fontSize={'large'} onClick={() =>{setPage((prevState => {
+											return prevState <= tiles.length/pageSize ? prevState + 1:prevState
+										}))}}/>
+									</div>
 								</div>
+								<div style={{"display":"inline-block","top":"-11px","left":"22px","position":"relative"}}> {page}/{Math.ceil(tiles.length/pageSize)}</div>
 							</div>
 						</div>
 					</div>
@@ -439,27 +443,27 @@ function ContextStats(props) {
 					{/*minWidth:gridControl.gridClass === 'defaultGrid' ? '64em':'57em'*/}
 
 					<div className={'crazy-scroll'}>
-					<CustomScroll>
-					<div className={styles.list} >
-						{transitions((style, item) => (
-							<a.div style={style} onClick={() =>{handleTileSelect(item)}}>
-								{item.type === "track" &&
-								<div className={tileSelectControl.tile && tileSelectControl.tile.id === item.id ? 'tile-selected':'tile-unselected' }>
-									<img height={120} src={item.album.images[0] && item.album.images[0].url}/>
-									<div style={{padding:"2px",background:"rgb(128 128 128 / .7)",position:"relative",top:"-43px",color:"white",height:"20px"}}>{item.name}</div>
-								</div>
-								}
-								{item.type !== "track" &&
-								<div className={tileSelectControl.tile && tileSelectControl.tile.id === item.id ? 'tile-selected':'tile-unselected' }>
-									<img height={120} src={item.images[0] && item.images[0].url}/>
-									<div style={{padding:"2px",background:"rgb(128 128 128 / .7)",position:"relative",top:"-43px",color:"white",height:"20px"}}>{item.name}</div>
-								</div>
-								}
+						<CustomScroll>
+							<div className={styles.list} >
+								{transitions((style, item) => (
+									<a.div style={style} onClick={() =>{handleTileSelect(item)}}>
+										{item.type === "track" &&
+										<div className={tileSelectControl.tile && tileSelectControl.tile.id === item.id ? 'tile-selected':'tile-unselected' }>
+											<img height={120} src={item.album.images[0] && item.album.images[0].url}/>
+											<div style={{padding:"2px",background:"rgb(128 128 128 / .7)",position:"relative",top:"-43px",color:"white",height:"20px"}}>{item.name}</div>
+										</div>
+										}
+										{item.type !== "track" &&
+										<div className={tileSelectControl.tile && tileSelectControl.tile.id === item.id ? 'tile-selected':'tile-unselected' }>
+											<img height={120} src={item.images[0] && item.images[0].url}/>
+											<div style={{padding:"2px",background:"rgb(128 128 128 / .7)",position:"relative",top:"-43px",color:"white",height:"20px"}}>{item.name}</div>
+										</div>
+										}
 
-							</a.div>
-						))}
-					</div>
-					</CustomScroll>
+									</a.div>
+								))}
+							</div>
+						</CustomScroll>
 					</div>
 				</div>
 
