@@ -1,4 +1,5 @@
 .MuiSelect-select[multiple]{
+    /*height:19em !important*/
     height:19em !important
 }
 

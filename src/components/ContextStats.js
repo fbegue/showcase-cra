@@ -46,6 +46,7 @@ import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
 import './utility/CustomScroll/contextStats.scss'
 import "./utility/CustomScroll/FirstComp/customScroll.css";
 import CustomScroll from "react-custom-scroll";
+import DragHand from "../assets/noun_Drag Hand_230196.png";
 
 function TabPanel(props) {
 	const { children, value, index, ...other } = props;
@@ -397,12 +398,23 @@ function ContextStats(props) {
 
 				{/*note: tiles*/}
 				<div>
-					<div style={{"width":"100%","height":"2em","backgroundColor":"lightblue","display":"flex","alignItems":"center",justifyContent:"space-between"}}>
-						<div style={{marginLeft:"1em"}}>{tiles.length} Items </div>
-						<div style={{marginRight:"1em",display:"flex"}}>
-							<div style={{lineHeight:"3em",marginRight:".5em"}}>View {events.length} Events </div>
-							<div> <img style={{height:"3em",marginRight:".5em"}} src={SwipeRight}/> </div>
+					{/*<div style={{"width":"100%","height":"3em","backgroundColor":"lightblue","display":"flex","alignItems":"center",justifyContent:"space-between"}}>*/}
+					{/*	<div style={{marginLeft:"1em"}}>{tiles.length} Items </div>*/}
+					{/*	<div style={{marginRight:"1em",display:"flex"}}>*/}
+					{/*		<div style={{lineHeight:"3em",marginRight:".5em"}}>View {events.length} Events </div>*/}
+					{/*		<div> <img style={{height:"3em",marginRight:".5em"}} src={SwipeRight}/> </div>*/}
+					{/*	</div>*/}
+					{/*</div>*/}
+					<div style={{"width":"100%","height":"3em","backgroundColor":"lightblue","display":"flex","alignItems":"center",justifyContent:"flex-end"}}>
+
+						<div style={{marginLeft:"1em"}}>Matched  {events.length} Events </div>
+						<div style={{position: "relative",zIndex:"2",transform: "scaleX(-1)"}}>
+							<img style={{"height":"2.5em","marginTop":"0.3em","marginRight":"0.5em","marginLeft":"-0.3em"}} src={DragHand}/>
 						</div>
+						<div >
+							<img style={{height:"3em",marginRight:".5em"}} src={SwipeRight}/>
+						</div>
+
 					</div>
 
 					{tabcontrol.section === 2 &&

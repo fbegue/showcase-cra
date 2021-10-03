@@ -595,14 +595,14 @@ function EventsList() {
 
 			<div>
 				{/*todo: componentize w/ reverse on in ContextStats */}
-				<div style={{"width":"100%","height":"2em","backgroundColor":"lightblue","display":"flex","alignItems":"center",justifyContent:"flex-start"}}>
+				<div style={{"width":"100%","height":"3em","backgroundColor":"lightblue","display":"flex","alignItems":"center",justifyContent:"flex-start"}}>
 					<div style={{"transform":"rotate(180deg)"}}>
 						<img style={{height:"3em",marginRight:".5em"}} src={SwipeRight}/>
 					</div>
 					<div style={{position: "relative",zIndex:"2"}}>
 						<img style={{"height":"2.5em","marginTop":"0.3em","marginRight":"0.5em","marginLeft":"-0.3em"}} src={DragHand}/>
 					</div>
-					<div style={{marginLeft:"1em"}}>View {tiles.length} Items </div>
+					<div style={{marginLeft:"1em"}}>Matched {tiles.length} Items </div>
 				</div>
 				<List>
 					<ListItem button divider key={'locdate'} onClick={handleClickConfig}>

@@ -2,7 +2,7 @@
 //todo: something about the content of ContextStats (but not EventsList?) causes the gesture space to be wacky
 import ContextStats from "./components/ContextStats";
 import EventsList from "./EventsList";
-import React, {useRef} from "react";
+import React, {useRef,useState} from "react";
 import useMeasure from "react-use-measure";
 import {animated, useSprings} from "@react-spring/web";
 import {useDrag} from "react-use-gesture";
@@ -59,9 +59,11 @@ export default function ViewPager() {
 		}),
 		[width]
 	)
-	const bind = useDrag(({ active, movement: [mx], direction: [xDir,yDir], distance, cancel }) => {
-		if (yDir) {}
-		else{
+
+	const [xval, setX] = useState(360);
+	const bind = useDrag(({ active, movement: [mx], direction: [xDir,yDir], distance, cancel,swipe }) => {
+		//console.log(swipe);
+
 			if (active && distance > width / 2) {
 				index.current = clamp(index.current + (xDir > 0 ? -1 : 1), 0, pages.length - 1)
 				cancel()
@@ -70,15 +72,16 @@ export default function ViewPager() {
 				if (i < index.current - 1 || i > index.current + 1) return { display: 'none' }
 				const x = (i - index.current) * width + (active ? mx : 0)
 				const scale = active ? 1 - distance / width / 2 : 1
+				console.log("x",x);
+				setX(x)
 				return { x, scale, display: 'block' }
 			})
-		}
 
 	})
 	return (
 
-		<div>
-			<div style={{height:"2em",backgroundColor:"blue"}}> BBBBBBBBBBBSSSSSSSSSSRRRRR</div>
+		<div  className={'layered'}>
+			<div style={{"height":"3em","width":"11em","marginLeft":xval > 0 ? "0em":"12em","backgroundColor":"blue","zIndex":"90","opacity":".1"}}> </div>
 			<div ref={ref} className={stylesViewPager.wrapper}>
 				{props.map(({ x, display, scale }, i) => (
 					<animated.div className={stylesViewPager.page} {...bind()} key={i} style={{ display, x }}>

@@ -78,7 +78,7 @@
 
 .defaultGrid {
   /*testing: disabling scrollbars here*/
-  height: 28em;
+  height: 23em;
   overflow-y: hidden;
 
   display: grid;
