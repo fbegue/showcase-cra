@@ -410,7 +410,7 @@ function ContextStats(props) {
 						<div style={{"marginLeft":"0em","border":"#e2e2e2 1px solid","borderRadius":"5px",display:"flex",alignItems: "center"}}>
 							{getTabs()}
 							<div style={{flexGrow:"1"}}>{'\u00A0'}</div>
-							<div style={{position:"relative",width:"8em",height:"4em","marginTop":"-.2em"}}>
+							<div style={{position:"relative",width:"5em",height:"4em","marginTop":"-.2em"}}>
 								{/*testing :disabled total length for now*/}
 								{/*<div>{items.length}/{tiles.length}</div>*/}
 								<div style={{display:'flex',flexDirection:"row"}}>
