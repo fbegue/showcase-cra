@@ -25,6 +25,7 @@ import FilterListIcon from '@material-ui/icons/FilterList';
 import BubbleFamilyGenreChips from "./chips/BubbleFamilyGenreChips";
 import SwipeRight from '../assets/swipe-right.png'
 import {tabMap} from "../Tabify";
+import IconButton from '@material-ui/core/IconButton';
 //import FilterGenreChips from "./chips/FilterGenreChips";
 import RotateSpring from "./springs/RotateSpring";
 import PlaylistCheckboxes from './tiles/PlaylistCheckboxes'
@@ -409,22 +410,35 @@ function ContextStats(props) {
 						<div style={{"marginLeft":"0em","border":"#e2e2e2 1px solid","borderRadius":"5px",display:"flex",alignItems: "center"}}>
 							{getTabs()}
 							<div style={{flexGrow:"1"}}>{'\u00A0'}</div>
-							<div style={{display:'flex',flexDirection:"column",position:"relative",width:"6em",height:"1em"}}>
+							<div style={{position:"relative",width:"8em",height:"4em","marginTop":"-.2em"}}>
 								{/*testing :disabled total length for now*/}
 								{/*<div>{items.length}/{tiles.length}</div>*/}
 								<div style={{display:'flex',flexDirection:"row"}}>
 									<div>
-										<NavigateBeforeIcon fontSize={'large'} onClick={() =>{setPage((prevState => {
-											return prevState !== 1 ? prevState - 1:prevState
-										}))}}/>
+										<IconButton aria-label="nav-prev">
+											<NavigateBeforeIcon style={{ fontSize: 50 }} onClick={() =>{setPage((prevState => {
+												return prevState !== 1 ? prevState - 1:prevState
+											}))}}/>
+										</IconButton>
+
 									</div>
-									<div>
-										<NavigateNextIcon fontSize={'large'} onClick={() =>{setPage((prevState => {
-											return prevState <= tiles.length/pageSize ? prevState + 1:prevState
-										}))}}/>
+									<div style={{"display":"inline-block","position":"relative","marginLeft":"-1em","marginTop":"1.5em","fontSize":"20px",minWidth:"1.4em"}}>
+										{ tiles.length > 0 &&
+											<span>
+												{page}/{Math.ceil(tiles.length/pageSize)}
+											</span>
+										}
+
+									</div>
+									<div style={{marginLeft:"-1em"}}>
+										<IconButton aria-label="nav-next">
+											<NavigateNextIcon style={{ fontSize: 50 }} onClick={() =>{setPage((prevState => {
+												return prevState <= tiles.length/pageSize ? prevState + 1:prevState
+											}))}}/>
+										</IconButton>
 									</div>
 								</div>
-								<div style={{"display":"inline-block","top":"-11px","left":"22px","position":"relative"}}> {page}/{Math.ceil(tiles.length/pageSize)}</div>
+
 							</div>
 						</div>
 					</div>
