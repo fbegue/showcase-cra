@@ -34,6 +34,23 @@
   top: 5em;
 }
 
+/*testing: shit way to prevent zoom on carousel click (b/c zoomable is broken)*/
+
+.ReactModalPortal{
+  display:none !important;
+}
+
+/*testing: remove shadowy background*/
+[class*="reactCoverCarousel__container"] {
+  background:#e2e2e2;
+  margin-left: -12px !important;
+}
+
+[class*="cover__figure__"] {
+  box-shadow:none;
+}
+
+
 /*testing: my own attempts to customize scrollbar*/
 /*https://css-tricks.com/custom-scrollbars-in-webkit/*/
 
@@ -77,12 +94,15 @@
 }
 
 .defaultGrid {
+
+  /*testing: defaultgrid's height only extends down to cover some of viewpager (the handle)? */
+  /*height: 23em;*/
+
   /*testing: disabling scrollbars here*/
-  height: 23em;
   overflow-y: hidden;
+  overflow-x:hidden;
 
   display: grid;
-  overflow-x:hidden;
   background-color:#8080803b;
   /*grid-template-rows: 350px;*/
   /*grid-template-rows: 4em;*/
@@ -143,7 +163,7 @@
   background: #54a3ff;
   grid-area: stats;
   transition: height 1s ease-out;
-  height:30em;
+  height:20em;
   /*padding-left:.5em;*/
   /*padding-right:.5em;*/
 

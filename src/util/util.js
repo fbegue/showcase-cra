@@ -1270,7 +1270,7 @@ function useProduceData(){
 		if(friendscontrol.families.length > 0){
 			console.log("skip setPieData with familiies selected");
 		}else{
-			// console.log("setPieData",tempPieData);
+			 console.log("setPieData",tempPieData);
 			setPieData(tempPieData);
 		}
 
@@ -1415,10 +1415,13 @@ function useProduceEvents(){
 			function jstr(a){return JSON.parse(JSON.stringify(a))}
 			let  {data_user,data_guest} = chooseData(statcontrol,friendscontrol,tabcontrol,globalState,globalUI)
 
+
 			if(!(statcontrol.mode)){
 				console.log("useProduceEvents skips b/c we're in custom mode");
 			}
-			else if(data_user.length ===0 || data_guest.length ===0 ){
+			//testing: what?
+			// || data_guest.length ===0
+			else if(data_user.length ===0 ){
 				var events = jstr(tables['events']);
 				console.log("$$events init",events.length);
 				EVENTS_VAR(events)
@@ -1526,7 +1529,7 @@ function useProduceEvents(){
 								a.genres.forEach(g =>{
 									genreArtist[g.name] ? genreArtist[g.name].push(r):genreArtist[g.name] = [r]
 									// if(g.id===88){
-									// 	debugger;
+
 									// }
 									genres.push(g)
 								})

@@ -4,12 +4,16 @@ import CardContent from "@material-ui/core/CardContent";
 import Typography from "@material-ui/core/Typography";
 import {GLOBAL_UI_VAR,CHIPGENRESRANKED} from "../storage/withApolloProvider";
 import {Context} from "../storage/Store";
-import {FriendsControl, StatControl} from "../index";
+import {FriendsControl, StatControl, TileSelectControl} from "../index";
 import {useReactiveVar} from "@apollo/react-hooks";
 import Paper from '@material-ui/core/Paper';
 //import GenreChipsSmartRanked from "./chips/GenreChipsSmartRanked";
 //import GenreChipsSmart from "./chips/GenreChipsSmart";
 import BubbleFamilyGenreChips from "./chips/BubbleFamilyGenreChips";
+import ItemCarousel from './ItemCarousel'
+
+//https://www.npmjs.com/package/react-cover-carousel
+import ReactCoverCarousel from 'react-cover-carousel';
 
 function InfoPanel(props) {
 
@@ -26,14 +30,29 @@ function InfoPanel(props) {
 	const [filter, setFilter] = React.useState(null);
 
 	function ListArtists(props){
+
 		return (
 			<div>
 				{props.artists.map((item,i) => (
-					<div key={item.artist.id}>{item.artist.name}</div>
+					<div key={item.artist.id}>{item.artist.name} ({item.value})</div>
 				))}
 			</div>
 		)
 	}
+
+	let tileSelectControl = TileSelectControl.useContainer();
+
+	const handleCarouselItemSelect = (item) =>{
+		console.log("handleTopItemSelect",item);
+		if(tileSelectControl.tile && tileSelectControl.tile.id === item.id){
+			tileSelectControl.setDrawerShowing(false);
+			tileSelectControl.selectTile(null)
+		}else{
+			tileSelectControl.setDrawerShowing(true);
+			tileSelectControl.selectTile(item)
+		}
+	}
+
 
 	function ListTracks(props){
 		return (
@@ -80,8 +99,9 @@ function InfoPanel(props) {
 				var source = globalState[globalUI.user.id + "_tracks_stats"];
 				_statCards.push({
 					label: "Favorite Artists",
-					value: <ListArtists artists={source.artists_top} />,
-					width: "240px"
+					// value: <ListArtists artists={source.artists_top} />,
+				//	value: <ListArtistPanels artists={source.artists_top} />,
+					// width: "240px"
 				})
 
 				//todo: doesn't make any sense if I'm already sorting by latest in table right?
@@ -117,44 +137,75 @@ function InfoPanel(props) {
 
 
 	return(
+		<div>
+			{
+				globalState[globalUI.user.id + "_tracks_stats"] &&
+				<div style={{display:"flex"}}>
+					<div>
+						<div style={{padding:"2px",position:"relative",top:"-10px",color:"white",height:"20px",width:"6.2em"}}>
+							<Paper elevation={3}>
+								<Typography variant="subtitle1">
+									Top Artists
+								</Typography>
+							</Paper>
+						</div>
+						{/*<ListArtistPanels artists={globalState[globalUI.user.id + "_tracks_stats"].artists_top} />*/}
+						<ItemCarousel artists={globalState[globalUI.user.id + "_tracks_stats"].artists_top} handleSelect={handleCarouselItemSelect} />
+					</div>
 
-		<div style={{display:"flex"}}>
-			<div style={{display:"flex",flexDirection:"column"}}>
-				<div style={{height:"5em"}}>
-					{statCards.length > 0 &&
-					<div style={{display:"flex", flexWrap:"wrap",width:"480px"}}>
-						{statCards.map((item,i) => (
-							<div key={i} style={{width:item.width, padding:"5px"}}>
-								<Card>
-									<CardContent>
-										<Typography variant="subtitle1" component={'span'} >{item.label}:{'\u00A0'}</Typography>
-										{/*todo: color should be typo color prop set in MUI theme*/}
-										<Typography variant="subtitle1" component={'span'} ><span style={{color:'#3f51b5'}}>{item.value}</span></Typography>
-									</CardContent>
-								</Card>
-							</div>
-						))}
-					</div>}
+					<div style={{"marginLeft":"-32px","zIndex":"1"}}>
+						<div style={{padding:"2px",position:"relative",top:"-10px",color:"white",height:"20px",width:"6.2em"}}>
+							<Paper elevation={3}>
+								<Typography variant="subtitle1">
+									Top Genres
+								</Typography>
+							</Paper>
+						</div>
+						<BubbleFamilyGenreChips families={[]} familyDisabled={true} occurred={true} clearable={false}  genres={chipGenresRanked} flexDirection={'column'}/>
+						{/*<Paper elevation={3} style={{padding:"3px"}}>*/}
+						{/*	<ChipsArray chipData={genres}/>*/}
+						{/*</Paper>*/}
+					</div>
 				</div>
+			}
+		</div>
 
-			</div>
+		//testing: maybe this stat cards thing wasn't as flexible as I need it to be?
 
-			<div style={{margin:"1em"}}>
-				<div style={{padding:"2px",position:"relative",top:"-10px",color:"white",height:"20px",width:"6.2em"}}>
-					<Paper elevation={3}>
-						<Typography variant="subtitle1">
-							Top Genres
-						</Typography>
-					</Paper>
-				</div>
-				{/*<div style={{marginTop:".5em"}}><GenreChipsSmartRanked chipData={chipGenresRanked}/></div>*/}
-				<BubbleFamilyGenreChips families={[]} familyDisabled={true} occurred={true} clearable={false}  genres={chipGenresRanked} flexDirection={'column'}/>
-
-				{/*<Paper elevation={3} style={{padding:"3px"}}>*/}
-				{/*	<ChipsArray chipData={genres}/>*/}
-				{/*</Paper>*/}
-			</div>
-		</div>)
+		// <div style={{display:"flex"}}>
+		// 	<div style={{height:"5em"}}>
+		// 		{statCards.length > 0 &&
+		// 		<div style={{display:"flex", flexWrap:"wrap"}}>
+		// 			{statCards.map((item,i) => (
+		// 				<div key={i} style={{width:item.width, padding:"5px"}}>
+		// 					<Card>
+		// 						<CardContent>
+		// 							<Typography variant="subtitle1" component={'span'} >{item.label}:{'\u00A0'}</Typography>
+		// 							{/*todo: color should be typo color prop set in MUI theme*/}
+		// 							<Typography variant="subtitle1" component={'span'} ><span style={{color:'#3f51b5'}}>{item.value}</span></Typography>
+		// 						</CardContent>
+		// 					</Card>
+		// 				</div>
+		// 			))}
+		// 		</div>}
+		// 	</div>
+		// 	<div style={{margin:"1em 1em 1em 0em"}}>
+		// 		<div style={{padding:"2px",position:"relative",top:"-10px",color:"white",height:"20px",width:"6.2em"}}>
+		// 			<Paper elevation={3}>
+		// 				<Typography variant="subtitle1">
+		// 					Top Genres
+		// 				</Typography>
+		// 			</Paper>
+		// 		</div>
+		// 		{/*<div style={{marginTop:".5em"}}><GenreChipsSmartRanked chipData={chipGenresRanked}/></div>*/}
+		// 		<BubbleFamilyGenreChips families={[]} familyDisabled={true} occurred={true} clearable={false}  genres={chipGenresRanked} flexDirection={'column'}/>
+		//
+		// 		{/*<Paper elevation={3} style={{padding:"3px"}}>*/}
+		// 		{/*	<ChipsArray chipData={genres}/>*/}
+		// 		{/*</Paper>*/}
+		// 	</div>
+		// </div>
+	)
 }
 export default InfoPanel;
 

@@ -9,9 +9,7 @@ import Dispatch from './api/Dispatch'
 import Player,{} from './components/Player'
 import Profile from './components/Profile'
 import Tabify from './Tabify'
-import EventsList from './EventsList'
-import Stats from "./components/Stats";
-import ContextStats from "./components/ContextStats";
+// import Stats from "./components/Stats";
 
 import Store, {Context} from './storage/Store'
 import withApolloProvider from './storage/withApolloProvider';
@@ -281,12 +279,12 @@ function App(props) {
                                 }
                             </div>
 
-                            {/*todo: hiding for now - but ContextStats doesn't function without something that's happening in there*/}
+                            {/*testing: move to other viewpager*/}
                             {/* style={{minWidth:"40em"}}*/}
-                            <div style={{display: "none"}}
-                                 className={gridControl.statCollapse ? 'stats-collapse' : 'stats'}>
-                                <Stats />
-                            </div>
+                            {/* style={{display: "none"}}*/}
+                            {/*<div className={gridControl.statCollapse ? 'stats-collapse' : 'stats'}>*/}
+                            {/*    <Stats />*/}
+                            {/*</div>*/}
 
 
                             <ViewPager />

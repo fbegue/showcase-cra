@@ -258,9 +258,14 @@ function BubbleFamilyGenreChips(props) {
 
 		{/*className={'genreChipContainer'}*/}
 		{/*note: set height | height:"17em"*/}
-		<div style={{display:"flex",flexDirection:props.flexDirection,flexWrap:"wrap",height:props.height || 'initial'}} >
+		<div style={{display:"flex",flexDirection:props.flexDirection,flexWrap:"wrap",
+			height:props.height || 'initial',alignItems: props.alignItems || "initial",
+			maxWidth: props.maxWidth || 'initial'}} >
+			{props.pre}
 			{_genres.map((gOb,i) =>
-				<div key={i} style={{display:"flex"}} onClick={() =>{handleGClick(gOb)}}>
+				//testing:??
+				//style={{display:"flex"}}
+				<div key={i}  onClick={() =>{handleGClick(gOb)}}>
 					<Chip
 						// className={[classes.chip,"genreChip"].join(' ')}
 						className={classes.chip}

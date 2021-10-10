@@ -18,7 +18,7 @@ import {a, useSpring} from "react-spring";
 import VictoryPieChart from "./Charts/VictoryPieChart";
 import TestComp from "./TestComp"
 import DisplayTile from './tiles/DisplayTile'
-
+import DisplayDetailRow from './tiles/DisplayDetailRow'
 //todo: update spring list implementation
 // import GenresDisplayVertical from "./GenresDisplayVertical";
 import BubbleChart from "./BubbleChart";
@@ -27,6 +27,8 @@ import {FormControl, FormControlLabel, Radio, RadioGroup, Select} from "@materia
 //testing:
 import ContextStats from './ContextStats'
 import BubbleFamilyGenreChips from "./chips/BubbleFamilyGenreChips";
+import Paper from "@material-ui/core/Paper";
+import Typography from "@material-ui/core/Typography";
 
 var detectWrap1= function(className) {
 
@@ -367,9 +369,14 @@ function Stats(props) {
 		// height: "100%"
 		// height: tileSelectControl.isDrawerShowing ? "20em" : "1em",
 		// minWidth:"40em"
-		height: tileSelectControl.isDrawerShowing ? "21em" : "1.5em",
-		minWidth:"44em"
+		//testing: auto-height when showing
+		//height: tileSelectControl.isDrawerShowing ? "21em" : "1.5em",
+		height: tileSelectControl.isDrawerShowing ? 'initial' : "1.5em",
+		minWidth:"23em",
+		paddingTop:".2em",
+		paddingBottom:".2em",
 	});
+	let paperStyle = {padding:".2em .5em .2em .5em",margin:".2em",width:"fit-content"}
 	return(
 
 		<div style={{position:"relative"}}>
@@ -388,26 +395,62 @@ function Stats(props) {
 			{/*</div>*/}
 
 			<div style={{"position":"absolute","top":"0px","left":"0px","zIndex":"6"}}>
+				{/*<button onClick={() =>{gridControl.setStatCollapse(!(gridControl.statCollapse))}}>statCollapse {gridControl.statCollapse.toString()}</button>*/}
+
+				{/*testing: disabled tile detail drawer for now*/}
+				<a.div  style={drawerProps}>
+					<div style={{"position":"absolute","top":"0px","right":"0px","zIndex":"7"}}
+						 onClick={() =>{handleToggleDrawer()}}>
+						{
+							tileSelectControl.isDrawerShowing ? <ExpandLessIcon fontSize={'large'}/>
+								:	<ExpandMoreIcon fontSize={'large'}/>
+						}
+					</div>
+					<div>{
+							tileSelectControl.tile && <div>
+								{
+								tileSelectControl.tile.type === 'artist' ?
+									//todo: feels weird contraining like this here
+									// style={{width:"10em"}}
+									<DisplayDetailRow item={tileSelectControl.tile}/>
+									:
+									<div style={{display:"flex",flexDirection:"column"}}>
+										{tileSelectControl.tile.artists.map((a) =>
+											<div id={a.id} style={{width:"10em"}}>
+												<DisplayDetailRow item={a}/>
+											</div>
+										)}
+									</div>
+							}
+							</div>
+						}
+					</div>
+				</a.div>
+			</div>
+
+
+			{/*testing: permanent display*/}
+			<div style={{"position":"absolute","top":"0px","left":"0px","zIndex":"6",display:"none"}}>
 				<button onClick={() =>{gridControl.setStatCollapse(!(gridControl.statCollapse))}}>statCollapse {gridControl.statCollapse.toString()}</button>
 
 				{/*testing: disabled tile detail drawer for now*/}
-				{/*<a.div  style={drawerProps}>*/}
-				{/*	<div style={{"position":"absolute","top":"0px","right":"0px","zIndex":"7"}}*/}
-				{/*		 onClick={() =>{handleToggleDrawer()}}>*/}
-				{/*		{*/}
-				{/*			tileSelectControl.isDrawerShowing ? <ExpandLessIcon fontSize={'large'}/>*/}
-				{/*			:	<ExpandMoreIcon fontSize={'large'}/>*/}
-				{/*		}*/}
-				{/*	</div>*/}
-				{/*	<div>*/}
-				{/*		/!*<div style={{border: "1px solid black",height:"1em"}}></div>*!/*/}
-				{/*		/!*todo: was thinking this content display was taken care of for me by the drawer but nooooo!?*!/*/}
-				{/*		/!*add delay on fade in*!/*/}
-				{/*		<div style={{display:tileSelectControl.isDrawerShowing ? "initial":"none"}}>*/}
-				{/*			<DisplayTile tile={tileSelectControl.tile}/>*/}
-				{/*		</div>*/}
-				{/*	</div>*/}
-				{/*</a.div>*/}
+				<a.div  style={drawerProps}>
+					<div style={{"position":"absolute","top":"0px","right":"0px","zIndex":"7"}}
+						 onClick={() =>{handleToggleDrawer()}}>
+						{
+							tileSelectControl.isDrawerShowing ? <ExpandLessIcon fontSize={'large'}/>
+								:	<ExpandMoreIcon fontSize={'large'}/>
+						}
+					</div>
+					<div>
+						{/*<div style={{border: "1px solid black",height:"1em"}}></div>*/}
+						{/*todo: was thinking this content display was taken care of for me by the drawer but nooooo!?*/}
+						{/*add delay on fade in*/}
+						<div style={{display:tileSelectControl.isDrawerShowing ? "initial":"none"}}>
+							<DisplayTile tile={tileSelectControl.tile}/>
+						</div>
+					</div>
+				</a.div>
 			</div>
 
 			{/*style={{paddingTop:"1em"}}*/}
@@ -415,99 +458,101 @@ function Stats(props) {
 				{/*<div style={{flexGrow:"1"}}></div>*/}
 				{/*style={{display:"flex",flexDirection:"column"}} */}
 				{/*style={{top: "-4em",position: "relative",height: "21em",zIndex:1}}*/}
-				<div >
+				<div>
 					{/*,"minWidth":"7em"*/}
 					{/*<div style={{"padding":"5px","zIndex":"5","flexGrow":"1","overflowY":"auto","overflowX":"hidden","maxHeight":"23.5em",width:"26em"}}>*/}
 					{/*	<BubbleFamilyGenreChips families={chipFamilies} genres={chipGenres} flexDirection={'row'} clearable={true} seperator={true}/>*/}
 					{/*	/!*<div>{getPointSum(bubbleData)}</div>*!/*/}
 					{/*</div>*/}
 					{/*options={{legend:legend}}*/}
-					<div style={{display:"flex"}} className={gridControl.statCollapse ? 'fadeOut':'fadeIn'}>
+
+					{/*testing: re-enable fading*/}
+					{/*className={gridControl.statCollapse ? 'fadeOut':'fadeIn'}*/}
+					<div style={{display:"flex"}}>
 						{/*{statcontrol.stats.name === 'friends' &&*/}
 
-						<div style={{paddingRight:"1em"}}>
+						{/*todo: re-enable BubbleChart*/}
+						<div style={{paddingRight:"1em",display:"none"}}>
 							{/*size={{height:380, width: friendscontrol.families.length === 0 ? 700:600}}*/}
 							<BubbleChart  options={{...bubbleOptionsGuest,series:bubbleData}}size={{height:400,width:380}} />
 						</div>
 
 						{/*todo: disabled until I can figure out some way to deal with data*/}
-						{/*<div style={{zIndex:2,padding:"5px"}}>*/}
-						{/*	<div style={{display:"flex"}}>*/}
-						{/*		/!*<VennChart data={vennData}/>*!/*/}
-						{/*		<div>*/}
-						{/*			<FormControl component="fieldset">*/}
-						{/*				/!*<FormLabel component="legend">Gender</FormLabel>*!/*/}
-						{/*				<RadioGroup  name="radio1" value={friendscontrol.compare} onChange={handleChange}>*/}
-						{/*					<FormControlLabel value="all" control={<Radio />} label="All" />*/}
-						{/*					<FormControlLabel value="shared" control={<Radio />} label="Shared" />*/}
-						{/*					<FormControlLabel value="user" control={<Radio />} label="User" />*/}
-						{/*					<FormControlLabel value="guest" control={<Radio />} label="Guest" />*/}
-						{/*				</RadioGroup>*/}
-						{/*			</FormControl>*/}
+						<div id={'chart-control'} style={{display1:"flex",display:"none"}}>
+							<div>
+								<FormControl component="fieldset">
+									{/*<FormLabel component="legend">Gender</FormLabel>*/}
+									<RadioGroup  name="radio1" value={friendscontrol.compare} onChange={handleChange}>
+										<FormControlLabel value="all" control={<Radio />} label="All" />
+										<FormControlLabel value="shared" control={<Radio />} label="Shared" />
+										<FormControlLabel value="user" control={<Radio />} label="User" />
+										<FormControlLabel value="guest" control={<Radio />} label="Guest" />
+									</RadioGroup>
+								</FormControl>
 
-						{/*			<Divider />*/}
-						{/*			/!*note: sourceFilter doesn't make sense unless we're tracks,artists*!/*/}
-						{/*			/!*todo: although it would be cool to do playlists = [followed,created]*!/*/}
-						{/*			{(friendscontrol.selectedTabIndex === 1 || friendscontrol.selectedTabIndex === 1) &&*/}
-						{/*			<FormControl component="fieldset">*/}
-						{/*				<RadioGroup  name="radio1" value={friendscontrol.sourceFilter} onChange={handleChange2}>*/}
-						{/*					<FormControlLabel value="both" control={<Radio />} label="Both" />*/}
-						{/*					<FormControlLabel value="saved" control={<Radio />} label="Saved" />*/}
-						{/*					<FormControlLabel value="top" control={<Radio />} label="Top" />*/}
-						{/*				</RadioGroup>*/}
-						{/*			</FormControl>*/}
-						{/*			}*/}
+								<Divider />
+								{/*note: sourceFilter doesn't make sense unless we're tracks,artists*/}
+								{/*todo: although it would be cool to do playlists = [followed,created]*/}
+								{(friendscontrol.selectedTabIndex === 1 || friendscontrol.selectedTabIndex === 1) &&
+								<FormControl component="fieldset">
+									<RadioGroup  name="radio1" value={friendscontrol.sourceFilter} onChange={handleChange2}>
+										<FormControlLabel value="both" control={<Radio />} label="Both" />
+										<FormControlLabel value="saved" control={<Radio />} label="Saved" />
+										<FormControlLabel value="top" control={<Radio />} label="Top" />
+									</RadioGroup>
+								</FormControl>
+								}
 
-						{/*		</div>*/}
-						{/*		/!*<div>*!/*/}
-						{/*		/!*	<Select*!/*/}
-						{/*		/!*		multiple*!/*/}
-						{/*		/!*		native*!/*/}
-						{/*		/!*		value={friendscontrol.families}*!/*/}
-						{/*		/!*		onChange={handleChangeMultiple}*!/*/}
-						{/*		/!*		inputProps={{*!/*/}
-						{/*		/!*			id: 'select-multiple-native',*!/*/}
-						{/*		/!*		}}*!/*/}
-						{/*		/!*	>*!/*/}
-						{/*		/!*		<option key={'all'} value={'all'}>all</option>*!/*/}
-						{/*		/!*		{systemFamilies.map((name) => (*!/*/}
-						{/*		/!*			<option key={name} value={name}>{name}</option>*!/*/}
-						{/*		/!*		))}*!/*/}
+							</div>
+							<div>
+								<Select
+									multiple
+									native
+									value={friendscontrol.families}
+									onChange={handleChangeMultiple}
+									inputProps={{
+										id: 'select-multiple-native',
+									}}
+								>
+									<option key={'all'} value={'all'}>all</option>
+									{systemFamilies.map((name) => (
+										<option key={name} value={name}>{name}</option>
+									))}
 
-						{/*		/!*	</Select>*!/*/}
-						{/*		/!*</div>*!/*/}
-
-						{/*	</div>*/}
-						{/*</div>*/}
-
-						{/*testing: disabled solo user bubble chart*/}
-						{/*{statcontrol.stats.name !== 'friends' &&*/}
-						{/*<BubbleChart  options={{...bubbleOptions,series:bubbleData}}/>*/}
-						{/*}*/}
-					</div>
-					<div className={gridControl.gridClass === 'defaultGrid' ? 'fadeIn':'fadeOut'} style={{"display":"flex"}}>
-
-						<div style={{"padding":"5px","zIndex":"5","flexGrow":"1","overflowY":"auto","overflowX":"hidden","maxHeight":"23.5em","minWidth":"7em"}}>
-							<div><PieGenreChips families={chipFamilies} genres={chipGenres}/></div>
-						</div>
-						<div style={{paddingRight:"1em"}}>
-							<div><PieChart data={{series: {name: 'Genres', colorByPoint: true, data:pieData, animation: {duration: 2000}}}} />
+								</Select>
 							</div>
 						</div>
 
+						{/*testing: re-enable fade*/}
+						{/*className={gridControl.gridClass === 'defaultGrid' ? 'fadeIn':'fadeOut'} */}
+						<div style={{"display":"flex"}}>
+
+							<div>
+								<div>
+									<PieChart data={{series: {name: 'Genres', colorByPoint: true, data:pieData, animation: {duration: 2000}}}} />
+								</div>
+							</div>
+
+							{/*testing: don't know if PieGenreChips really works space-wise on mobile
+							  really it's (supposed to - noticed a small difference) be repeating the content down in*/}
+
+							{/*<div style={{"padding":"5px","zIndex":"5","flexGrow":"1","overflowY":"auto","overflowX":"hidden","maxHeight":"23.5em","minWidth":"7em"}}>*/}
+							{/*	<div><PieGenreChips families={chipFamilies} genres={chipGenres}/></div>*/}
+							{/*</div>*/}
+							{/* style={{paddingRight:"1em"}}*/}
+
+						</div>
 					</div>
+
+					{/*<div><TestTiles /></div>*/}
+
+					{/*testing: disable node display, genres*/}
+					{/*<div style={{right:"5em",position: "relative"}}><NodeDisplay/> </div>*/}
+					{/*<div style={{right:"5em",position: "relative"}}>*/}
+					{/*	/!*<GenresDisplayVertical genres={genres}/> *!/*/}
+					{/*<div>GenresDisplayVertical</div>*/}
+					{/*</div>*/}
 				</div>
-
-				{/*<div><TestTiles /></div>*/}
-
-
-
-				{/*testing: disable node display, genres*/}
-				{/*<div style={{right:"5em",position: "relative"}}><NodeDisplay/> </div>*/}
-				{/*<div style={{right:"5em",position: "relative"}}>*/}
-				{/*	/!*<GenresDisplayVertical genres={genres}/> *!/*/}
-				{/*<div>GenresDisplayVertical</div>*/}
-				{/*</div>*/}
 			</div>
 		</div>
 	)

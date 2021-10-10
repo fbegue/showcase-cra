@@ -43,7 +43,7 @@ function PieChart(props) {
 			plotShadow: false,
 			type: 'pie',
 			height:325,
-			width:500,
+			width:360,
 			margin: [0, 0, 0, 0],
 			animation: {
 				duration: 1500,
@@ -64,9 +64,18 @@ function PieChart(props) {
 				//note: enabling this will mess up multiselect
 				allowPointSelect: false,
 				cursor: 'pointer',
+				//testing: lines w/ pie names
 				dataLabels: {
 					enabled: true,
+
+					//todo: labels enabled / label inside = weird things happen to chart size
+					//just an alternative to a legend somewhere... might just be easier to go with that
+					//https://api.highcharts.com/highcharts/plotOptions.pie.dataLabels
+
+					//https://www.highcharts.com/forum/viewtopic.php?t=42724
+					 distance:-80,
 					format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+					// format: '<b>{point.name}</b>'
 				}
 			},
 			series: {

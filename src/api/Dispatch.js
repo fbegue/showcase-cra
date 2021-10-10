@@ -58,8 +58,8 @@ function Dispatch(props) {
 			//userProms.push(api.getRecentlyPlayedTracks(req))
 			// userProms.push(api.getSavedTracks(req))
 
-			//todo: testing albums back
-			// userProms.push(api.getMySavedAlbums(req))
+			//testing: why the fuck is everything so slow / bombing again? :(
+			 userProms.push(api.getMySavedAlbums(req))
 			var r = await Promise.all(userProms)
 
 			//all these artist's have 'sources' so they all end up in here together
@@ -73,18 +73,27 @@ function Dispatch(props) {
 			var artistsPay = [];
 			artistsPay = artistsPay.concat(r[0]).concat(r[1].artists);
 
-			//todo: what is this getRecentlyPlayedTracks = {tracks:[],artists:[]} ARTISTS here?
-			//ignoring for now...
-
-			//var tracksPay = [];
-			// tracksPay = tracksPay.concat(r[2].tracks).concat(r[3].tracks);
-			//tracksPay = tracksPay.concat(r[3].tracks);
 
 			globalDispatch({type: 'init', payload:{artists:artistsPay,stats:null},user: globalUI.user,context:'artists'});
-			//globalDispatch({type: 'init', payload:{tracks:r[2].tracks,stats:null},user: globalUI.user,context:'tracks'});
-			// globalDispatch({type: 'init', payload:r[2],user: globalUI.user,context:'albums'});
+			 globalDispatch({type: 'init', payload:r[2],user: globalUI.user,context:'albums'});
 			//control.setDataLoaded(true)
 
+
+			//===============================================================
+			//testing: call tracks before staticFetch
+
+			var userProms2 = [];
+			userProms2.push(api.getRecentlyPlayedTracks(req))
+			userProms2.push(api.getSavedTracks(req))
+			let r2 = await Promise.all(userProms2)
+
+			var tracksPay = {tracks:[]};
+
+			//todo: what is this getRecentlyPlayedTracks = {tracks:[],artists:[]} ARTISTS here?
+			tracksPay.tracks = tracksPay.tracks.concat(r2[0].tracks);tracksPay.tracks = tracksPay.tracks.concat(r2[1].tracks);
+			tracksPay.stats = r2[1].stats
+
+			globalDispatch({type: 'init', payload:tracksPay,user: globalUI.user,context:'tracks'});
 
 			//===============================================================
 			//fetch friends profiles + global users
@@ -94,11 +103,10 @@ function Dispatch(props) {
 
 			globalUI.user.related_users.filter(r =>{return r.friend})
 				//testing: Dan only
-				// .filter(r =>{return r.id === "123028477"})
-
+				 //.filter(r =>{return r.id === "123028477"})
 				//.filter(r =>{return r.id !== "123028477"})
-				//.filter(r =>{return r.id !== "123028477#2"})
-			  .filter(r =>{return r.display_name !== "Dustin Reinhart"})
+				.filter(r =>{return r.id === "123028477#2"})
+			 // .filter(r =>{return r.display_name !== "Dustin Reinhart"})
 				.forEach(f =>{
 					friendsProms.push(api.fetchStaticUser( {auth:globalUI,friend:f}))
 				})
@@ -128,17 +136,19 @@ function Dispatch(props) {
 			//===============================================================
 			//testing: call tracks after
 
-			var userProms2 = [];
-			userProms2.push(api.getRecentlyPlayedTracks(req))
-			userProms2.push(api.getSavedTracks(req))
-			let r2 = await Promise.all(userProms2)
-
-			var tracksPay = {tracks:[]};
-			tracksPay.tracks = tracksPay.tracks.concat(r2[0].tracks);tracksPay.tracks = tracksPay.tracks.concat(r2[1].tracks);
-			tracksPay.stats = r2[1].stats
-
-			globalDispatch({type: 'init', payload:tracksPay,user: globalUI.user,context:'tracks'});
-
+			// var userProms2 = [];
+			// userProms2.push(api.getRecentlyPlayedTracks(req))
+			// userProms2.push(api.getSavedTracks(req))
+			// let r2 = await Promise.all(userProms2)
+			//
+			// var tracksPay = {tracks:[]};
+			//
+			// //todo: what is this getRecentlyPlayedTracks = {tracks:[],artists:[]} ARTISTS here?
+			// tracksPay.tracks = tracksPay.tracks.concat(r2[0].tracks);tracksPay.tracks = tracksPay.tracks.concat(r2[1].tracks);
+			// tracksPay.stats = r2[1].stats
+			//
+			// globalDispatch({type: 'init', payload:tracksPay,user: globalUI.user,context:'tracks'});
+			//===============================================================
 
 			return "asyncDispatch finished";
 		}catch(e){
