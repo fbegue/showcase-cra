@@ -373,7 +373,7 @@ var createPlaylist =  function(req){
 
 var getAuth =  function(code){
     return new Promise(function(done, fail) {
-        console.log("code for accessToken fetch",code);
+       // console.log("code for accessToken fetch",code);
         fetch(api_address + '/getAuth', {
             method: 'POST', // *GET, POST, PUT, DELETE, etc.
             mode: 'cors', // no-cors, *cors, same-origin

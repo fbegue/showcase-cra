@@ -205,6 +205,8 @@ function Stats(props) {
 
 	const {bubbleData,pieData,genres} = util.useProduceData()
 
+	console.log("$pie",pieData);
+
 
 	//console.log("Stats | pieData update",pieData);
 	//testing:

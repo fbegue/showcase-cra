@@ -48,6 +48,7 @@ function PieChart(props) {
 			animation: {
 				duration: 1500,
 			},
+			backgroundColor: 'rgba(0,0,0,0)'
 		},
 		title: {text: undefined},
 
