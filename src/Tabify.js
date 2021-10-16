@@ -95,7 +95,6 @@ const useStyles = makeStyles((theme) => ({
 	root: {
 		flexGrow: 1,
 		backgroundColor: "grey"
-
 	}
 }));
 
@@ -533,6 +532,7 @@ export default function Tabify() {
 					onChange={(e,v) =>{handleTabChange(e,v)}}
 					className={classes.root}
 					aria-label="simple tabs example"
+					id={'generated-tabs'}
 				>
 					{toRender.map((tab,i) =>
 						<Tab
@@ -545,6 +545,7 @@ export default function Tabify() {
 					{/*<Tab*/}
 					{/*	label="Albums"*/}
 					{/*/>*/}
+
 				</Tabs>
 			</AppBar>
 		)

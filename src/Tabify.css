@@ -8,15 +8,17 @@
     padding:0px !important;
 }
 .tabs0 .MuiTab-root {
-    min-width:144px !important
+    min-width:110px !important
 }
 
 .tabs1 .MuiContainer-root {
     padding:0px !important;
 }
 .tabs1 .MuiTab-root {
-    min-width:124px !important
+    min-width:110px !important
 }
+
+
 
 .MuiAppBar-colorPrimary {
     background-color:grey

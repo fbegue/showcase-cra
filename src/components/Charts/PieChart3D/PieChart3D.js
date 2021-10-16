@@ -17,8 +17,11 @@ HC_more(Highcharts)
 highcharts3d(Highcharts)
 drilldown(Highcharts)
 
-//name
-//piechart-stacked (broken css grid stack attempt)
+
+//api
+//https://api.highcharts.com/highcharts/plotOptions.pie
+
+//codesandbox: piechart-stacked (broken css grid stack attempt)
 //source
 //https://jsfiddle.net/gspd2ua6/10/
 
@@ -48,6 +51,9 @@ function PieChart3D(props) {
 			//renderTo: 'container',
 			type: 'pie',
 			backgroundColor: 'rgba(0,0,0,0)',
+			//todo: tried to remove all extra white space ala this example
+			//https://www.highcharts.com/forum/viewtopic.php?t=22877
+
 			plotBackgroundColor: null,
 			plotBorderWidth: null,
 			//backgroundColor: 'black',
