@@ -2,7 +2,7 @@ import React, {useState, useEffect, useContext, useRef, useMemo} from 'react';
 import {VictoryPie,VictoryLabel} from "victory";
 import {Context} from "../storage/Store";
 import {useReactiveVar} from "@apollo/react-hooks";
-import {GLOBAL_UI_VAR, TILES,CHIPFAMILIES,CHIPGENRES} from '../storage/withApolloProvider';
+import {GLOBAL_UI_VAR, TILES,CHIPFAMILIES,CHIPGENRES,PIEDATADRILLDOWN,PIEDATA} from '../storage/withApolloProvider';
 import RedoIcon from "@material-ui/icons/Redo";
 import PieChartIcon from "@material-ui/icons/PieChart";
 import CloudIcon from "@material-ui/icons/Cloud";
@@ -14,6 +14,8 @@ import {Control, FriendsControl, TabControl, StatControl, GridControl, TileSelec
 import util from "../util/util";
 import PieGenreChips from "./chips/PieGenreChips";
 import PieChart from "./Charts/PieChart";
+import SocialPairPie from "./Charts/PieChart3D/SocialPairPie";
+
 import {a, useSpring} from "react-spring";
 import VictoryPieChart from "./Charts/VictoryPieChart";
 import TestComp from "./TestComp"
@@ -29,6 +31,7 @@ import ContextStats from './ContextStats'
 import BubbleFamilyGenreChips from "./chips/BubbleFamilyGenreChips";
 import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
+import PieChart3D from "./Charts/PieChart3D/PieChart3D";
 
 var detectWrap1= function(className) {
 
@@ -136,7 +139,8 @@ function Stats(props) {
 
 	const chipFamilies = useReactiveVar(CHIPFAMILIES);
 	const chipGenres = useReactiveVar(CHIPGENRES);
-
+	const pieData = useReactiveVar(PIEDATA);
+	const pieSeriesDrilldown = useReactiveVar(PIEDATADRILLDOWN);
 
 	/*
 	 todo: attempting to only show 1 row of these
@@ -203,9 +207,9 @@ function Stats(props) {
 	//
 	// },[statcontrol.stats.name,statcontrol.mode,highlighter.hoverState, JSON.stringify(globalState.node)]);
 
-	const {bubbleData,pieData,genres} = util.useProduceData()
-
-	console.log("$pie",pieData);
+	// const {bubbleData,pieData,genres} = util.useProduceData()
+	const {bubbleData} = util.useProduceData()
+	//console.log("$pie",pieData);
 
 
 	//console.log("Stats | pieData update",pieData);
@@ -530,8 +534,22 @@ function Stats(props) {
 						<div style={{"display":"flex"}}>
 
 							<div>
+								{/*<div>*/}
+								{/*	<PieChart data={{series: {name: 'Genres', colorByPoint: true, data:pieData, animation: {duration: 2000}}}} />*/}
+								{/*</div>*/}
+								{/*<div>*/}
+								{/*	<SocialPairPie data={{series: {name: 'Genres', colorByPoint: true, data:pieData, animation: {duration: 2000}}}} />*/}
+								{/*</div>*/}
 								<div>
-									<PieChart data={{series: {name: 'Genres', colorByPoint: true, data:pieData, animation: {duration: 2000}}}} />
+									{pieData.length && pieSeriesDrilldown.series.length &&
+									<div  id={'container'} style={{background:"lightblue",zIndex:2,position:"absolute",
+										height:"300px",width:"400px","marginTop":"-6em","marginLeft":"-.5em"}}>
+										{/* animation: {duration: 2000}*/}
+										<PieChart3D series={[{name: 'Families', colorByPoint: true, data:pieData}]}
+													drilldown={pieSeriesDrilldown}/>
+									</div>
+									}
+
 								</div>
 							</div>
 

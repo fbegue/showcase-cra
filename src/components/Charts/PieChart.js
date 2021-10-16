@@ -99,17 +99,6 @@ function PieChart(props) {
 									event.point.select(false,true)
 									return prevState.filter(r =>{return r !== sel})}
 							}));
-
-							// if(!(friendscontrol.families.includes(sel))){
-							// 	friendscontrol.setFamilies((prevState => {
-							// 		console.log("prev",prevState);
-							// 		return [...prevState,sel]
-							// 	}));
-							// }else{
-							// 	friendscontrol.setFamilies((prevState => {return prevState.filter(r =>{return r !== sel}) }));
-							// }
-
-							//
 						}
 					}
 				}

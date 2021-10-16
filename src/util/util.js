@@ -7,7 +7,7 @@ import {families as systemFamilies, familyColors,familyIdMap} from "../families"
 import {Highlighter, StatControl,FriendsControl,Control,TabControl} from "../index";
 import {Context} from "../storage/Store";
 import {useReactiveVar} from "@apollo/react-hooks";
-import {GLOBAL_UI_VAR,TILES,EVENTS_VAR,STATS,CHIPFAMILIES,CHIPGENRES,CHIPGENRESRANKED,CHIPFAMILIESRANKED} from "../storage/withApolloProvider";
+import {GLOBAL_UI_VAR,TILES,EVENTS_VAR,STATS,CHIPFAMILIES,CHIPGENRES,CHIPGENRESRANKED,CHIPFAMILIESRANKED,PIEDATADRILLDOWN,PIEDATA} from "../storage/withApolloProvider";
 import {data1} from './testData'
 const uuid = require('react-uuid')
 
@@ -885,6 +885,7 @@ function useProduceData(){
 
 		/** producePieData
 		 *  @desc read the maps produced above to output pieData respresenting # of artists in each family */
+
 		var producePieData = function(maporarr,key,owner,){
 
 			var map = {};
@@ -1080,6 +1081,7 @@ function useProduceData(){
 		//note: use maps to produce pie and bubble data
 		//for friends, change the input to these produce functions based on friendscontrol.compare
 
+
 		switch(statcontrol.stats.name) {
 			case "artists_top":
 			case "artists_recent":
@@ -1266,11 +1268,12 @@ function useProduceData(){
 		]
 
 
-		//testing:
+		//testing: add drilldown prop
 		if(friendscontrol.families.length > 0){
 			console.log("skip setPieData with familiies selected");
 		}else{
 			 console.log("setPieData",tempPieData);
+			tempPieData.forEach(famOb =>{famOb.drilldown = famOb.name})
 			setPieData(tempPieData);
 		}
 
@@ -1540,7 +1543,6 @@ function useProduceEvents(){
 					}
 				});
 
-
 				//console.log("friendscontrol",friendscontrol);
 
 				//console.log("$$set new chip families/genres");
@@ -1604,7 +1606,6 @@ function useProduceEvents(){
 				console.log("CHIPGENRES",genres);
 				//console.log("CHIPGENRES",genres.length);
 				// console.log(relatedArtist);
-
 
 				if(friendscontrol.families.length > 0){
 					//console.warn("skip CHIPFAMILIES set");
@@ -1689,6 +1690,43 @@ function useProduceEvents(){
 						})
 					}
 				})
+
+				var dataPtr = []
+				var tempPieDataDrilldown = {series: []}
+
+				Object.keys(familyArtist).forEach((fname) =>{
+					var gs = genres.filter(gOb =>{return gOb.family_name === fname});
+					var d = []
+					gs.forEach(gOb =>{
+						d.push([gOb.name,Object.keys(genreArtist[gOb.name]).length])
+					})
+					tempPieDataDrilldown.series.push({name:fname,id:fname,data:d})
+				})
+
+
+				Object.keys(genreArtist).forEach((gname,i) =>{
+					dataPtr.push([gname,Object.keys(genreArtist[gname]).length])
+				})
+
+				//console.log(tempPieDataDrilldown);
+
+				var tempPieData  = [];
+
+				var producePieData = function(map,destArr){
+					Object.keys(map).forEach(fam =>{
+						destArr.push({name:fam,drilldown:fam,id:familyIdMap[fam],y:map[fam].length})
+					});
+					destArr = destArr.sort((a,b) =>{return a.y > b.y})
+				}
+
+				producePieData(familyArtist,tempPieData)
+
+				debugger;
+				console.log("$PIEDATA",PIEDATA);
+				console.log("$PIEDATADRILLDOWN",PIEDATADRILLDOWN);
+				PIEDATA(tempPieData)
+				PIEDATADRILLDOWN(tempPieDataDrilldown)
+
 
 
 				// console.log("friendscontrol.families",friendscontrol.families);

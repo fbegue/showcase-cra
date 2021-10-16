@@ -50,6 +50,10 @@
   box-shadow:none;
 }
 
+/*remove standard blue shading that happens when you select something*/
+body {
+  -webkit-tap-highlight-color: transparent;
+}
 
 /*testing: my own attempts to customize scrollbar*/
 /*https://css-tricks.com/custom-scrollbars-in-webkit/*/
@@ -121,6 +125,10 @@
           /*"events";*/
 }
 
+.layered{
+  z-index: 1;
+}
+
 /*deprecated*/
 /*.friendsGrid {*/
 /*  display: grid;*/
@@ -156,6 +164,7 @@
   grid-area: tabs;
   /*background: red;*/
   transition: width 1s ease-out;
+  z-index: 2;
   /*height:30em;*/
 }
 .stats {
