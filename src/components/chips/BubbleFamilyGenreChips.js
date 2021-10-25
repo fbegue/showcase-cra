@@ -5,7 +5,7 @@ import Chip from "@material-ui/core/Chip";
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import PropTypes from 'prop-types';
 import _ from 'lodash'
-
+//import {PieControl} from "../../index";
 import {familyColors,families as systemFamilies} from '../../families'
 import {FriendsControl,Control} from "../../index";
 const useStyles = makeStyles({
@@ -99,7 +99,10 @@ function BubbleFamilyGenreChips(props) {
 	}else{
 		props.genres.forEach(g =>{
 			if(props.familyDisabled || props.occurred){
-				_genres.push(g)
+				if(!(props.genresDisabled)){
+					_genres.push(g)
+				}
+
 			}else{
 				if(toMap.indexOf(g.family_name) !== -1 && friendscontrol.families.indexOf(g.family_name) !== -1 ){_genres.push(g)}
 			}
@@ -138,6 +141,9 @@ function BubbleFamilyGenreChips(props) {
 	const [color, setColor] = useState(initColorState);
 	const [gcolor, setGColor] = useState(initGColorState);
 
+	//testing:
+	//var piecontrol = PieControl.useContainer()
+
 	const handleClick = (fam) => {
 		//todo: this is a pretty shifty way of getting the value (which I can't set) here...
 		console.log("handleClick", fam);
@@ -146,7 +152,10 @@ function BubbleFamilyGenreChips(props) {
 		if(!(friendscontrol.families.includes(fam))){
 		//if(!(_.find(friendscontrol.families,r =>{return r.id === fam}))){
 			setColor({ ...color, [fam]: map[fam]["clicked"] });
+			//piecontrol.setAllowUpdate(false)
 			friendscontrol.setFamilies((prevState => {return [...prevState,fam] }));
+			//testing:
+
 		}else{
 			setColor({ ...color, [fam]: map[fam]["default"] });
 			friendscontrol.setFamilies((prevState => {return prevState.filter(r =>{return r !== fam}) }));

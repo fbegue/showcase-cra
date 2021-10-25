@@ -43,7 +43,7 @@ function InfoPanel(props) {
 	let tileSelectControl = TileSelectControl.useContainer();
 
 	const handleCarouselItemSelect = (item) =>{
-		console.log("handleTopItemSelect",item);
+		//console.log("handleCarouselItemSelect",item);
 		if(tileSelectControl.tile && tileSelectControl.tile.id === item.id){
 			tileSelectControl.setDrawerShowing(false);
 			tileSelectControl.selectTile(null)

@@ -417,10 +417,11 @@ function ContextStats(props) {
 
 					</div>
 
-					{tabcontrol.section === 2 &&
 					<div>
 						<div style={{"marginLeft":"0em","border":"#e2e2e2 1px solid","borderRadius":"5px",display:"flex",alignItems: "center"}}>
-							{getTabs()}
+							{tabcontrol.section === 2 &&
+							getTabs()
+							}
 							{/*<div style={{flexGrow:"1"}}>{'\u00A0'}</div>*/}
 							<div style={{position:"relative",width:"7em",height:"4em","marginTop":"-.2em"}}>
 								{/*testing :disabled total length for now*/}
@@ -454,7 +455,7 @@ function ContextStats(props) {
 							</div>
 						</div>
 					</div>
-					}
+
 
 					{/*testing: it's either happening really fast or the value isn't changing....*/}
 					{/*{tilesLoading && <div>tilesLoading</div>}*/}

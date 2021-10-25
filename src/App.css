@@ -173,6 +173,7 @@ body {
   grid-area: stats;
   transition: height 1s ease-out;
   height:20em;
+  border:solid red 1px;
   /*padding-left:.5em;*/
   /*padding-right:.5em;*/
 
@@ -199,6 +200,7 @@ body,
 #root {
   height: 100%;
   width: 100%;
+  /*max-width: 20em;*/
   overflow-x: hidden;
   position: absolute;
 }

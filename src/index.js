@@ -125,7 +125,7 @@ function useStats(initialState = 0) {
 let StatControl  = createContainer(useStats);
 
 function useTabs(initialState = 0) {
-     const [section, setActiveSection] = useState(1);
+     const [section, setActiveSection] = useState(2);
     //const [section, setActiveSection] = useState(2);
     const [tab, setActiveTab] = useState(0);
     const [data, setData] = useState('data1');
@@ -169,6 +169,15 @@ function useTileSelect(initialState = 0) {
 }
 let TileSelectControl  = createContainer(useTileSelect);
 
+
+function usePieControl(initialState = 0) {
+    const [angle, setAngle] = useState(180);
+    const [allowUpdate, setAllowUpdate] = useState(true);
+    return { angle,setAngle,allowUpdate, setAllowUpdate}
+
+}
+let PieControl  = createContainer(usePieControl);
+
 const rootElement = document.getElementById("root");
 ReactDOM.render(
     <Control.Provider>
@@ -178,7 +187,9 @@ ReactDOM.render(
                     <GridControl.Provider>
                         <TabControl.Provider>
                             <TileSelectControl.Provider>
-                                <App />
+                                <PieControl.Provider>
+                                    <App />
+                                </PieControl.Provider>
                             </TileSelectControl.Provider>
                         </TabControl.Provider>
                     </GridControl.Provider>
@@ -190,7 +201,7 @@ ReactDOM.render(
 );
 
 export{
-    Control,Highlighter,StatControl,FriendsControl,PaneControl,GridControl,TabControl,TileSelectControl
+    Control,Highlighter,StatControl,FriendsControl,PaneControl,GridControl,TabControl,TileSelectControl,PieControl
 }
 
 //=====================================================

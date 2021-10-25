@@ -1,8 +1,15 @@
 import React, {useState, useEffect, useContext, useRef, useMemo} from 'react';
-import {VictoryPie,VictoryLabel} from "victory";
 import {Context} from "../storage/Store";
 import {useReactiveVar} from "@apollo/react-hooks";
-import {GLOBAL_UI_VAR, TILES,CHIPFAMILIES,CHIPGENRES,PIEDATADRILLDOWN,PIEDATA} from '../storage/withApolloProvider';
+import {
+	GLOBAL_UI_VAR,
+	TILES,
+	CHIPFAMILIES,
+	CHIPGENRES,
+	PIEDATADRILLDOWN,
+	PIEDATA,
+	CHIPGENRESRANKED
+} from '../storage/withApolloProvider';
 import RedoIcon from "@material-ui/icons/Redo";
 import PieChartIcon from "@material-ui/icons/PieChart";
 import CloudIcon from "@material-ui/icons/Cloud";
@@ -10,7 +17,9 @@ import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Divider from '@material-ui/core/Divider';
 import {families as systemFamilies,familyColors} from '../families'
-import {Control, FriendsControl, TabControl, StatControl, GridControl, TileSelectControl} from "../index";
+//FriendsControl
+
+import {Control, TabControl, StatControl, GridControl, TileSelectControl} from "../index";
 import util from "../util/util";
 import PieGenreChips from "./chips/PieGenreChips";
 import PieChart from "./Charts/PieChart";
@@ -21,6 +30,8 @@ import VictoryPieChart from "./Charts/VictoryPieChart";
 import TestComp from "./TestComp"
 import DisplayTile from './tiles/DisplayTile'
 import DisplayDetailRow from './tiles/DisplayDetailRow'
+
+
 //todo: update spring list implementation
 // import GenresDisplayVertical from "./GenresDisplayVertical";
 import BubbleChart from "./BubbleChart";
@@ -32,6 +43,9 @@ import BubbleFamilyGenreChips from "./chips/BubbleFamilyGenreChips";
 import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
 import PieChart3D from "./Charts/PieChart3D/PieChart3D";
+
+//testing: static data
+//import {pieData,pieSeriesDrilldown} from '../data/example/pieData'
 
 var detectWrap1= function(className) {
 
@@ -125,22 +139,30 @@ var flag = 0;
 function Stats(props) {
 
 	// useTraceUpdate(props);
-	let statcontrol = StatControl.useContainer();
-	const [globalState, globalDispatch] = useContext(Context);
+	//let statcontrol = StatControl.useContainer();
+	//const [globalState, globalDispatch] = useContext(Context);
 	// const [pieData, setPieData] = useState([]);
 	// const [genres, setGenres] = useState([]);
 	// const [bubbleData, setBubbleData] = useState([]);
-	const globalUI = useReactiveVar(GLOBAL_UI_VAR);
+	//const globalUI = useReactiveVar(GLOBAL_UI_VAR);
 	//let highlighter = Highlighter.useContainer();
-	let friendscontrol = FriendsControl.useContainer()
+
+	//let friendscontrol = FriendsControl.useContainer()
 	let gridControl = GridControl.useContainer();
 	let tileSelectControl = TileSelectControl.useContainer();
 	//console.log("Stats | tileSelectControl",tileSelectControl);
 
 	const chipFamilies = useReactiveVar(CHIPFAMILIES);
 	const chipGenres = useReactiveVar(CHIPGENRES);
+	const chipGenresRanked = useReactiveVar(CHIPGENRESRANKED);
+
+	//testing: static data (comment out)
 	const pieData = useReactiveVar(PIEDATA);
 	const pieSeriesDrilldown = useReactiveVar(PIEDATADRILLDOWN);
+
+
+	//console.log("Stats | pieData:",pieData);
+	//console.log("Stats | pieSeriesDrilldown:",pieSeriesDrilldown);
 
 	/*
 	 todo: attempting to only show 1 row of these
@@ -150,7 +172,7 @@ function Stats(props) {
 	   I just always show the 'more' button in a element right next to the list which animates the height change or something?
 	*/
 
-	useEffect(() => {
+	//useEffect(() => {
 		//console.log("detectWrap...");
 
 		//testing: only calculates 3 chips wrapping for some reason?
@@ -162,7 +184,7 @@ function Stats(props) {
 
 		//testing: container doesn't see items in it
 		//detectWrap2('genreChipContainer');
-	},[chipGenres]);
+	//},[chipGenres]);
 
 
 	var doc = document.documentElement.style;
@@ -210,23 +232,18 @@ function Stats(props) {
 	// const {bubbleData,pieData,genres} = util.useProduceData()
 	const {bubbleData} = util.useProduceData()
 	//console.log("$pie",pieData);
-
-
 	//console.log("Stats | pieData update",pieData);
-	//testing:
-	//pieData.forEach((d ,i)=>{d.id=i++})
 
 
-	//testing:
+	//testing: wait why?
 	util.useProduceEvents()
 	//const bubbleData = [];const pieData = [];const genres = []
 
 	// console.log("useProduceData:pieData",pieData);
 	//---------------------------------------------------------------------
-	var options = {rotations:0,deterministic:true}
+	//var options = {rotations:0,deterministic:true}
 	//false = pie, true = bubble
 	//const [view, setView] = React.useState(true);
-
 
 
 	//------------------------------------------------------
@@ -301,14 +318,14 @@ function Stats(props) {
 	let tabcontrol = TabControl.useContainer();
 
 	//testing:
-	const { data:bubbleData2} = util.useTestBubbles()
-	//console.log("Stats | bubbleData2",bubbleData2);
-
-	function setbubble(){
-		console.log("setbubble");
-		const rndInt = Math.floor(Math.random() * 99999) + 1
-		tabcontrol.setData('data' + rndInt)
-	}
+	// const { data:bubbleData2} = util.useTestBubbles()
+	// //console.log("Stats | bubbleData2",bubbleData2);
+	//
+	// function setbubble(){
+	// 	console.log("setbubble");
+	// 	const rndInt = Math.floor(Math.random() * 99999) + 1
+	// 	tabcontrol.setData('data' + rndInt)
+	// }
 
 
 	//------------------------------------------------------
@@ -320,30 +337,31 @@ function Stats(props) {
 	// 	console.log();
 	// }
 
-	const handleChange = (event) => {
-		friendscontrol.setCompare(event.target.value);
-	};
-	const handleChange2 = (event) => {
-		friendscontrol.setSourceFilter(event.target.value);
-	};
-
-	const handleChangeMultiple = (event) => {
-		const { options } = event.target;
-		console.log("$options",options);
-
-		if(options[0].selected){
-			friendscontrol.setFamilies([]);
-		}
-		else{
-			const value = [];
-			for (let i = 0, l = options.length; i < l; i += 1) {
-				if (options[i].selected) {
-					value.push(options[i].value);
-				}
-			}
-			friendscontrol.setFamilies(value);
-		}
-	};
+	//testing: disabled trying to diagnose pie rerender
+	// const handleChange = (event) => {
+	// 	friendscontrol.setCompare(event.target.value);
+	// };
+	// const handleChange2 = (event) => {
+	// 	friendscontrol.setSourceFilter(event.target.value);
+	// };
+	//
+	// const handleChangeMultiple = (event) => {
+	// 	const { options } = event.target;
+	// 	console.log("$options",options);
+	//
+	// 	if(options[0].selected){
+	// 		friendscontrol.setFamilies([]);
+	// 	}
+	// 	else{
+	// 		const value = [];
+	// 		for (let i = 0, l = options.length; i < l; i += 1) {
+	// 			if (options[i].selected) {
+	// 				value.push(options[i].value);
+	// 			}
+	// 		}
+	// 		friendscontrol.setFamilies(value);
+	// 	}
+	// };
 
 	// useEffect(() => {
 	// 	globalDispatch({type: 'update', payload: null,context:'events',
@@ -365,6 +383,8 @@ function Stats(props) {
 		tileSelectControl.setDrawerShowing(false);
 	};
 
+	const [toggle, setToggle] = useState(false);
+
 	const drawerProps = useSpring({
 		// top: show ? 200 : 0,
 		position: "absolute",
@@ -375,35 +395,34 @@ function Stats(props) {
 		// height: "100%"
 		// height: tileSelectControl.isDrawerShowing ? "20em" : "1em",
 		// minWidth:"40em"
-		//testing: auto-height when showing
+		//todo: spring won't function w/out specified height, but want auto-height of content when showing
 		//height: tileSelectControl.isDrawerShowing ? "21em" : "1.5em",
-		height: tileSelectControl.isDrawerShowing ? 'initial' : "1.5em",
+		//testing: don't work: initial,unset,revert,minContent
+		height: tileSelectControl.isDrawerShowing ? 'min-content' : "1.5em",
 		minWidth:"23em",
 		paddingTop:".2em",
 		paddingBottom:".2em",
 	});
 	let paperStyle = {padding:".2em .5em .2em .5em",margin:".2em",width:"fit-content"}
+
+
+
 	return(
 
 		<div style={{position:"relative"}}>
+			{/*todo: disabled friendscontrol.compare /statcontrol.setchart toggles*/}
 			{/*<div style={{"position":"absolute","top":"-40px","left":"0px","zIndex":"30"}}>*/}
 			{/*	{statcontrol.stats.name}*/}
 			{/*	<button  onClick={() =>{statcontrol.setMode(!statcontrol.mode)}}>{statcontrol.mode ===  true? 'Context':'Custom'}*/}
-			{/*	</button>*/}
-			{/*	<button onClick={checkState}>checkState</button>*/}
-			{/*	<button onClick={setbubble}>setbubble</button>*/}
-			{/*	/!*<button onClick={checkProviders}>checkProviders</button>*!/*/}
-			{/*	/!*<button  onClick={() =>{friendscontrol.setCompare(!friendscontrol.compare)}}>{friendscontrol.compare ===  true? 'Both':'Difference'}</button>*!/*/}
-			{/*	<RedoIcon fontSize={'small'}/>*/}
+			{/*	</button>*/}{/*	<RedoIcon fontSize={'small'}/>*/}
 			{/*	<button onClick={() =>{statcontrol.setChart(!statcontrol.chart)}}>*/}
 			{/*		{statcontrFol.chart ? <PieChartIcon fontSize={'small'}/>:<CloudIcon fontSize={'small'}/>}*/}
 			{/*	</button>*/}
 			{/*</div>*/}
 
-			<div style={{"position":"absolute","top":"0px","left":"0px","zIndex":"6"}}>
+			<div id={'drawer'} style={{"position":"absolute","top":"0px","left":"0px","zIndex":"6"}}>
 				{/*<button onClick={() =>{gridControl.setStatCollapse(!(gridControl.statCollapse))}}>statCollapse {gridControl.statCollapse.toString()}</button>*/}
 
-				{/*testing: disabled tile detail drawer for now*/}
 				<a.div  style={drawerProps}>
 					<div style={{"position":"absolute","top":"0px","right":"0px","zIndex":"7"}}
 						 onClick={() =>{handleToggleDrawer()}}>
@@ -435,29 +454,27 @@ function Stats(props) {
 			</div>
 
 
-			{/*testing: permanent display*/}
-			<div style={{"position":"absolute","top":"0px","left":"0px","zIndex":"6",display:"none"}}>
-				<button onClick={() =>{gridControl.setStatCollapse(!(gridControl.statCollapse))}}>statCollapse {gridControl.statCollapse.toString()}</button>
-
-				{/*testing: disabled tile detail drawer for now*/}
-				<a.div  style={drawerProps}>
-					<div style={{"position":"absolute","top":"0px","right":"0px","zIndex":"7"}}
-						 onClick={() =>{handleToggleDrawer()}}>
-						{
-							tileSelectControl.isDrawerShowing ? <ExpandLessIcon fontSize={'large'}/>
-								:	<ExpandMoreIcon fontSize={'large'}/>
-						}
-					</div>
-					<div>
-						{/*<div style={{border: "1px solid black",height:"1em"}}></div>*/}
-						{/*todo: was thinking this content display was taken care of for me by the drawer but nooooo!?*/}
-						{/*add delay on fade in*/}
-						<div style={{display:tileSelectControl.isDrawerShowing ? "initial":"none"}}>
-							<DisplayTile tile={tileSelectControl.tile}/>
-						</div>
-					</div>
-				</a.div>
-			</div>
+			{/*testing: disabled permanent display*/}
+							{/*<div style={{"position":"absolute","top":"0px","left":"0px","zIndex":"6"}}>*/}
+						{/*	<button onClick={() =>{gridControl.setStatCollapse(!(gridControl.statCollapse))}}>statCollapse {gridControl.statCollapse.toString()}</button>*/}
+						{/*	<a.div  style={drawerProps}>*/}
+						{/*		<div style={{"position":"absolute","top":"0px","right":"0px","zIndex":"7"}}*/}
+						{/*			 onClick={() =>{handleToggleDrawer()}}>*/}
+						{/*			{*/}
+						{/*				tileSelectControl.isDrawerShowing ? <ExpandLessIcon fontSize={'large'}/>*/}
+						{/*					:	<ExpandMoreIcon fontSize={'large'}/>*/}
+						{/*			}*/}
+						{/*		</div>*/}
+						{/*		<div>*/}
+						{/*			/!*<div style={{border: "1px solid black",height:"1em"}}></div>*!/*/}
+						{/*			/!*todo: was thinking this content display was taken care of for me by the drawer but nooooo!?*!/*/}
+						{/*			/!*add delay on fade in*!/*/}
+						{/*			<div style={{display:tileSelectControl.isDrawerShowing ? "initial":"none"}}>*/}
+						{/*				<DisplayTile tile={tileSelectControl.tile}/>*/}
+						{/*			</div>*/}
+						{/*		</div>*/}
+						{/*	</a.div>*/}
+						{/*</div>*/}
 
 			{/*style={{paddingTop:"1em"}}*/}
 			<div >
@@ -472,94 +489,120 @@ function Stats(props) {
 					{/*</div>*/}
 					{/*options={{legend:legend}}*/}
 
-					{/*testing: re-enable fading*/}
+					{/*testing: re-enable content fading*/}
 					{/*className={gridControl.statCollapse ? 'fadeOut':'fadeIn'}*/}
 					<div style={{display:"flex"}}>
+
+				        {/*note: big fold	*/}
 						{/*{statcontrol.stats.name === 'friends' &&*/}
-
 						{/*todo: re-enable BubbleChart*/}
-						<div style={{paddingRight:"1em",display:"none"}}>
-							{/*size={{height:380, width: friendscontrol.families.length === 0 ? 700:600}}*/}
-							<BubbleChart  options={{...bubbleOptionsGuest,series:bubbleData}}size={{height:400,width:380}} />
-						</div>
+						{/*<div style={{paddingRight:"1em"}}>*/}
+						{/*	/!*size={{height:380, width: friendscontrol.families.length === 0 ? 700:600}}*!/*/}
+						{/*	<BubbleChart  options={{...bubbleOptionsGuest,series:bubbleData}}size={{height:400,width:380}} />*/}
+						{/*</div>*/}
 
-						{/*todo: disabled until I can figure out some way to deal with data*/}
-						<div id={'chart-control'} style={{display1:"flex",display:"none"}}>
-							<div>
-								<FormControl component="fieldset">
-									{/*<FormLabel component="legend">Gender</FormLabel>*/}
-									<RadioGroup  name="radio1" value={friendscontrol.compare} onChange={handleChange}>
-										<FormControlLabel value="all" control={<Radio />} label="All" />
-										<FormControlLabel value="shared" control={<Radio />} label="Shared" />
-										<FormControlLabel value="user" control={<Radio />} label="User" />
-										<FormControlLabel value="guest" control={<Radio />} label="Guest" />
-									</RadioGroup>
-								</FormControl>
+						{/*todo: disabled chart controls (friendscontrol.compare, sources)
+						until I can figure out some way to deal with data*/}
+						{/*<div id={'chart-control'} style={{display1:"flex"}}>*/}
+						{/*	<div>*/}
+						{/*		<FormControl component="fieldset">*/}
+						{/*			/!*<FormLabel component="legend">Gender</FormLabel>*!/*/}
+						{/*			<RadioGroup  name="radio1" value={friendscontrol.compare} onChange={handleChange}>*/}
+						{/*				<FormControlLabel value="all" control={<Radio />} label="All" />*/}
+						{/*				<FormControlLabel value="shared" control={<Radio />} label="Shared" />*/}
+						{/*				<FormControlLabel value="user" control={<Radio />} label="User" />*/}
+						{/*				<FormControlLabel value="guest" control={<Radio />} label="Guest" />*/}
+						{/*			</RadioGroup>*/}
+						{/*		</FormControl>*/}
 
-								<Divider />
-								{/*note: sourceFilter doesn't make sense unless we're tracks,artists*/}
-								{/*todo: although it would be cool to do playlists = [followed,created]*/}
-								{(friendscontrol.selectedTabIndex === 1 || friendscontrol.selectedTabIndex === 1) &&
-								<FormControl component="fieldset">
-									<RadioGroup  name="radio1" value={friendscontrol.sourceFilter} onChange={handleChange2}>
-										<FormControlLabel value="both" control={<Radio />} label="Both" />
-										<FormControlLabel value="saved" control={<Radio />} label="Saved" />
-										<FormControlLabel value="top" control={<Radio />} label="Top" />
-									</RadioGroup>
-								</FormControl>
-								}
+						{/*		<Divider />*/}
+						{/*		/!*note: sourceFilter doesn't make sense unless we're tracks,artists*!/*/}
+						{/*		/!*todo: although it would be cool to do playlists = [followed,created]*!/*/}
+						{/*		{(friendscontrol.selectedTabIndex === 1 || friendscontrol.selectedTabIndex === 1) &&*/}
+						{/*		<FormControl component="fieldset">*/}
+						{/*			<RadioGroup  name="radio1" value={friendscontrol.sourceFilter} onChange={handleChange2}>*/}
+						{/*				<FormControlLabel value="both" control={<Radio />} label="Both" />*/}
+						{/*				<FormControlLabel value="saved" control={<Radio />} label="Saved" />*/}
+						{/*				<FormControlLabel value="top" control={<Radio />} label="Top" />*/}
+						{/*			</RadioGroup>*/}
+						{/*		</FormControl>*/}
+						{/*		}*/}
 
-							</div>
-							<div>
-								<Select
-									multiple
-									native
-									value={friendscontrol.families}
-									onChange={handleChangeMultiple}
-									inputProps={{
-										id: 'select-multiple-native',
-									}}
-								>
-									<option key={'all'} value={'all'}>all</option>
-									{systemFamilies.map((name) => (
-										<option key={name} value={name}>{name}</option>
-									))}
+						{/*	</div>*/}
+						{/*	<div>*/}
+						{/*		<Select*/}
+						{/*			multiple*/}
+						{/*			native*/}
+						{/*			value={friendscontrol.families}*/}
+						{/*			onChange={handleChangeMultiple}*/}
+						{/*			inputProps={{*/}
+						{/*				id: 'select-multiple-native',*/}
+						{/*			}}*/}
+						{/*		>*/}
+						{/*			<option key={'all'} value={'all'}>all</option>*/}
+						{/*			{systemFamilies.map((name) => (*/}
+						{/*				<option key={name} value={name}>{name}</option>*/}
+						{/*			))}*/}
 
-								</Select>
-							</div>
-						</div>
+						{/*		</Select>*/}
+						{/*	</div>*/}
+						{/*</div>*/}
 
 						{/*testing: re-enable fade*/}
 						{/*className={gridControl.gridClass === 'defaultGrid' ? 'fadeIn':'fadeOut'} */}
-						<div style={{"display":"flex"}}>
 
-							<div>
+						{/*todo: something odd going on with placement of entire stats = marginTops*/}
+						<div style={{"display":"flex",flexDirection:"column"}}>
+
+							<div style={{"padding":"5px","zIndex":"5","flexGrow":"1","overflowY":"auto","overflowX":"hidden","maxHeight":"23.5em","minWidth":"7em",marginTop:"2em"}}>
+								{/*<div><PieGenreChips families={chipFamilies} genres={chipGenres}/></div>*/}
+								{/*familyDisabled={false}*/}
+								<BubbleFamilyGenreChips families={chipFamilies} genresDisabled={true} occurred={true} clearable={true}  genres={chipGenresRanked} flexDirection={'row'}/>
+							</div>
+
+							{/*note: need this for flex-column to work*/}
+							<div style={{minHeight:"14em",marginTop:"-8em"}}>
 								{/*<div>*/}
 								{/*	<PieChart data={{series: {name: 'Genres', colorByPoint: true, data:pieData, animation: {duration: 2000}}}} />*/}
 								{/*</div>*/}
-								{/*<div>*/}
-								{/*	<SocialPairPie data={{series: {name: 'Genres', colorByPoint: true, data:pieData, animation: {duration: 2000}}}} />*/}
-								{/*</div>*/}
+
 								<div>
-									{pieData.length && pieSeriesDrilldown.series.length &&
+									{tabcontrol.section === 1 &&
 									<div  id={'container'} style={{background:"lightblue",zIndex:2,position:"absolute",
-										height:"300px",width:"400px","marginTop":"-6em","marginLeft":"-.5em"}}>
+										height:"300px",
+										 width:"21em",
+										"marginLeft":"-.5em",
+									marginTop:"-5em"}}>
 										{/* animation: {duration: 2000}*/}
-										<PieChart3D series={[{name: 'Families', colorByPoint: true, data:pieData}]}
+										{/*todo: toggleing here rerenders child PieChart, which can cause it to lose drillddown state?*/}
+										<div onClick={() =>{setToggle(!(toggle))}} style={{border: toggle ? "1px solid red":"1px solid blue"}}>
+											{/*toggle {toggle}*/}
+										<PieChart3D series={[{name: 'Families-User', colorByPoint: true, data:pieData}]}
 													drilldown={pieSeriesDrilldown}/>
+										</div>
 									</div>
 									}
 
+									{tabcontrol.section === 2 &&
+
+									<div>
+										{/*data={{series: {name: 'Genres', colorByPoint: true, data:pieData, animation: {duration: 2000}}}}*/}
+
+										<SocialPairPie  />
+									</div>
+									//
+									// <div  id={'container'} style={{background:"lightblue",zIndex:2,position:"absolute",
+									// 	height:"300px",
+									// 	width:"21em",
+									// 	"marginTop":"-5em","marginLeft":"-.5em"}}>
+									// 	{/* animation: {duration: 2000}*/}
+									// 	<PieChart3D series={[{name: 'Families', colorByPoint: true, data:pieData}]}
+									// 				drilldown={pieSeriesDrilldown}/>
+									// </div>
+
+									}
 								</div>
 							</div>
-
-							{/*testing: don't know if PieGenreChips really works space-wise on mobile
-							  really it's (supposed to - noticed a small difference) be repeating the content down in*/}
-
-							{/*<div style={{"padding":"5px","zIndex":"5","flexGrow":"1","overflowY":"auto","overflowX":"hidden","maxHeight":"23.5em","minWidth":"7em"}}>*/}
-							{/*	<div><PieGenreChips families={chipFamilies} genres={chipGenres}/></div>*/}
-							{/*</div>*/}
-							{/* style={{paddingRight:"1em"}}*/}
 
 						</div>
 					</div>

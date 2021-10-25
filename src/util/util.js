@@ -1,13 +1,16 @@
 /* eslint-disable no-unused-expressions */
+import Highcharts from 'highcharts'
 import _ from "lodash";
 // import ChipsArray from "../components/utility/ChipsArray";
 import React, {useContext,useState,useEffect} from "react";
 import tables from "../storage/tables";
 import {families as systemFamilies, familyColors,familyIdMap} from "../families";
-import {Highlighter, StatControl,FriendsControl,Control,TabControl} from "../index";
+import {Highlighter, StatControl,FriendsControl,Control,TabControl,PieControl} from "../index";
 import {Context} from "../storage/Store";
 import {useReactiveVar} from "@apollo/react-hooks";
-import {GLOBAL_UI_VAR,TILES,EVENTS_VAR,STATS,CHIPFAMILIES,CHIPGENRES,CHIPGENRESRANKED,CHIPFAMILIESRANKED,PIEDATADRILLDOWN,PIEDATA} from "../storage/withApolloProvider";
+import {GLOBAL_UI_VAR,TILES,EVENTS_VAR,STATS,CHIPFAMILIES,CHIPGENRES,
+	CHIPGENRESRANKED,CHIPFAMILIESRANKED,PIEDATADRILLDOWN,PIEDATA,PIEDATAGUEST,PIEDATADRILLDOWNGUEST} from "../storage/withApolloProvider";
+
 import {data1} from './testData'
 const uuid = require('react-uuid')
 
@@ -1268,15 +1271,6 @@ function useProduceData(){
 		]
 
 
-		//testing: add drilldown prop
-		if(friendscontrol.families.length > 0){
-			console.log("skip setPieData with familiies selected");
-		}else{
-			 console.log("setPieData",tempPieData);
-			tempPieData.forEach(famOb =>{famOb.drilldown = famOb.name})
-			setPieData(tempPieData);
-		}
-
 		setGenres(_genres)
 
 		//================================================
@@ -1315,6 +1309,7 @@ function useProduceData(){
 		//_tiles = _tiles.slice(0,10)
 
 		//pretty sure this is for initialization?
+
 		if(tiles.length === 0){
 			console.log("tiles init");
 			TILES(_tiles);
@@ -1391,6 +1386,7 @@ function useProduceData(){
 	return {bubbleData:bubbleData,pieData:pieData,genres:genres,vennData:vennData,friendStats:friendStats}
 }
 
+var lastTab = null;
 function useProduceEvents(){
 
 	let control = Control.useContainer();
@@ -1398,7 +1394,12 @@ function useProduceEvents(){
 	//let highlighter = Highlighter.useContainer();
 	let friendscontrol = FriendsControl.useContainer()
 	let tabcontrol = TabControl.useContainer()
+	var piecontrol = PieControl.useContainer()
 	const globalUI = useReactiveVar(GLOBAL_UI_VAR);
+	const piedata = useReactiveVar(PIEDATA);
+	const piedatadrilldown = useReactiveVar(PIEDATADRILLDOWN);
+	const piedataguest = useReactiveVar(PIEDATAGUEST);
+	const piedatadrilldownguest = useReactiveVar(PIEDATADRILLDOWNGUEST);
 
 	const [globalState, globalDispatch] = useContext(Context);
 	//const events = useReactiveVar(EVENTS_VAR);
@@ -1422,7 +1423,7 @@ function useProduceEvents(){
 			if(!(statcontrol.mode)){
 				console.log("useProduceEvents skips b/c we're in custom mode");
 			}
-			//testing: what?
+				//testing: what?
 			// || data_guest.length ===0
 			else if(data_user.length ===0 ){
 				var events = jstr(tables['events']);
@@ -1459,7 +1460,11 @@ function useProduceEvents(){
 					let {artists_user,artists_guest} = getFriendsArtists(map_user,map_guest)
 
 					//note: copied from above, just w/out setting bubbles,pie and tiles
-					switch (friendscontrol.compare) {
+					//note: recall object will have both "owner"(string) and "shared" (boolean)
+
+					//testing: force all
+					// switch (friendscontrol.compare) {
+					switch ('all') {
 						case 'all':
 							dataset = _.uniqBy(artists_user.concat(artists_guest),'id')
 							break;
@@ -1468,6 +1473,7 @@ function useProduceEvents(){
 							//var uniqAll = _.uniqBy(artists_user.concat(artists_guest),'id')
 							break;
 						case 'shared':
+
 							dataset = _.uniqBy(artists_user.concat(artists_guest),'id').filter(r =>{return r.shared})
 							break;
 						case 'user':
@@ -1483,6 +1489,23 @@ function useProduceEvents(){
 
 				var familyArtist = {};
 				var genreArtist  = {};
+
+				//todo: noooo hold on you can't compare folks if your always in SHARED mode duh
+				//need to restore friendscontrol.compare == all versus shared
+				//for all, dataset for events filtering stays the same, but now
+				//we need to produce a 2nd set of family/genre (pie/drill) values
+
+				var familyArtistGuest = {};
+				var genreArtistGuest  = {};
+				var familyArtistUser= {};
+				var genreArtistUser  = {};
+				var targets = {
+					'user_family':familyArtistUser,
+					'user_genre':genreArtistUser,
+					'guest_family':familyArtistGuest,
+					'guest_genre':genreArtistGuest,
+
+				}
 				//id of every primary artist's related_artist, mapped to the primary
 				var relatedArtist = {};
 				var allArtist = {};
@@ -1506,13 +1529,31 @@ function useProduceEvents(){
 				//they definitely have crossover but big difference obviously is that this dataset is COMBINED while useProduceData
 				//keeps them seperate
 
+
 				dataset.forEach(r =>{
-					if(r.type === 'artist'){
+					if(r.type === 'artist') {
 
-
+						//todo: will fail for 'shared' ...for some reason
 						familyArtist[r.familyAgg] ? familyArtist[r.familyAgg].push(r):familyArtist[r.familyAgg] = [r]
+						if(r.shared){
+							targets["user" + "_family"][r.familyAgg] ?	targets["user" + "_family"][r.familyAgg].push(r):	targets["user" + "_family"][r.familyAgg] = [r]
+							targets["guest" + "_family"][r.familyAgg] ? 	targets["guest" + "_family"][r.familyAgg].push(r):	targets["guest" + "_family"][r.familyAgg] = [r]
+						}else{
+							targets[r.owner + "_family"][r.familyAgg] ? targets[r.owner + "_family"][r.familyAgg].push(r):targets[r.owner + "_family"][r.familyAgg] = [r]
+
+						}
+
+
 						r.genres.forEach(g =>{
 							genreArtist[g.name] ? genreArtist[g.name].push(r):genreArtist[g.name] = [r]
+							if(r.shared){
+								targets["user" + "_genre"][g.name] ? 	targets["user" + "_genre"][g.name].push(r):targets["user" + "_genre"][g.name] = [r]
+								targets["guest" + "_genre"][g.name] ? 	targets["guest" + "_genre"][g.name].push(r):targets["guest" + "_genre"][g.name] = [r]
+							}else{
+								targets[r.owner + "_genre"][g.name] ? 	targets[r.owner + "_genre"][g.name].push(r):targets[r.owner + "_genre"][g.name] = [r]
+
+							}
+
 							// if(g.id===88){
 							// }
 							genres.push(g)
@@ -1520,7 +1561,9 @@ function useProduceEvents(){
 						//allArtist[r] ? allArtist[r] = r:allArtist[r]
 						allArtist[r.id] = r
 						//processRelated(r)
-					}else if(r.type === 'playlist' || r.type === 'track' || r.type === 'album'){
+					}
+					//testing: add targets
+					else if(r.type === 'playlist' || r.type === 'track' || r.type === 'album'){
 						//todo: we're not doing any weighting on the artist's ratio of tracks here
 						//so just one song from one genre from one family get in
 						r.artists.forEach(a =>{
@@ -1531,9 +1574,6 @@ function useProduceEvents(){
 							else{
 								a.genres.forEach(g =>{
 									genreArtist[g.name] ? genreArtist[g.name].push(r):genreArtist[g.name] = [r]
-									// if(g.id===88){
-
-									// }
 									genres.push(g)
 								})
 							}
@@ -1548,6 +1588,8 @@ function useProduceEvents(){
 				//console.log("$$set new chip families/genres");
 				// console.log("CHIPFAMILIES",Object.keys(familyArtist));
 				//console.log("CHIPFAMILIES",Object.keys(familyArtist).length);
+
+
 
 				function makeGenreRank(genres){
 					//note: think I overmapped this guy but its fine!
@@ -1691,41 +1733,119 @@ function useProduceEvents(){
 					}
 				})
 
-				var dataPtr = []
+
+
 				var tempPieDataDrilldown = {series: []}
+				var tempPieDataDrilldownGuest = {series: []}
 
-				Object.keys(familyArtist).forEach((fname) =>{
-					var gs = genres.filter(gOb =>{return gOb.family_name === fname});
-					var d = []
-					gs.forEach(gOb =>{
-						d.push([gOb.name,Object.keys(genreArtist[gOb.name]).length])
+				// Object.keys(familyArtist).forEach((fname) =>{
+				// 	var gs = genres.filter(gOb =>{return gOb.family_name === fname});
+				// 	var d = []
+				// 	gs.forEach(gOb =>{
+				// 		d.push([gOb.name,Object.keys(genreArtist[gOb.name]).length])
+				// 	})
+				// 	tempPieDataDrilldown.series.push({name:fname,id:fname,data:d})
+				// })
+
+				var getDrilldownData = (fmap,gmap,drilldown) =>{
+					Object.keys(fmap).forEach((fname) =>{
+						var gs = genres.filter(gOb =>{return gOb.family_name === fname});
+						var d = []
+						gs.forEach(gOb =>{
+							//because genres is the entire list for both users, it's possible
+							//the inputed user's map doesn't have an entry for it
+							gmap[gOb.name] ? d.push([gOb.name,Object.keys(gmap[gOb.name]).length]):{}
+						})
+						d.sort((a,b) =>{return  b[1] - a[1]})
+
+						//todo: bandaid (1) (null shouldn't be here)
+						if(fname !== 'null'){
+							drilldown.series.push({name:fname,id:fname,data:d})
+						}
+
 					})
-					tempPieDataDrilldown.series.push({name:fname,id:fname,data:d})
-				})
+				}
 
+				getDrilldownData(familyArtist,genreArtist,tempPieDataDrilldown)
 
-				Object.keys(genreArtist).forEach((gname,i) =>{
-					dataPtr.push([gname,Object.keys(genreArtist[gname]).length])
-				})
-
-				//console.log(tempPieDataDrilldown);
+				getDrilldownData(familyArtistGuest,genreArtistGuest,tempPieDataDrilldownGuest)
 
 				var tempPieData  = [];
+				var tempPieDataGuest  = [];
 
 				var producePieData = function(map,destArr){
 					Object.keys(map).forEach(fam =>{
-						destArr.push({name:fam,drilldown:fam,id:familyIdMap[fam],y:map[fam].length})
+						//todo: bandaid (2) (null shouldn't be here)
+						if(fam !== 'null'){
+							destArr.push({name:fam,drilldown:fam,id:familyIdMap[fam],y:map[fam].length})
+						}
 					});
-					destArr = destArr.sort((a,b) =>{return a.y > b.y})
+					destArr.sort((a,b) =>{return  b.y - a.y})
 				}
 
 				producePieData(familyArtist,tempPieData)
+				producePieData(familyArtistGuest,tempPieDataGuest)
 
-				debugger;
-				console.log("$PIEDATA",PIEDATA);
-				console.log("$PIEDATADRILLDOWN",PIEDATADRILLDOWN);
-				PIEDATA(tempPieData)
-				PIEDATADRILLDOWN(tempPieDataDrilldown)
+
+
+
+				//todo: looks like I've set the state correctly but it fucks up
+				//testing: on context change, need to toggle on allowChartUpdate
+				// piecontrol.setAllowUpdate(true)
+
+				if(lastTab !== tabcontrol.tab){
+					lastTab = tabcontrol.tab;
+
+					console.log("$CONTEXT SWITCH");
+					console.log("$PIEDATA",tempPieData);
+					PIEDATA(tempPieData)
+
+					console.log("$PIEDATADRILLDOWN",tempPieDataDrilldown);
+					PIEDATADRILLDOWN(tempPieDataDrilldown)
+
+					console.log("$PIEDATAGUEST",tempPieDataGuest);
+					PIEDATAGUEST(tempPieDataGuest)
+
+					console.log("$PIEDATADRILLDOWNGUEST", tempPieDataDrilldownGuest);
+					PIEDATADRILLDOWNGUEST(tempPieDataDrilldownGuest)
+
+				}else{
+					if(piedata.length === 0 ){
+						console.log("$INIT");
+						console.log("$PIEDATA",tempPieData);
+						PIEDATA(tempPieData)
+					}else{
+						console.log("skip tempPieData");
+					}
+					if(piedatadrilldown.series.length === 0 ){
+						console.log("$PIEDATADRILLDOWN",tempPieDataDrilldown);
+						PIEDATADRILLDOWN(tempPieDataDrilldown)
+					}else{
+						console.log("skip tempPieDataDrilldown");
+					}
+
+					if(piedataguest.length === 0 ){
+						console.log("$PIEDATAGUEST",tempPieDataGuest);
+						PIEDATAGUEST(tempPieDataGuest)
+					}else{
+						console.log("skip tempPieData");
+					}
+					if(piedatadrilldownguest.series.length === 0 ){
+						console.log("$PIEDATADRILLDOWNGUEST",tempPieDataDrilldownGuest);
+						PIEDATADRILLDOWNGUEST(tempPieDataDrilldownGuest)
+					}else{
+						console.log("skip tempPieDataDrilldown");
+					}
+				}
+
+
+
+				//todo: probably b/c of this timeout i'd imagine
+				//testing: then back to normal render-ignoring state
+				// setTimeout(e =>{
+				// 	piecontrol.setAllowUpdate(false)
+				// },1000)
+
 
 
 
@@ -1861,6 +1981,18 @@ function useProduceEvents(){
 	)
 
 }
+
+
+//todo: pretty much cancels the drilldown animation :/
+
+// function useTestPieEvent(){
+//
+// 	let friendscontrol = FriendsControl.useContainer()
+// 	var piecontrol = PieControl.useContainer()
+//
+// 	var ignored = {value:"ignored"}
+// 	return {ignored}
+// }
 
 function useTestBubbles(){
 	let tabcontrol = TabControl.useContainer();

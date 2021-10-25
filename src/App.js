@@ -38,6 +38,12 @@ import {clamp} from 'lodash'
 import stylesViewPager from'./stylesViewPager.module.css'
 import ViewPager from "./ViewPager";
 
+//testing:
+import PieChart3D from "./components/Charts/PieChart3D/PieChart3D";
+import {pieData, pieSeriesDrilldown} from "./data/example/pieData";
+import SocialPairPie from "./components/Charts/PieChart3D/SocialPairPie";
+
+
 
 //testing:
 //import ControlTest from "./components/ControlTest";
@@ -287,7 +293,11 @@ function App(props) {
                             {/*</div>*/}
 
 
+                            {/*testing:*/}
                             <ViewPager />
+                            {/*<PieChart3D series={[{name: 'Families', colorByPoint: true, data:pieData}]}*/}
+                            {/*            drilldown={pieSeriesDrilldown}/>*/}
+                            {/*<SocialPairPie  />*/}
 
                             {/*<div className="tiles" >*/}
                             {/*    <ContextStats/>*/}
@@ -308,4 +318,5 @@ function App(props) {
     );
 }
 
-export default withStyles(styles)(withApolloProvider(App));
+export default withStyles(styles)(App);
+// export default withStyles(styles)(withApolloProvider(App));
