@@ -58,7 +58,7 @@ export const CHIPGENRESRANKED = makeVar([]);
 export const CHIPFAMILIESRANKED = makeVar([]);
 export const EVENTS_VAR = makeVar([]);
 export const NODES_VAR = makeVar(nodes);
-
+// export const OVERFLOW_VAR = makeVar(false);
 
 
 //testing: set on page refresh from localstorage

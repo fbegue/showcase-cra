@@ -1,5 +1,6 @@
 import React, {useState, useEffect, useContext, useRef, useMemo} from 'react';
 import {Context} from "../storage/Store";
+import useMeasure from 'react-use-measure'
 import {useReactiveVar} from "@apollo/react-hooks";
 import {
 	GLOBAL_UI_VAR,
@@ -43,6 +44,7 @@ import BubbleFamilyGenreChips from "./chips/BubbleFamilyGenreChips";
 import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
 import PieChart3D from "./Charts/PieChart3D/PieChart3D";
+
 
 //testing: static data
 //import {pieData,pieSeriesDrilldown} from '../data/example/pieData'
@@ -385,23 +387,31 @@ function Stats(props) {
 
 	const [toggle, setToggle] = useState(false);
 
+	// const [bind, { height }] = useMeasure()
+	// const heightMeasureProps = useSpring({ height })
+
+
+	const [ref, bounds] = useMeasure()
+
+	console.log("$gotbounds",bounds.height);
+
 	const drawerProps = useSpring({
 		// top: show ? 200 : 0,
 		position: "absolute",
 		left: 0,
 		right:0,
 		backgroundColor: "#808080",
-		// width: "100%",
-		// height: "100%"
-		// height: tileSelectControl.isDrawerShowing ? "20em" : "1em",
-		// minWidth:"40em"
-		//todo: spring won't function w/out specified height, but want auto-height of content when showing
-		//height: tileSelectControl.isDrawerShowing ? "21em" : "1.5em",
-		//testing: don't work: initial,unset,revert,minContent
-		height: tileSelectControl.isDrawerShowing ? 'min-content' : "1.5em",
+		//note: spring doesn't do auto, so you need to calculate it
+		//note: mixing bounds.height (integer) w/ string measures (em) throws:
+		//Cannot animate between AnimatedString and AnimatedValue, as the "to" prop suggests
+		// height: tileSelectControl.isDrawerShowing ? bounds.height || '2em' : "1.5em",
+
+		//note: 74px = height of 2 rows I guess?
+		height: tileSelectControl.isDrawerShowing ? bounds.height  : 74,
 		minWidth:"23em",
 		paddingTop:".2em",
 		paddingBottom:".2em",
+		overflow:'hidden'
 	});
 	let paperStyle = {padding:".2em .5em .2em .5em",margin:".2em",width:"fit-content"}
 
@@ -420,20 +430,24 @@ function Stats(props) {
 			{/*	</button>*/}
 			{/*</div>*/}
 
+			{/*testing: disabled whole drawer concept*/}
+
+
 			<div id={'drawer'} style={{"position":"absolute","top":"0px","left":"0px","zIndex":"6"}}>
 				{/*<button onClick={() =>{gridControl.setStatCollapse(!(gridControl.statCollapse))}}>statCollapse {gridControl.statCollapse.toString()}</button>*/}
 
-				<a.div  style={drawerProps}>
-					<div style={{"position":"absolute","top":"0px","right":"0px","zIndex":"7"}}
+				<a.div  style={{...drawerProps}}>
+					<div   style={{"position":"absolute","top":"0px","right":"0px","zIndex":"7"}}
 						 onClick={() =>{handleToggleDrawer()}}>
 						{
 							tileSelectControl.isDrawerShowing ? <ExpandLessIcon fontSize={'large'}/>
 								:	<ExpandMoreIcon fontSize={'large'}/>
 						}
 					</div>
-					<div>{
-							tileSelectControl.tile && <div>
-								{
+					<div ref={ref}>{
+							tileSelectControl.tile?
+							<div>
+							{
 								tileSelectControl.tile.type === 'artist' ?
 									//todo: feels weird contraining like this here
 									// style={{width:"10em"}}
@@ -447,12 +461,28 @@ function Stats(props) {
 										)}
 									</div>
 							}
-							</div>
+							</div>:
+								<div className={'genres-summary'}>
+									<BubbleFamilyGenreChips families={[]} familyDisabled={true} occurred={true} clearable={false}  genres={chipGenresRanked} flexDirection={'row'}/>
+								</div>
 						}
 					</div>
 				</a.div>
 			</div>
 
+			{/*note: need this height = default drawer height to prevent layout shift between drawer open/close to do this*/}
+			<div style={{display:"flex",height:74}}>
+				{	!(tileSelectControl.tile) &&
+				//
+				<div  style={{padding:"2px",color:"white",zIndex:'7',position:"relative","marginLeft":"auto","top":"-2em"}}>
+					<Paper elevation={3} style={{padding:".2em .5em .2em .5em",width:"fit-content"}}>
+						<Typography variant="subtitle1">
+							Top Genres
+						</Typography>
+					</Paper>
+				</div>
+				}
+			</div>
 
 			{/*testing: disabled permanent display*/}
 							{/*<div style={{"position":"absolute","top":"0px","left":"0px","zIndex":"6"}}>*/}
@@ -554,10 +584,11 @@ function Stats(props) {
 						{/*todo: something odd going on with placement of entire stats = marginTops*/}
 						<div style={{"display":"flex",flexDirection:"column"}}>
 
-							<div style={{"padding":"5px","zIndex":"5","flexGrow":"1","overflowY":"auto","overflowX":"hidden","maxHeight":"23.5em","minWidth":"7em",marginTop:"2em"}}>
+							<div style={{"padding":"5px","zIndex":"5","flexGrow":"1","overflowY":"auto","overflowX":"hidden","maxHeight":"23.5em","minWidth":"7em",marginTop:"9em"}}>
 								{/*<div><PieGenreChips families={chipFamilies} genres={chipGenres}/></div>*/}
 								{/*familyDisabled={false}*/}
-								<BubbleFamilyGenreChips families={chipFamilies} genresDisabled={true} occurred={true} clearable={true}  genres={chipGenresRanked} flexDirection={'row'}/>
+								{/*testing: MoreChips*/}
+								{/*<BubbleFamilyGenreChips families={chipFamilies} genresDisabled={true} occurred={true} clearable={true}  genres={chipGenresRanked} flexDirection={'row'}/>*/}
 							</div>
 
 							{/*note: need this for flex-column to work*/}

@@ -105,14 +105,14 @@ const tabMap = {
 		2:{"artists_top":"Top Artists"}},
 	1:{
 		0:{"artists_saved":"Artists"},
-		1:{"playlists":"Playlists"},
-		2:{"tracks_saved":"Tracks"},
-		3:{"albums_saved":"Albums"}
+		// 1:{"playlists":"Playlists"},
+		1:{"tracks_saved":"Tracks"},
+		2:{"albums_saved":"Albums"}
 	},2:{
 		0:{"artists_friends":"Artists"},
 		1:{"albums_friends":"Albums"},
 		2:{"tracks_friends":"Tracks"},
-		3:{"playlists_friends":"Playlists"},
+		// 3:{"playlists_friends":"Playlists"},
 	}}
 export {tabMap}
 export default function Tabify() {

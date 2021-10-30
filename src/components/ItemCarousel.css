@@ -1,0 +1,28 @@
+[class*="cover__figure__"]:nth-child(1)::after
+{
+    content: var(--caroText0);
+    top: -1em;
+    background: white;
+    position: relative;
+    padding:2px;
+}
+
+[class*="cover__figure__"]:nth-child(2)::after
+{
+
+    content: var(--caroText1);
+    top: -1em;
+    background: white;
+    position: relative;
+    padding:2px;
+    max-height:2em;
+}
+
+[class*="cover__figure__"]:nth-child(3)::after
+{
+    content: var(--caroText2);
+    top: -1em;
+    background: white;
+    position: relative;
+    padding:2px;
+}

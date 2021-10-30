@@ -1,19 +1,12 @@
-import React, {useContext, useEffect} from 'react';
-import Card from "@material-ui/core/Card";
-import CardContent from "@material-ui/core/CardContent";
+import React, {useContext, useEffect,useState} from 'react';
 import Typography from "@material-ui/core/Typography";
 import {GLOBAL_UI_VAR,CHIPGENRESRANKED} from "../storage/withApolloProvider";
 import {Context} from "../storage/Store";
 import {FriendsControl, StatControl, TileSelectControl} from "../index";
 import {useReactiveVar} from "@apollo/react-hooks";
 import Paper from '@material-ui/core/Paper';
-//import GenreChipsSmartRanked from "./chips/GenreChipsSmartRanked";
-//import GenreChipsSmart from "./chips/GenreChipsSmart";
-import BubbleFamilyGenreChips from "./chips/BubbleFamilyGenreChips";
 import ItemCarousel from './ItemCarousel'
 
-//https://www.npmjs.com/package/react-cover-carousel
-import ReactCoverCarousel from 'react-cover-carousel';
 
 function InfoPanel(props) {
 
@@ -21,6 +14,7 @@ function InfoPanel(props) {
 	let friendscontrol = FriendsControl.useContainer()
 	const globalUI = useReactiveVar(GLOBAL_UI_VAR);
 	const chipGenresRanked = useReactiveVar(CHIPGENRESRANKED);
+
 	//console.log("$InfoPanel",chipGenresRanked);
 	const [globalState, globalDispatch] = useContext(Context)
 
@@ -136,13 +130,17 @@ function InfoPanel(props) {
 	},[statcontrol.stats.name,friendscontrol.selectedTabIndex,filter]);
 
 
+	// const overflow = useReactiveVar(OVERFLOW_VAR);
+	// console.log("InfoPanel | overflow",overflow);
+	//const [overflowActive, setOverflowActive] = useState(false);
+
 	return(
 		<div>
 			{
 				globalState[globalUI.user.id + "_tracks_stats"] &&
-				<div style={{display:"flex"}}>
+				<div style={{display:"flex",flexDirection:"column"}}>
 					<div>
-						<div style={{padding:"2px",position:"relative",top:"-10px",color:"white",height:"20px",width:"6.2em"}}>
+						<div style={{padding:"2px",position:"relative",zIndex:2,color:"white",height:"20px",width:"6.2em",marginLeft:"auto"}}>
 							<Paper elevation={3}>
 								<Typography variant="subtitle1">
 									Top Artists
@@ -150,18 +148,19 @@ function InfoPanel(props) {
 							</Paper>
 						</div>
 						{/*<ListArtistPanels artists={globalState[globalUI.user.id + "_tracks_stats"].artists_top} />*/}
-						<ItemCarousel artists={globalState[globalUI.user.id + "_tracks_stats"].artists_top} handleSelect={handleCarouselItemSelect} />
+
+							<ItemCarousel style={{marginTop:"-1em"}} artists={globalState[globalUI.user.id + "_tracks_stats"].artists_top} handleSelect={handleCarouselItemSelect} />
 					</div>
 
-					<div style={{"marginLeft":"-32px","zIndex":"1"}}>
-						<div style={{padding:"2px",position:"relative",top:"-10px",color:"white",height:"20px",width:"6.2em"}}>
-							<Paper elevation={3}>
-								<Typography variant="subtitle1">
-									Top Genres
-								</Typography>
-							</Paper>
-						</div>
-						<BubbleFamilyGenreChips families={[]} familyDisabled={true} occurred={true} clearable={false}  genres={chipGenresRanked} flexDirection={'column'}/>
+					<div>
+						{/*testing: playing around w/ detecting overflow and reacting to it w/ a 'more' popover
+						*/}
+						{/*<TransitionChips setOverflowActive={setOverflowActive} item={tileSelectControl.tile} />*/}
+						{/*<div style={{"marginTop":"-3em","float":"right"}}>*/}
+						{/*	{ overflowActive ? <MoreChips  /> : "here"}*/}
+						{/*</div>*/}
+
+						{/*<BubbleFamilyGenreChips families={[]} familyDisabled={true} occurred={true} clearable={false}  genres={chipGenresRanked} flexDirection={'row'}/>*/}
 						{/*<Paper elevation={3} style={{padding:"3px"}}>*/}
 						{/*	<ChipsArray chipData={genres}/>*/}
 						{/*</Paper>*/}

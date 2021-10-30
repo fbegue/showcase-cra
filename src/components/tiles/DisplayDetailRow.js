@@ -9,7 +9,7 @@ function DisplayDetailRow(props) {
 	let paperStyle = {padding:".2em .5em .2em .5em",margin:".2em",width:"max-content"}
 
 	return(<div style={{paddingLeft:".5em",paddingRight:".5em"}}>
-		<div style={{"position":"absolute","right":"0px","zIndex":"30"}}>	{props.item && props.item.id}</div>
+		{/*<div style={{"position":"absolute","right":"0px","zIndex":"30"}}>	{props.item && props.item.id}</div>*/}
 		{props.item &&
 		//	testing:
 		<div style={{display:"flex"}}>
@@ -25,15 +25,16 @@ function DisplayDetailRow(props) {
 				<BubbleFamilyGenreChips
 					families={[]} familyDisabled={true}genres={props.item.genres}
 					flexDirection={'row'} alignItems={'center'} maxWidth={'20em'}
-					pre={
-						<div >
-							<Paper elevation={3} style={paperStyle}>
-								<Typography variant="subtitle1">
-									{props.item.name}
-								</Typography>
-							</Paper>
-						</div>
-					} />
+					// pre={
+					// 	<div >
+					// 		<Paper elevation={3} style={paperStyle}>
+					// 			<Typography variant="subtitle1">
+					// 				{props.item.name}
+					// 			</Typography>
+					// 		</Paper>
+					// 	</div>
+					// }
+				/>
 			</div>
 		</div>
 		}

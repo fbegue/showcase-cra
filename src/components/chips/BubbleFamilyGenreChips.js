@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-expressions */
-import React, {useState,useEffect} from 'react';
+import React, {useState,useEffect,useRef,createRef} from 'react';
 import { makeStyles } from "@material-ui/core/styles";
 import Chip from "@material-ui/core/Chip";
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
@@ -8,6 +8,9 @@ import _ from 'lodash'
 //import {PieControl} from "../../index";
 import {familyColors,families as systemFamilies} from '../../families'
 import {FriendsControl,Control} from "../../index";
+//import OVERFLOW_VAR from '../../storage/withApolloProvider'
+
+//import MoreChips from "../utility/Menu/MoreChips";
 const useStyles = makeStyles({
 	chip: {
 		//customize normal/hovered colors
@@ -35,11 +38,32 @@ const useStyles = makeStyles({
 	}
 });
 
+
+function useOnScreen(ref) {
+
+	const [isIntersecting, setIntersecting] = useState(false)
+
+	const observer = new IntersectionObserver(
+		([entry]) => setIntersecting(entry.isIntersecting)
+	)
+
+	useEffect(() => {
+		observer.observe(ref.current)
+		// Remove the observer as soon as the component is unmounted
+		return () => { observer.disconnect() }
+	}, [])
+
+	return isIntersecting
+}
+
 function BubbleFamilyGenreChips(props) {
 
 	const classes = useStyles();
 	let friendscontrol = FriendsControl.useContainer()
 	let control = Control.useContainer()
+
+	console.log("$BubbleFamilyGenreChips | props",props);
+
 
 	const makeStyle = (fam,which) =>{
 
@@ -240,13 +264,44 @@ function BubbleFamilyGenreChips(props) {
 
 	}
 
+	function   isEllipsisActive(e) {
+		return e.offsetHeight < e.scrollHeight || e.offsetWidth < e.scrollWidth;
+	}
+
+	let myContainer = useRef(null);
+	//const [overflowActive, setOverflowActive] = useState(false);
+	useEffect(() => {
+		console.log("BubbleFamilyGenreChips | setOverflowActive",isEllipsisActive(myContainer));
+		//props.setOverflowActive(isEllipsisActive(myContainer))
+
+		//todo: while tryingn to use reactive var its updating incorrectly in InfoPanel before this useEffect executes
+		//OVERFLOW_VAR(isEllipsisActive(myContainer))
+		//props.setOverflowActive(isEllipsisActive(myContainer))
+	});
+
+	//testing: trying to check if elements are visible
+	//https://stackoverflow.com/questions/45514676/react-check-if-element-is-visible-in-dom
+	// const visRef = useRef()
+	// const isVisible = useOnScreen(visRef)
+
+	//testing:have an array of references
+	//https://dev.to/ajsharp/-an-array-of-react-refs-pnf
+	const refs = useRef(_genres.map(() => createRef()))
+
+	useEffect(() => {
+		//console.log("BubbleFamilyGenreChips | refs",refs);
+		//todo: but can't check the hook useOnScreen in a callback
+		//const isVisible = useOnScreen(refs[0])
+	});
 
 	return(<div>
 
 		{/*note: not sure how to get flex to respect any sort of height unless you specify it here */}
 		{/*todo: not sure this flexDirection is effective here*/}
 
-		<div style={{display:"flex",flexDirection:props.flexDirection,flexWrap:"wrap"}}>
+
+		{/*<div ref={visRef}>{isVisible && `Yep, I'm on screen`}</div>*/}
+		<div  style={{display:"flex",flexDirection:props.flexDirection,flexWrap:"wrap"}}>
 			{toMap.map((fam,i) =>
 				<div  key={i} style={{display:"flex"}} onClick={() =>{handleClick(fam)}}>
 					<Chip
@@ -267,37 +322,46 @@ function BubbleFamilyGenreChips(props) {
 
 		{/*className={'genreChipContainer'}*/}
 		{/*note: set height | height:"17em"*/}
-		<div style={{display:"flex",flexDirection:props.flexDirection,flexWrap:"wrap",
-			height:props.height || 'initial',alignItems: props.alignItems || "initial",
-			maxWidth: props.maxWidth || 'initial'}} >
+		{/*height:'4em' || 'initial'*/}
+		<div ref={ref => (myContainer= ref)}  style={{display:"flex",flexDirection:props.flexDirection,flexWrap:"wrap",
+			alignItems: props.alignItems || "initial",overflow:'hidden',
+			maxWidth: props.maxWidth || 'initial',paddingBottom:".5em"}} >
 			{props.pre}
 			{_genres.map((gOb,i) =>
-				//testing:??
-				//style={{display:"flex"}}
-				<div key={i}  onClick={() =>{handleGClick(gOb)}}>
-					<Chip
-						// className={[classes.chip,"genreChip"].join(' ')}
-						className={classes.chip}
-						key={i}
-						// className={'genreChip'}
-						variant={
-							props.varied ?
-								_.find(varied, r =>{return r.id === gOb.id}) ? "outlined" :"default"
-						:"default"}
-						label={
-							props.occurred ? gOb.genre.name + " (" + gOb.occurred.toString() + ")"
-								: gOb.name
-						}
+				{
+					return (
+						<div key={i}  ref={refs.current[i]} onClick={() =>{handleGClick(gOb)}}>
+							<Chip
+								// className={[classes.chip,"genreChip"].join(' ')}
+								className={classes.chip}
+								 key={i}
 
-						style={getGColor(gOb)}
-						// style={initGColorState[gOb.name]}
-						// style={gcolor[gOb.name]}
-						// style={{"--background-color2":"blue"}}
-					/>
-					{ props.removable ? <div style={{"left":"-8px","position":"relative"}}><HighlightOffIcon fontSize={'small'}/> </div> : ""}
-				</div>
+								// className={'genreChip'}
+								variant={
+									props.varied ?
+										_.find(varied, r =>{return r.id === gOb.id}) ? "outlined" :"default"
+										:"default"}
+								label={
+									props.occurred ? gOb.genre.name + " (" + gOb.occurred.toString() + ")"
+										: gOb.name
+								}
+
+								style={getGColor(gOb)}
+								// style={initGColorState[gOb.name]}
+								// style={gcolor[gOb.name]}
+								// style={{"--background-color2":"blue"}}
+							/>
+							{ props.removable ? <div style={{"left":"-8px","position":"relative"}}><HighlightOffIcon fontSize={'small'}/> </div> : ""}
+						</div>
+					)
+				}
 			)}
 		</div>
+		{/*<div style={{zIndex:50,height:"2em"}}>*/}
+		{/*	/!*{overflowActive.toString()}*!/*/}
+
+			{/*{ overflowActive ? <MoreChips/> : "here"}*/}
+		{/*</div>*/}
 
 	</div>)
 }
@@ -319,7 +383,7 @@ BubbleFamilyGenreChips.propTypes = {
 	removable :PropTypes.bool,
 	//display dataset which includes occurence values
 	occurred:PropTypes.bool,
-	//
+	more:PropTypes.bool,
 	seperator: PropTypes.bool
 
 

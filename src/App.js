@@ -275,7 +275,6 @@ function App(props) {
                     {/* className={gridControl.gridClass}*/}
                     {globalUI.access_token ?
                         <div className={'defaultGrid'}>
-
                             {/*testing: messed up width of tabs and stats, so disabled this transition for now */}
                             {/*- is this gridClass changing here affecting responsive collapsing?*/}
                             {/*<div className="tabs" style={{width:gridControl.gridClass === 'defaultGrid' ? "44em":"35em"}} >*/}
@@ -294,6 +293,7 @@ function App(props) {
 
 
                             {/*testing:*/}
+
                             <ViewPager />
                             {/*<PieChart3D series={[{name: 'Families', colorByPoint: true, data:pieData}]}*/}
                             {/*            drilldown={pieSeriesDrilldown}/>*/}
