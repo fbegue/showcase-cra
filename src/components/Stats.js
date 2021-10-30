@@ -432,58 +432,6 @@ function Stats(props) {
 
 			{/*testing: disabled whole drawer concept*/}
 
-
-			<div id={'drawer'} style={{"position":"absolute","top":"0px","left":"0px","zIndex":"6"}}>
-				{/*<button onClick={() =>{gridControl.setStatCollapse(!(gridControl.statCollapse))}}>statCollapse {gridControl.statCollapse.toString()}</button>*/}
-
-				<a.div  style={{...drawerProps}}>
-					<div   style={{"position":"absolute","top":"0px","right":"0px","zIndex":"7"}}
-						 onClick={() =>{handleToggleDrawer()}}>
-						{
-							tileSelectControl.isDrawerShowing ? <ExpandLessIcon fontSize={'large'}/>
-								:	<ExpandMoreIcon fontSize={'large'}/>
-						}
-					</div>
-					<div ref={ref}>{
-							tileSelectControl.tile?
-							<div>
-							{
-								tileSelectControl.tile.type === 'artist' ?
-									//todo: feels weird contraining like this here
-									// style={{width:"10em"}}
-									<DisplayDetailRow item={tileSelectControl.tile}/>
-									:
-									<div style={{display:"flex",flexDirection:"column"}}>
-										{tileSelectControl.tile.artists.map((a) =>
-											<div id={a.id} style={{width:"10em"}}>
-												<DisplayDetailRow item={a}/>
-											</div>
-										)}
-									</div>
-							}
-							</div>:
-								<div className={'genres-summary'}>
-									<BubbleFamilyGenreChips families={[]} familyDisabled={true} occurred={true} clearable={false}  genres={chipGenresRanked} flexDirection={'row'}/>
-								</div>
-						}
-					</div>
-				</a.div>
-			</div>
-
-			{/*note: need this height = default drawer height to prevent layout shift between drawer open/close to do this*/}
-			<div style={{display:"flex",height:74}}>
-				{	!(tileSelectControl.tile) &&
-				//
-				<div  style={{padding:"2px",color:"white",zIndex:'7',position:"relative","marginLeft":"auto","top":"-2em"}}>
-					<Paper elevation={3} style={{padding:".2em .5em .2em .5em",width:"fit-content"}}>
-						<Typography variant="subtitle1">
-							Top Genres
-						</Typography>
-					</Paper>
-				</div>
-				}
-			</div>
-
 			{/*testing: disabled permanent display*/}
 							{/*<div style={{"position":"absolute","top":"0px","left":"0px","zIndex":"6"}}>*/}
 						{/*	<button onClick={() =>{gridControl.setStatCollapse(!(gridControl.statCollapse))}}>statCollapse {gridControl.statCollapse.toString()}</button>*/}
@@ -592,7 +540,7 @@ function Stats(props) {
 							</div>
 
 							{/*note: need this for flex-column to work*/}
-							<div style={{minHeight:"14em",marginTop:"-8em"}}>
+							<div style={{minHeight:"14em",marginTop:"-3em"}}>
 								{/*<div>*/}
 								{/*	<PieChart data={{series: {name: 'Genres', colorByPoint: true, data:pieData, animation: {duration: 2000}}}} />*/}
 								{/*</div>*/}

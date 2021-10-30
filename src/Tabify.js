@@ -41,6 +41,8 @@ import InfoPanel from "./components/InfoPanel";
 import Spinner from './components/utility/Spinner';
 import './Tabify.css'
 import PulseSpinnerSpring from './components/springs/PulseSpinnerSpring'
+import useMeasure from "react-use-measure";
+import {useSpring,a} from "react-spring";
 
 
 // const styles = {
@@ -551,10 +553,36 @@ export default function Tabify() {
 		)
 	}
 
+
+	const [infoBound, setInfoBound] = React.useState(0);
+	const [infoCollapse, setInfoCollapse] = React.useState(false);
+	const [ref, bounds] = useMeasure()
+
+	console.log("$gotbounds",bounds.height);
+	console.log("$infoBounds",infoBound);
+
+	const drawerProps = useSpring({
+		// top: show ? 200 : 0,
+		position: "absolute",
+		left: 0,
+		right:0,
+		backgroundColor: "#808080",
+		//testing: seems like infopane's dynamic drawer height messes with my ability to calculate correctly here
+		//so I pass it back + also provide some offset value (which makes sense I think...)
+		 height: infoCollapse ? 74 :bounds.height + infoBound - 65,
+		//height:'40em',
+		minWidth:"23em",
+		paddingTop:".2em",
+		paddingBottom:".2em",
+		overflow:'hidden'
+	});
+
+
+
+
 	return(
 		// style={styles}
-		<div  >
-
+		<div>
 			<AppBar position="static">
 				<Tabs className={classes.root} value={tabcontrol.section} onChange={handleSectionSelect} >
 					{/*todo: disabled for now (broke in multiple places)*/}
@@ -577,17 +605,36 @@ export default function Tabify() {
 					{/*</Tab>*/}
 				</Tabs>
 			</AppBar>
-			<TabPanel   className={'tabs0'} value={tabcontrol.section} index={0}>
-				{getTabs()}
-				<InfoPanel/>
-			</TabPanel>
-			<TabPanel   className={'tabs1'} value={tabcontrol.section} index={1}>
-				{getTabs()}
-				<InfoPanel/>
-			</TabPanel>
-			<TabPanel value={tabcontrol.section} index={2}>
-				<Social/>
-			</TabPanel>
+			<a.div id={'purple'} style={{...drawerProps,outline:"1px solid purple"}}>
+				<div ref={ref}>
+					{/*todo: copy & paste*/}
+					<TabPanel   className={'tabs0'} value={tabcontrol.section} index={0}>
+
+						{getTabs()}
+						{
+							infoCollapse &&
+							<div id={'handle'} style={{background:'#f53177',height:30,zIndex:500,position:"relative",width:"100%"}}>
+								<button onClick={() =>{setInfoCollapse(prev => !(prev))}}>expand summary</button>
+							</div>
+						}
+						<InfoPanel setInfoBound={setInfoBound} setInfoCollapse={setInfoCollapse}/>
+
+					</TabPanel>
+					<TabPanel   className={'tabs1'} value={tabcontrol.section} index={1}>
+						{getTabs()}
+						{
+							infoCollapse &&
+							<div id={'handle'} style={{background:'#f53177',height:30,zIndex:500,position:"relative",width:"100%"}}>
+								<button onClick={() =>{setInfoCollapse(prev => !(prev))}}>expand summary</button>
+							</div>
+						}
+						<InfoPanel setInfoBound={setInfoBound} setInfoCollapse={setInfoCollapse}/>
+					</TabPanel>
+					<TabPanel value={tabcontrol.section} index={2}>
+						<Social/>
+					</TabPanel>
+				</div>
+			</a.div>
 		</div>
 	)
 }

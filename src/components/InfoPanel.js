@@ -6,6 +6,12 @@ import {FriendsControl, StatControl, TileSelectControl} from "../index";
 import {useReactiveVar} from "@apollo/react-hooks";
 import Paper from '@material-ui/core/Paper';
 import ItemCarousel from './ItemCarousel'
+import useMeasure from "react-use-measure";
+import {a, useSpring} from "react-spring";
+import ExpandLessIcon from "@material-ui/icons/ExpandLess";
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import DisplayDetailRow from "./tiles/DisplayDetailRow";
+import BubbleFamilyGenreChips from "./chips/BubbleFamilyGenreChips";
 
 
 function InfoPanel(props) {
@@ -134,6 +140,47 @@ function InfoPanel(props) {
 	// console.log("InfoPanel | overflow",overflow);
 	//const [overflowActive, setOverflowActive] = useState(false);
 
+
+	const handleToggleDrawer = () => {
+		tileSelectControl.setDrawerShowing(false);
+	};
+
+	const [toggle, setToggle] = useState(false);
+
+	// const [bind, { height }] = useMeasure()
+	// const heightMeasureProps = useSpring({ height })
+
+
+	const [ref, bounds] = useMeasure()
+
+	console.log("$gotbounds",bounds.height);
+
+	const drawerProps = useSpring({
+		// top: show ? 200 : 0,
+		position: "absolute",
+		left: 0,
+		right:0,
+		backgroundColor: "#808080",
+		//note: spring doesn't do auto, so you need to calculate it
+		//note: mixing bounds.height (integer) w/ string measures (em) throws:
+		//Cannot animate between AnimatedString and AnimatedValue, as the "to" prop suggests
+		// height: tileSelectControl.isDrawerShowing ? bounds.height || '2em' : "1.5em",
+
+		//note: 74px = height of 2 rows I guess?
+		//note: + the height of the handle
+		height: tileSelectControl.isDrawerShowing ? bounds.height  : 74 +30,
+		minWidth:"23em",
+		paddingTop:".2em",
+		paddingBottom:".2em",
+		overflow:'hidden'
+	});
+
+	useEffect(() => {
+		props.setInfoBound(bounds.height)
+	},[bounds.height]);
+
+
+
 	return(
 		<div>
 			{
@@ -152,9 +199,64 @@ function InfoPanel(props) {
 							<ItemCarousel style={{marginTop:"-1em"}} artists={globalState[globalUI.user.id + "_tracks_stats"].artists_top} handleSelect={handleCarouselItemSelect} />
 					</div>
 
+					<div id={'drawer'}>
+						{/*<button onClick={() =>{gridControl.setStatCollapse(!(gridControl.statCollapse))}}>statCollapse {gridControl.statCollapse.toString()}</button>*/}
+						<a.div  style={{...drawerProps}}>
+							<div   style={{"position":"absolute","top":"0px","right":"0px","zIndex":"7"}}
+								   onClick={() =>{handleToggleDrawer()}}>
+								{
+									tileSelectControl.isDrawerShowing ? <ExpandLessIcon fontSize={'large'}/>
+										:	<ExpandMoreIcon fontSize={'large'}/>
+								}
+							</div>
+							<div ref={ref}>{
+								tileSelectControl.tile?
+									<div>
+										{
+											tileSelectControl.tile.type === 'artist' ?
+												//todo: feels weird contraining like this here
+												// style={{width:"10em"}}
+												<DisplayDetailRow item={tileSelectControl.tile}/>
+												:
+												<div style={{display:"flex",flexDirection:"column"}}>
+													{tileSelectControl.tile.artists.map((a) =>
+														<div id={a.id} style={{width:"10em"}}>
+															<DisplayDetailRow item={a}/>
+														</div>
+													)}
+												</div>
+										}
+									</div>:
+									<div className={'genres-summary'}>
+										<BubbleFamilyGenreChips families={[]} familyDisabled={true} occurred={true} clearable={false}  genres={chipGenresRanked} flexDirection={'row'}/>
+									</div>
+							}
+								<div id={'handle'} style={{background:'#f53177',height:30,zIndex:500,position:"relative",width:"100%"}}>
+									<button onClick={() =>{props.setInfoCollapse(prev => !(prev))}}>collapse summary</button>
+								</div>
+							</div>
+
+						</a.div>
+
+					</div>
+
+					{/*note: need this height = default drawer height to prevent layout shift between drawer open/close to do this*/}
+					<div style={{display:"flex",height:74}}>
+						{	!(tileSelectControl.tile) &&
+						//
+						<div  style={{padding:"2px",color:"white",zIndex:'7',position:"relative","marginLeft":"auto","top":"-2em"}}>
+							<Paper elevation={3} style={{padding:".2em .5em .2em .5em",width:"fit-content"}}>
+								<Typography variant="subtitle1">
+									Top Genres
+								</Typography>
+							</Paper>
+						</div>
+						}
+					</div>
+
+
+					{/*testing: playing around w/ detecting overflow and reacting to it w/ a 'more' popover*/}
 					<div>
-						{/*testing: playing around w/ detecting overflow and reacting to it w/ a 'more' popover
-						*/}
 						{/*<TransitionChips setOverflowActive={setOverflowActive} item={tileSelectControl.tile} />*/}
 						{/*<div style={{"marginTop":"-3em","float":"right"}}>*/}
 						{/*	{ overflowActive ? <MoreChips  /> : "here"}*/}
