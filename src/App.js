@@ -240,8 +240,7 @@ function App(props) {
                 <div className={'app'}>
                     <div  style={{position: "sticky",top: "-16px", padding:"1em 1em 0em 1em", borderBottom: "1px solid black", zIndex: "20",display:'flex',background:"#f0f0f0"}}>
                         <div><img style={{height:"4em"}} src={logo}/> </div>
-                        {/*testing:*/}
-                        {/*<button onClick={() =>{setStatCollapse(!(statCollapse))}}>statCollapse {statCollapse.toString()}</button>*/}
+                        {/*testing: need to make spring for auto-height on scroll event*/}
                         <div style={{marginRight:"1em"}}>
                             <Profile/>
                         </div>
