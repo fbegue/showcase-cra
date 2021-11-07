@@ -1,7 +1,6 @@
 import React, {useState, useEffect, useRef, useContext} from 'react';
 import RedirectPage from './RedirectPage';
 
-
 //todo: wtf is this shit?
 // import 'brace/mode/json';
 // import 'brace/theme/monokai';
@@ -31,18 +30,12 @@ import './App.css'
 import './components/tiles/Tiles.css'
 
 //testing: viewpager
-import { useSprings, animated } from '@react-spring/web'
-import useMeasure from 'react-use-measure'
-import { useDrag } from 'react-use-gesture'
-import {clamp} from 'lodash'
-import stylesViewPager from'./stylesViewPager.module.css'
-import ViewPager from "./ViewPager";
+//import stylesViewPager from'./stylesViewPager.module.css'
+//import ViewPager from "./ViewPager";
 
-//testing:
-import PieChart3D from "./components/Charts/PieChart3D/PieChart3D";
-import {pieData, pieSeriesDrilldown} from "./data/example/pieData";
-import SocialPairPie from "./components/Charts/PieChart3D/SocialPairPie";
-
+import Accordion from "./components/Framer/Accordion";
+import Pager from "./components/Framer/Pager";
+import {motion} from "framer-motion";
 
 
 //testing:
@@ -118,8 +111,8 @@ function App(props) {
     const { classes } = props;
     let [filter, setFilter] = useState('active');
     let control = Control.useContainer()
-    let gridControl = GridControl.useContainer()
-    let friendscontrol = FriendsControl.useContainer()
+    //let gridControl = GridControl.useContainer()
+  //  let friendscontrol = FriendsControl.useContainer()
 
     const globalUI = useReactiveVar(GLOBAL_UI_VAR);
     console.log("APP | globalUI ",globalUI);
@@ -222,6 +215,12 @@ function App(props) {
     // const [gridClass, setGridClass] = useState('defaultGrid');
     // <button onClick={() =>{setGridClass(gridClass === 'defaultGrid' ? 'friendsGrid':'defaultGrid')}}>grid</button>
 
+    // const height = "20em";
+    // const width = "100%";
+    // const [expanded, setExpanded] = React.useState(false);
+
+    let gridControl = GridControl.useContainer()
+
     return (
         <MuiThemeProvider theme={muiTheme}>
             <Store>
@@ -262,53 +261,66 @@ function App(props) {
                         {/*todo: forcing delay until I can figure it out*/}
 
                         {/*<Delayed waitBeforeShow={2000}>*/}
-                            {globalUI.access_token  &&
-                            <div >
-                                <Player token={globalUI.access_token} id={control.id} play={control.play}/>
-                                {/*<div>PLAYER</div>*/}
-                            </div>
-                            }
+                        {globalUI.access_token  &&
+                        <div >
+                            <Player token={globalUI.access_token} id={control.id} play={control.play}/>
+                            {/*<div>PLAYER</div>*/}
+                        </div>
+                        }
                         {/*</Delayed>*/}
 
                     </div>
                     {/* className={gridControl.gridClass}*/}
                     {globalUI.access_token ?
-                        <div className={'defaultGrid'}>
+                        <div >
                             {/*testing: messed up width of tabs and stats, so disabled this transition for now */}
                             {/*- is this gridClass changing here affecting responsive collapsing?*/}
                             {/*<div className="tabs" style={{width:gridControl.gridClass === 'defaultGrid' ? "44em":"35em"}} >*/}
-                            <div className="tabs">
+
+
+
+                            <div >
                                 {globalUI.access_token &&
-                                <Tabify></Tabify>
-                                }
+
+                                  <Tabify/>
+                                // <Accordion setExpanded={setExpanded} expanded={expanded}
+                                //
+                                //            content={
+                                //                <div style={{background:'pink',height:height,width:width}}>
+                                //                    <Tabify/>
+                                //                </div>
+                                //            }
+                                // />
+                                 }
                             </div>
 
-                            {/*testing: move to other viewpager*/}
-                            {/* style={{minWidth:"40em"}}*/}
-                            {/* style={{display: "none"}}*/}
-                            {/*<div className={gridControl.statCollapse ? 'stats-collapse' : 'stats'}>*/}
-                            {/*    <Stats />*/}
+                            {/*testing: trying framer instead*/}
+                            {/*<ViewPager />*/}
+
+                            <motion.div
+                                initial={false}
+                                animate={{y: gridControl.collapse ? 0:gridControl.infoBound -80}}
+                                transition={{ duration: 0.3 }}
+
+                            >
+                                {globalUI.access_token &&
+                                <Pager/>}
+                            </motion.div>
+
+                            {/*<div style={{marginTop:"2em"}}>*/}
+                            {/*    {globalUI.access_token &&*/}
+                            {/*    <>*/}
+                            {/*       */}
+                            {/*        <Pager/>*/}
+                            {/*    </>*/}
+                            {/*    }*/}
                             {/*</div>*/}
 
 
-                            {/*testing:*/}
-
-                            <ViewPager />
-                            {/*<PieChart3D series={[{name: 'Families', colorByPoint: true, data:pieData}]}*/}
-                            {/*            drilldown={pieSeriesDrilldown}/>*/}
-                            {/*<SocialPairPie  />*/}
-
-                            {/*<div className="tiles" >*/}
-                            {/*    <ContextStats/>*/}
-                            {/*</div>*/}
-                            {/*/!*style={{minWidth:"30em"}}*!/*/}
-
-                            {/*<div className="events" >*/}
-                            {/*    <EventsList data={[]} />*/}
-                            {/*</div>*/}
 
                         </div>
                         : <div>splash</div>
+
                     }
 
                 </div>

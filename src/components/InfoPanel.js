@@ -155,6 +155,7 @@ function InfoPanel(props) {
 
 	console.log("$gotbounds",bounds.height);
 
+	//testing: disabled for now
 	const drawerProps = useSpring({
 		// top: show ? 200 : 0,
 		position: "absolute",
@@ -167,8 +168,8 @@ function InfoPanel(props) {
 		// height: tileSelectControl.isDrawerShowing ? bounds.height || '2em' : "1.5em",
 
 		//note: 74px = height of 2 rows I guess?
-		//note: + the height of the handle
-		height: tileSelectControl.isDrawerShowing ? bounds.height  : 74 +30,
+		//note: + the height of the handle + 30
+		height: tileSelectControl.isDrawerShowing ? bounds.height  : 74,
 		minWidth:"23em",
 		paddingTop:".2em",
 		paddingBottom:".2em",
@@ -196,19 +197,22 @@ function InfoPanel(props) {
 						</div>
 						{/*<ListArtistPanels artists={globalState[globalUI.user.id + "_tracks_stats"].artists_top} />*/}
 
+
 							<ItemCarousel style={{marginTop:"-1em"}} artists={globalState[globalUI.user.id + "_tracks_stats"].artists_top} handleSelect={handleCarouselItemSelect} />
-					</div>
+
+						</div>
 
 					<div id={'drawer'}>
 						{/*<button onClick={() =>{gridControl.setStatCollapse(!(gridControl.statCollapse))}}>statCollapse {gridControl.statCollapse.toString()}</button>*/}
 						<a.div  style={{...drawerProps}}>
-							<div   style={{"position":"absolute","top":"0px","right":"0px","zIndex":"7"}}
-								   onClick={() =>{handleToggleDrawer()}}>
-								{
-									tileSelectControl.isDrawerShowing ? <ExpandLessIcon fontSize={'large'}/>
-										:	<ExpandMoreIcon fontSize={'large'}/>
-								}
-							</div>
+						{/*<div>*/}
+							{/*<div   style={{"position":"absolute","top":"0px","right":"0px","zIndex":"7"}}*/}
+							{/*	   onClick={() =>{handleToggleDrawer()}}>*/}
+							{/*	{*/}
+							{/*		tileSelectControl.isDrawerShowing ? <ExpandLessIcon fontSize={'large'}/>*/}
+							{/*			:	<ExpandMoreIcon fontSize={'large'}/>*/}
+							{/*	}*/}
+							{/*</div>*/}
 							<div ref={ref}>{
 								tileSelectControl.tile?
 									<div>
@@ -231,13 +235,13 @@ function InfoPanel(props) {
 										<BubbleFamilyGenreChips families={[]} familyDisabled={true} occurred={true} clearable={false}  genres={chipGenresRanked} flexDirection={'row'}/>
 									</div>
 							}
-								<div id={'handle'} style={{background:'#f53177',height:30,zIndex:500,position:"relative",width:"100%"}}>
-									<button onClick={() =>{props.setInfoCollapse(prev => !(prev))}}>collapse summary</button>
-								</div>
+								{/*<div id={'handle'} style={{background:'#f53177',height:30,zIndex:500,position:"relative",width:"100%"}}>*/}
+								{/*	<button onClick={() =>{props.setInfoCollapse(prev => !(prev))}}>collapse summary</button>*/}
+								{/*</div>*/}
 							</div>
 
 						</a.div>
-
+						{/*</div>*/}
 					</div>
 
 					{/*note: need this height = default drawer height to prevent layout shift between drawer open/close to do this*/}

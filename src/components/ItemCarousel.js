@@ -5,8 +5,7 @@ import React,{useRef,useEffect} from "react";
 //src:
 //https://www.npmjs.com/package/react-cover-carousel
 
-//testing: messing around w/ psuedo elements to place text over img
-//import './ItemCarousel.css'
+import './ItemCarousel.css'
 
 
 function Test(){
@@ -20,14 +19,20 @@ function ItemCarousel(props){
 	//todo: spent a non-zero amount of time trying to force this VERY OLD caro library to have text over images
 	//basically only way I came up with was using ::after w/ css vars but I can't access
 
+	var img = null;
 	props.artists.forEach((a,i) =>{
 		//
-		var img = <img alt={a.artist.name} src={a.artist.images[0].url} onClickCapture={(e) =>{props.handleSelect(a.artist);e.preventDefault()}} ></img>
+		img = <img alt={a.artist.name} src={a.artist.images[0].url} onClickCapture={(e) =>{props.handleSelect(a.artist);e.preventDefault()}} ></img>
 
 		//https://stackoverflow.com/questions/56071265/css-pseudo-class-disappears-after-variable-value-update-via-js
 		//root.style.setProperty("--caroText" + i, '"' + a.artist.name + '"');
 		images.push(img)
 	})
+
+	//testing: with 2 more images
+	images.push(images[0])
+	images.push(images[1])
+
 
 	// {props.artists.map((item,i) => (
 	// 	<div>
@@ -41,8 +46,8 @@ function ItemCarousel(props){
 		// <p>test css var</p>
 		<ReactCoverCarousel
 			 enableHeading={true}
-			width={280}
-			height={150}
+			// width={'100%'}
+			height={210}
 			// height={window.innerHeight/2}
 			displayQuantityOfSide={1}
 			// navigation={true}
@@ -53,7 +58,7 @@ function ItemCarousel(props){
 			}}
 			activeFigureScale={1.5}
 			otherFigureScale={1}
-			otherFigureRotation={10}
+			otherFigureRotation={20}
 			// mediaQueries={{}}
 			infiniteScroll={true}
 			transitionSpeed={700}

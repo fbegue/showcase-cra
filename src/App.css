@@ -121,7 +121,7 @@ body {
   grid-template-areas:
           "tabs"
           "stats"
-          "tiles";
+          /*"tiles";*/
           /*"events";*/
 }
 
@@ -150,21 +150,23 @@ body {
   border: 1px solid green;
 }
 
-.header {
-  grid-area: header;
-  background: pink;
-}
+/*.header {*/
+/*  grid-area: header;*/
+/*  background: pink;*/
+/*}*/
 
-.tiles {
-  grid-area: tiles;
-  background: gray;
-}
+
+/*.tiles {*/
+/*  grid-area: tiles;*/
+/*  background: gray;*/
+/*}*/
 
 .tabs {
   grid-area: tabs;
   /*background: red;*/
   transition: width 1s ease-out;
   z-index: 2;
+  outline:solid orangered 1px;
   /*height:30em;*/
 }
 .stats {
@@ -172,8 +174,8 @@ body {
   background: #54a3ff;
   grid-area: stats;
   transition: height 1s ease-out;
-  height:20em;
-  border:solid red 1px;
+  /*height:20em;*/
+  outline:solid orangered 1px;
   /*padding-left:.5em;*/
   /*padding-right:.5em;*/
 

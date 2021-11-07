@@ -43,6 +43,7 @@ import './Tabify.css'
 import PulseSpinnerSpring from './components/springs/PulseSpinnerSpring'
 import useMeasure from "react-use-measure";
 import {useSpring,a} from "react-spring";
+import Accordion from "./components/Framer/Accordion";
 
 
 // const styles = {
@@ -414,15 +415,16 @@ export default function Tabify() {
 		console.log("handleSectionSelect",sectionkey);
 		tabcontrol.setActiveSection(sectionkey)
 
-		if(sectionkey === 2){
-			gridControl.setGridClass('friendsGrid')
-			// console.log("pane shift: friends");
-			// paner.setPane(paner.paneSettings['friends'])
-		}else{
-			gridControl.setGridClass('defaultGrid')
-			// console.log("pane shift: default");
-			// paner.setPane(paner.paneSettings['default'])
-		}
+		//testing: went away from grid control
+		// if(sectionkey === 2){
+		// 	gridControl.setGridClass('friendsGrid')
+		// 	// console.log("pane shift: friends");
+		// 	// paner.setPane(paner.paneSettings['friends'])
+		// }else{
+		// 	gridControl.setGridClass('defaultGrid')
+		// 	// console.log("pane shift: default");
+		// 	// paner.setPane(paner.paneSettings['default'])
+		// }
 
 		//if the section changed, also trigger tab set (0 as default)
 		if(sectionkey !== tabcontrol.section){
@@ -515,7 +517,17 @@ export default function Tabify() {
 		//console.log(tabcontrol.section);
 
 		const isLoaded = (tab) =>{
-			return globalState[globalUI.user.id + "_" + tab[Object.keys(tab)[0]].toLowerCase()].length > 0
+
+			var strName = Object.keys(tab)[0].toLowerCase();
+			//testing: assume home loads instantly and first
+			//todo: need to take care of these tho...
+
+			if(strName === "home" || strName === "artists_top" || strName === "tracks_recent"){
+				return false
+			}else{
+				return globalState[globalUI.user.id + "_" + tab[strName].toLowerCase()].length > 0
+			}
+
 		}
 		const getTabLabel = (tab) =>{
 			return <div style={{display:"flex"}}>
@@ -554,32 +566,37 @@ export default function Tabify() {
 	}
 
 
-	const [infoBound, setInfoBound] = React.useState(0);
+	//const [infoBound, setInfoBound] = React.useState(0);
 	const [infoCollapse, setInfoCollapse] = React.useState(false);
 	const [ref, bounds] = useMeasure()
 
-	console.log("$gotbounds",bounds.height);
-	console.log("$infoBounds",infoBound);
+	//console.log("$gotbounds",bounds.height);
+	//console.log("$infoBounds",infoBound);
 
-	const drawerProps = useSpring({
+	const drawerExpandProps = useSpring({
 		// top: show ? 200 : 0,
+		outline:"1px dashed purple",
 		position: "absolute",
 		left: 0,
 		right:0,
 		backgroundColor: "#808080",
 		//testing: seems like infopane's dynamic drawer height messes with my ability to calculate correctly here
 		//so I pass it back + also provide some offset value (which makes sense I think...)
-		 height: infoCollapse ? 74 :bounds.height + infoBound - 65,
+		 height: infoCollapse ? 268 :bounds.height,
 		//height:'40em',
 		minWidth:"23em",
 		paddingTop:".2em",
 		paddingBottom:".2em",
-		overflow:'hidden'
+		overflow:'visible'
 	});
 
 
 
+	const height = "20em";
+	const width = "100%";
+	//const [expanded, setExpanded] = React.useState(false);
 
+	const mapNum = [0,1,2];
 	return(
 		// style={styles}
 		<div>
@@ -605,36 +622,54 @@ export default function Tabify() {
 					{/*</Tab>*/}
 				</Tabs>
 			</AppBar>
-			<a.div id={'purple'} style={{...drawerProps,outline:"1px solid purple"}}>
-				<div ref={ref}>
-					{/*todo: copy & paste*/}
-					<TabPanel   className={'tabs0'} value={tabcontrol.section} index={0}>
+			{/*<a.div style={{...drawerExpandProps}}>*/}
+				<div >
+					{/*todo: further parameterize to allow for "My Profile" content*/}
 
-						{getTabs()}
-						{
-							infoCollapse &&
-							<div id={'handle'} style={{background:'#f53177',height:30,zIndex:500,position:"relative",width:"100%"}}>
-								<button onClick={() =>{setInfoCollapse(prev => !(prev))}}>expand summary</button>
-							</div>
-						}
-						<InfoPanel setInfoBound={setInfoBound} setInfoCollapse={setInfoCollapse}/>
+					{mapNum.map((index) =>
+						<TabPanel   className={'tabs' + index} value={tabcontrol.section} index={index}>
 
-					</TabPanel>
-					<TabPanel   className={'tabs1'} value={tabcontrol.section} index={1}>
-						{getTabs()}
-						{
-							infoCollapse &&
-							<div id={'handle'} style={{background:'#f53177',height:30,zIndex:500,position:"relative",width:"100%"}}>
-								<button onClick={() =>{setInfoCollapse(prev => !(prev))}}>expand summary</button>
-							</div>
-						}
-						<InfoPanel setInfoBound={setInfoBound} setInfoCollapse={setInfoCollapse}/>
-					</TabPanel>
-					<TabPanel value={tabcontrol.section} index={2}>
-						<Social/>
-					</TabPanel>
+
+							{index !== 2 ? getTabs():""}
+
+							<Accordion infoBound={gridControl.infoBound} ref={ref} i={0} setCollapse={gridControl.setCollapse} collapse={gridControl.collapse}
+									   content={
+										   <div style={{background:'pink',width:width}}>
+											   {index !== 2 ?
+											   <>
+												   {/*{*/}
+													{/*   infoCollapse &&*/}
+													{/*   <div id={'handle'} style={{background:'#f53177',height:30,zIndex:500,position:"relative",width:"100%"}}>*/}
+													{/*	   <button onClick={() =>{setInfoCollapse(prev => !(prev))}}>expand summary</button>*/}
+													{/*   </div>*/}
+												   {/*}*/}
+												   <InfoPanel setInfoBound={gridControl.setInfoBound} setInfoCollapse={setInfoCollapse}/>
+											   </>:
+												   <Social/>
+											   }
+										   </div>
+									   }
+							/>
+
+						</TabPanel>
+					)}
+
+
+					{/*<TabPanel   className={'tabs1'} value={tabcontrol.section} index={1}>*/}
+					{/*	{getTabs()}*/}
+					{/*	{*/}
+					{/*		infoCollapse &&*/}
+					{/*		<div id={'handle'} style={{background:'#f53177',height:30,zIndex:500,position:"relative",width:"100%"}}>*/}
+					{/*			<button onClick={() =>{setInfoCollapse(prev => !(prev))}}>expand summary</button>*/}
+					{/*		</div>*/}
+					{/*	}*/}
+					{/*	<InfoPanel setInfoBound={setInfoBound} setInfoCollapse={setInfoCollapse}/>*/}
+					{/*</TabPanel>*/}
+					{/*<TabPanel value={tabcontrol.section} index={2}>*/}
+					{/*	<Social/>*/}
+					{/*</TabPanel>*/}
 				</div>
-			</a.div>
+			{/*</a.div>*/}
 		</div>
 	)
 }

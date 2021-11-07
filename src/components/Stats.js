@@ -40,7 +40,8 @@ import './Stats.css'
 import {FormControl, FormControlLabel, Radio, RadioGroup, Select} from "@material-ui/core";
 //testing:
 import ContextStats from './ContextStats'
-import BubbleFamilyGenreChips from "./chips/BubbleFamilyGenreChips";
+//import BubbleFamilyGenreChips from "./chips/BubbleFamilyGenreChips";
+import PieChips from "./chips/PieChips";
 import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
 import PieChart3D from "./Charts/PieChart3D/PieChart3D";
@@ -469,7 +470,7 @@ function Stats(props) {
 
 					{/*testing: re-enable content fading*/}
 					{/*className={gridControl.statCollapse ? 'fadeOut':'fadeIn'}*/}
-					<div style={{display:"flex"}}>
+					<div >
 
 				        {/*note: big fold	*/}
 						{/*{statcontrol.stats.name === 'friends' &&*/}
@@ -532,15 +533,15 @@ function Stats(props) {
 						{/*todo: something odd going on with placement of entire stats = marginTops*/}
 						<div style={{"display":"flex",flexDirection:"column"}}>
 
-							<div style={{"padding":"5px","zIndex":"5","flexGrow":"1","overflowY":"auto","overflowX":"hidden","maxHeight":"23.5em","minWidth":"7em",marginTop:"9em"}}>
+							<div style={{"padding":"5px","zIndex":"5","flexGrow":"1","overflowY":"auto","overflowX":"hidden","maxHeight":"23.5em","minWidth":"7em",marginTop:"2em"}}>
 								{/*<div><PieGenreChips families={chipFamilies} genres={chipGenres}/></div>*/}
 								{/*familyDisabled={false}*/}
 								{/*testing: MoreChips*/}
-								{/*<BubbleFamilyGenreChips families={chipFamilies} genresDisabled={true} occurred={true} clearable={true}  genres={chipGenresRanked} flexDirection={'row'}/>*/}
+								<PieChips families={chipFamilies} genresDisabled={false} occurred={false} clearable={false}  genres={chipGenres} flexDirection={'row'}/>
 							</div>
 
 							{/*note: need this for flex-column to work*/}
-							<div style={{minHeight:"14em",marginTop:"-3em"}}>
+							<div style={{minHeight:"14em"}}>
 								{/*<div>*/}
 								{/*	<PieChart data={{series: {name: 'Genres', colorByPoint: true, data:pieData, animation: {duration: 2000}}}} />*/}
 								{/*</div>*/}
@@ -566,7 +567,6 @@ function Stats(props) {
 
 									<div>
 										{/*data={{series: {name: 'Genres', colorByPoint: true, data:pieData, animation: {duration: 2000}}}}*/}
-
 										<SocialPairPie  />
 									</div>
 									//

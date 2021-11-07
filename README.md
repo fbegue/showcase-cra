@@ -8,6 +8,13 @@ https://eslint.org/docs/rules/no-unused-expressions
 
 - For material-ui-pickers v3 use v1.x version of @date-io adapters.
 
+- Framer v5 (and other libraries) has an issue with the react-scripts (CRA) version I'm on
+    - going down a framer version gets ride of drag (the whole point of it)
+    - upgrading CRA causes a whole bunch of shit
+    - SOLUTION: overrides via react-app-rewired (root: config-overrides.js)
+    //https://github.com/framer/motion/issues/1307
+    //https://github.com/reactioncommerce/reaction-component-library/issues/399#issuecomment-467860022
+
 ## unused components (POCs)
 
 - src/components/utility/CssFade

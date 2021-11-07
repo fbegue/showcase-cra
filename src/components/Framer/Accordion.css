@@ -1,0 +1,10 @@
+.accordion header {
+    background: #0055ff;
+    border-radius: 10px;
+    color: white;
+    cursor: pointer;
+    height: 40px;
+    z-index: 10;
+    position: relative;
+    /*margin-bottom: 20px;*/
+}
