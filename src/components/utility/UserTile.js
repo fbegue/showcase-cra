@@ -19,15 +19,16 @@ function UserTile(props) {
 	}
 	return(
 
-		<div style={{display:"flex",flexDirection:"column",position:"relative"}}
+		<div id={'UserTile'} style={{display:"flex",flexDirection:"column",position:"relative"}}
 			 className={props.single ? null : props.selectedUser && props.selectedUser.id === props.item.id ? 'tile-selected':'tile-unselected'}>
 
 			<div >
-				{/*testing:*/}
+
 				{/*{!(props.item.isUser) ? getInvite(props.item):""}*/}
 				{/* width="150px" height="150px"*/}
 				{/*114px | 80px*/}
-				<img   width={props.size[0]} height={props.size[1]}  src={props.item.images[0] && props.item.images[0].url ? props.item.images[0].url:'https://via.placeholder.com/150?text=?'}
+				{/*testing: had this as img attrs but why?*/}
+				<img   style={{width:props.size[0], height:props.size[1]}} src={props.item.images[0] && props.item.images[0].url ? props.item.images[0].url:'https://via.placeholder.com/150?text=?'}
 					  onError={(e)=>{e.target.onerror = null; e.target.src="https://via.placeholder.com/150?text=?"}}/>
 			</div>
 			<div style={{background:"rgb(128 128 128 / .7)",color:"white",position:"absolute",width:"100%"}}>

@@ -7,11 +7,16 @@ import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
 import {a, animated, useSpring} from "react-spring";
 import RotateSpring from "./springs/RotateSpring";
 import InputIcon from "@material-ui/icons/Input";
+import './Player.css'
 import CustomizedInputBase from "./utility/CustomizedInputBase";
 import FriendsDisplay from "./Social/FriendsDisplay";
 import Popper from "@material-ui/core/Popper";
 import styles from "./Social/Social.tiles.module.css";
 import UserTile from "./utility/UserTile";
+
+//src library
+//https://github.com/gilbarbara/react-spotify-web-playback
+
 
 function Main(props) {
 	//console.log("$player",props);
@@ -52,7 +57,7 @@ function Main(props) {
 
 	//todo: even just pulling from params - somehow setting GLOBAL_UI_VAR crashes this????
 	const params = JSON.parse(localStorage.getItem('params'));
-	console.log("$player",params);
+	//console.log("$player",params);
 
 	//-------------------------------------------------
 	const [pstate, toggle] = useState(false)
@@ -73,7 +78,7 @@ function Main(props) {
 		// from: { opacity: 0, color: 'red' },
 		opacity:  pstate ? 1 : .5,
 		// "filter": isDrawerShowing ? "brightness(.5)" : "brightness(1)",
-		width: pstate ? "22.5em" : "3em"
+		width: pstate ? "17em" : "3em"
 		// width: isDrawerShowing ? "2.2em":"22.5em"
 	});
 

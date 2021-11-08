@@ -461,34 +461,38 @@ function Social(props) {
 				</animated.div>
 
 				{selectedUser && !(isDrawerShowing) &&
-				// <Paper>
-				<div style={{display:"flex",flexDirection:"row",marginLeft:".2em",marginTop:".5em"}}>
+
+				//	todo: not sure why I can't get this UserTile and guestStats to flex correctly
+
+				<div style={{display:"flex",flexDirection:"row"}}>
 					{/*<div><UserTile item={selectedUser} single={true} size={["200px","200px"]} /> </div>*/}
 					{/* style={{"position":"absolute","zIndex":"1"}}*/}
-					<div><UserTile item={selectedUser} single={true} size={["auto","auto"]} /> </div>
-					<div style={{"display":"flex","flexDirection":"column","zIndex":"2","marginLeft":".5em"}}>
-						<div style={{display:"flex", flexWrap:"wrap"}}>
-							{statCards.map((item,i) => (
-								<div key={item.label} style={{width:item.width, padding:"5px"}}>
-									<Card>
-										<CardContent>
-											<Typography variant="subtitle1" component={'span'} >{item.label}:{'\u00A0'}</Typography>
+					<div><UserTile item={selectedUser} single={true} size={["auto","16em"]} /> </div>
 
-											{/*todo: color should be typo color prop set in MUI theme*/}
-											<Typography variant="subtitle1" component={'span'} ><span style={{color:'#3f51b5'}}>{item.value}</span></Typography>
-										</CardContent>
-									</Card>
-								</div>
-							))}
-						</div>
-						<div>
-							<div style={{padding:"2px",color:"white",height:"20px",width:friendscontrol.families.length > 0? "9.2em":"5.3em",marginBottom:"1em"}}>
-								<Paper elevation={3}>
-									<Typography variant="subtitle1">
-										{friendscontrol.families.length > 0 ? 'Selected Family':"Top Family"}
-									</Typography>
-								</Paper>
-							</div>
+
+						{/*testing: sort of ditched this card idea*/}
+						{/*<div style={{display:"flex", flexWrap:"wrap"}}>*/}
+						{/*	{statCards.map((item,i) => (*/}
+						{/*		<div key={item.label} style={{width:item.width, padding:"5px"}}>*/}
+						{/*			<Card>*/}
+						{/*				<CardContent>*/}
+						{/*					<Typography variant="subtitle1" component={'span'} >{item.label}:{'\u00A0'}</Typography>*/}
+						{/*					*/}
+						{/*					<Typography variant="subtitle1" component={'span'} ><span style={{color:'#3f51b5'}}>{item.value}</span></Typography>*/}
+						{/*				</CardContent>*/}
+						{/*			</Card>*/}
+						{/*		</div>*/}
+						{/*	))}*/}
+						{/*</div>*/}
+						<div style={{"zIndex":"2",marginLeft:"11.5em"}} id={'guestStats'}>
+							{/*testing: meh*/}
+							{/*<div style={{padding:"2px",color:"white",height:"20px",width:friendscontrol.families.length > 0? "9.2em":"5.3em",marginBottom:"1em"}}>*/}
+							{/*	<Paper elevation={3}>*/}
+							{/*		<Typography variant="subtitle1">*/}
+							{/*			{friendscontrol.families.length > 0 ? 'Selected Family':"Top Family"}*/}
+							{/*		</Typography>*/}
+							{/*	</Paper>*/}
+							{/*</div>*/}
 							<div>
 								<BubbleFamilyGenreChips families={ chipFamiliesRanked[0] ? [chipFamiliesRanked[0].family_name]:[]} familyDisabled={true} occurred={true} clearable={false} genres={[]} flexDirection={'column'}/>
 							</div>
@@ -504,7 +508,7 @@ function Social(props) {
 								<BubbleFamilyGenreChips families={[]} familyDisabled={true} occurred={true} clearable={false} genres={chipGenresRanked} flexDirection={'column'}/>
 							</div>
 						</div>
-					</div>
+
 				</div>
 					// </Paper>
 				}

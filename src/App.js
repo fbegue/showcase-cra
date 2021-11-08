@@ -25,6 +25,8 @@ import { createMuiTheme } from '@material-ui/core/styles';
 // import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
 import { ThemeProvider as MuiThemeProvider } from '@material-ui/core/styles';
 import logo from './assets/sound_found.png'
+import { useDrag } from 'react-use-gesture'
+import {useSpring,animated} from "react-spring";
 import 'fontsource-roboto';
 import './App.css'
 import './components/tiles/Tiles.css'
@@ -115,7 +117,7 @@ function App(props) {
   //  let friendscontrol = FriendsControl.useContainer()
 
     const globalUI = useReactiveVar(GLOBAL_UI_VAR);
-    console.log("APP | globalUI ",globalUI);
+    //console.log("APP | globalUI ",globalUI);
 
     useEffect(() => {
         var newTime = null;
@@ -221,6 +223,48 @@ function App(props) {
 
     let gridControl = GridControl.useContainer()
 
+    //=============================================================
+
+     const [scrollTop, setScrollTop] = useState(0);
+    //
+    // const getScrollData = (event) =>{
+    //     console.log("getScrollData",event.target.scrollTop);
+    //     setScrollTop(event.target.scrollTop)
+    // }
+    //
+    // document.addEventListener("wheel", function (e) {
+    //
+    //     // get the old value of the translation (there has to be an easier way than this)
+    //     //var oldVal = parseInt(document.getElementById("body").style.transform.replace("translateY(","").replace("px)",""));
+    //
+    //     // to make it work on IE or Chrome
+    //     var variation = parseInt(e.deltaY);
+    //
+    //     // update the body translation to simulate a scroll
+    //    // document.getElementById("body").style.transform = "translateY(" + (oldVal - variation) + "px)";
+    //
+    //     console.log("wheel",variation);
+    //     return false;
+    //
+    // }, true);
+
+
+    //testing: so yeaaahh this is garbage...
+    //drag only detects 1 'drag event' as in 1 direction - if you double back it stops updating - so this isn't ever going to function like that...
+    //definitely shouldn't be using the xy end position in order to determine these bounds
+    //bc scrolling up then down  won't activate
+    //src (need to update to @useGesture)
+    //https://use-gesture.netlify.app/docs/state/
+
+    const bind = useDrag((state) => {
+        // console.log("drag",state.xy);
+        // console.log("drag",state.direction[1]);
+         if((state.direction[1] === -1  && state.xy[1] >415) ||  (state.direction[1] === 1 &&  state.xy[1] >260)){
+             //console.log("trigger");
+             setScrollTop(state.xy[1])
+         }
+    }, {})
+
     return (
         <MuiThemeProvider theme={muiTheme}>
             <Store>
@@ -236,12 +280,12 @@ function App(props) {
                         </Switch>
                     </div>
                 </BrowserRouter>
-                <div className={'app'}>
-                    <div  style={{position: "sticky",top: "-16px", padding:"1em 1em 0em 1em", borderBottom: "1px solid black", zIndex: "20",display:'flex',background:"#f0f0f0"}}>
-                        <div><img style={{height:"4em"}} src={logo}/> </div>
-                        {/*testing: need to make spring for auto-height on scroll event*/}
-                        <div style={{marginRight:"1em"}}>
-                            <Profile/>
+                {/* style={{overflow:"scroll"}} onScroll={getScrollData}*/}
+                <animated.div {...bind()}  className={'app'} >
+                    <div  style={{position: "sticky",top: "0px", "paddingTop":"0.5em","paddingBottom":"0.5em", borderBottom: "1px solid black", zIndex: "20",display:'flex',background:"#f0f0f0"}}>
+                        <div>
+
+                            <Profile scrollTop={scrollTop}/>
                         </div>
                         {/*<div><ControlTest/></div>*/}
                         {/*<input value={code} onChange={(event) =>{setCode(event.target.value)}}  />*/}
@@ -261,12 +305,11 @@ function App(props) {
                         {/*todo: forcing delay until I can figure it out*/}
 
                         {/*<Delayed waitBeforeShow={2000}>*/}
-                        {globalUI.access_token  &&
-                        <div >
-                            <Player token={globalUI.access_token} id={control.id} play={control.play}/>
-                            {/*<div>PLAYER</div>*/}
-                        </div>
-                        }
+                        {/*{globalUI.access_token  &&*/}
+                        {/*<div >*/}
+                        {/*    <Player token={globalUI.access_token} id={control.id} play={control.play}/>*/}
+                        {/*    /!*<div>PLAYER</div>*!/*/}
+                        {/*</div>*/}
                         {/*</Delayed>*/}
 
                     </div>
@@ -279,7 +322,7 @@ function App(props) {
 
 
 
-                            <div >
+                            <div>
                                 {globalUI.access_token &&
 
                                   <Tabify/>
@@ -323,7 +366,7 @@ function App(props) {
 
                     }
 
-                </div>
+                </animated.div>
             </Store>
         </MuiThemeProvider>
     );

@@ -7,7 +7,7 @@ export default function RotateSpring(props) {
 	const [shrink, setShrink] = useState(false);
 
 	const sprops = useSpring({
-		rotate: props.state ? 0 : 180,
+		rotate: props.vert ? props.state ? 90 : 270: props.state ? 0 : 180
 	})
 
 	const {x} = useSpring({
@@ -46,6 +46,7 @@ export default function RotateSpring(props) {
 			<animated.div style={sprops} >
 				<animated.div
 					style={{
+						color:"green",
 						//this is called an interpolation, and it has basically no documentation
 						scale: x.to({
 							range: [0, 1],

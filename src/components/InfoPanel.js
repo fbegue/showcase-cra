@@ -2,7 +2,7 @@ import React, {useContext, useEffect,useState} from 'react';
 import Typography from "@material-ui/core/Typography";
 import {GLOBAL_UI_VAR,CHIPGENRESRANKED} from "../storage/withApolloProvider";
 import {Context} from "../storage/Store";
-import {FriendsControl, StatControl, TileSelectControl} from "../index";
+import {FriendsControl, StatControl, TabControl, TileSelectControl} from "../index";
 import {useReactiveVar} from "@apollo/react-hooks";
 import Paper from '@material-ui/core/Paper';
 import ItemCarousel from './ItemCarousel'
@@ -20,6 +20,7 @@ function InfoPanel(props) {
 	let friendscontrol = FriendsControl.useContainer()
 	const globalUI = useReactiveVar(GLOBAL_UI_VAR);
 	const chipGenresRanked = useReactiveVar(CHIPGENRESRANKED);
+	let tabcontrol = TabControl.useContainer()
 
 	//console.log("$InfoPanel",chipGenresRanked);
 	const [globalState, globalDispatch] = useContext(Context)
@@ -153,7 +154,7 @@ function InfoPanel(props) {
 
 	const [ref, bounds] = useMeasure()
 
-	console.log("$gotbounds",bounds.height);
+	//console.log("$gotbounds",bounds.height);
 
 	//testing: disabled for now
 	const drawerProps = useSpring({
@@ -181,7 +182,23 @@ function InfoPanel(props) {
 	},[bounds.height]);
 
 
+//todo: need to centralize these
 
+	var tabIndexMap = {
+		0:{"artists_saved":"Artists"},
+		// 1:{"playlists":"Playlists"},
+		1:{"tracks_saved":"Tracks"},
+		2:{"albums_saved":"Albums"}
+	}
+	const getArtists = () =>{
+		var k = Object.values(tabIndexMap[tabcontrol.tab])[0].toLowerCase();
+		console.log("$k",k);
+		if(k === 'artists'){
+			console.warn("missing top artists stats designation = defaults to albums");
+			k = 'albums'
+		}
+		return globalState[globalUI.user.id + "_" + k +"_stats"].artists_top
+	}
 	return(
 		<div>
 			{
@@ -197,9 +214,7 @@ function InfoPanel(props) {
 						</div>
 						{/*<ListArtistPanels artists={globalState[globalUI.user.id + "_tracks_stats"].artists_top} />*/}
 
-
-							<ItemCarousel style={{marginTop:"-1em"}} artists={globalState[globalUI.user.id + "_tracks_stats"].artists_top} handleSelect={handleCarouselItemSelect} />
-
+							<ItemCarousel style={{marginTop:"-1em"}} artists={getArtists()} handleSelect={handleCarouselItemSelect} />
 						</div>
 
 					<div id={'drawer'}>

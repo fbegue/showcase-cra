@@ -532,8 +532,8 @@ function Stats(props) {
 
 						{/*todo: something odd going on with placement of entire stats = marginTops*/}
 						<div style={{"display":"flex",flexDirection:"column"}}>
-
-							<div style={{"padding":"5px","zIndex":"5","flexGrow":"1","overflowY":"auto","overflowX":"hidden","maxHeight":"23.5em","minWidth":"7em",marginTop:"2em"}}>
+							{/*,marginTop:"2em"*/}
+							<div style={{"padding":"5px","zIndex":"5","flexGrow":"1","overflowY":"auto","overflowX":"hidden","maxHeight":"23.5em","minWidth":"7em"}}>
 								{/*<div><PieGenreChips families={chipFamilies} genres={chipGenres}/></div>*/}
 								{/*familyDisabled={false}*/}
 								{/*testing: MoreChips*/}

@@ -279,7 +279,7 @@ function BubbleFamilyGenreChips(props) {
 	let myContainer = useRef(null);
 	//const [overflowActive, setOverflowActive] = useState(false);
 	useEffect(() => {
-		console.log("BubbleFamilyGenreChips | setOverflowActive",isEllipsisActive(myContainer));
+		//console.log("PieChips | setOverflowActive",isEllipsisActive(myContainer));
 		//props.setOverflowActive(isEllipsisActive(myContainer))
 
 		//todo: while tryingn to use reactive var its updating incorrectly in InfoPanel before this useEffect executes

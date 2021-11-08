@@ -3,6 +3,10 @@ import { useState,useEffect} from "react";
 import { motion, AnimatePresence,useMotionValue } from "framer-motion";
 //import { ContentPlaceholder } from "./ContentPlaceholder";
 import './Accordion.css'
+import RotateSpring from "../springs/RotateSpring";
+import FilterListIcon from "@material-ui/icons/FilterList";
+import InputIcon from "@material-ui/icons/Input";
+import {TabControl} from "../../index";
 const Accordion = ({infoBound,collapse, setCollapse,content }) => {
      // const i = 0;
     // const isOpen = i === collapse;
@@ -27,7 +31,8 @@ const Accordion = ({infoBound,collapse, setCollapse,content }) => {
     //console.log("$x",x);
 
 
-    //todo: not understanding why
+    let tabcontrol = TabControl.useContainer()
+
   return (
     <div className={'accordion'}>
 
@@ -63,7 +68,15 @@ const Accordion = ({infoBound,collapse, setCollapse,content }) => {
         transition={{ duration: 0.3 }}
         // onClick={() => setcollapse(collapse ? false : i)}
         onClick={() => setCollapse(collapse ? false : true)}
-      > click to {collapse ? 'expand':'collapse'}  </motion.header>
+      >
+      <div style={{display:"flex"}}>
+          <div style={{marginLeft:".5em"}}><RotateSpring vert={true} toggle={setCollapse} state={collapse} target={<InputIcon fontSize={'inherit'} style={{fontSize:"32px"}} color={'secondary'} />}/>
+          </div>
+          <div>
+              {collapse ? 'expand':'collapse'} {tabcontrol.section === 2 ? 'friends':'summary'}
+          </div>
+      </div>
+      </motion.header>
     </div>
   );
 };

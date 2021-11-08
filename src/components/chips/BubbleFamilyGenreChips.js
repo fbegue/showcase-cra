@@ -62,7 +62,7 @@ function BubbleFamilyGenreChips(props) {
 	let friendscontrol = FriendsControl.useContainer()
 	let control = Control.useContainer()
 
-	console.log("$BubbleFamilyGenreChips | props",props);
+	//console.log("$BubbleFamilyGenreChips | props",props);
 
 
 	const makeStyle = (fam,which) =>{
@@ -271,7 +271,7 @@ function BubbleFamilyGenreChips(props) {
 	let myContainer = useRef(null);
 	//const [overflowActive, setOverflowActive] = useState(false);
 	useEffect(() => {
-		console.log("BubbleFamilyGenreChips | setOverflowActive",isEllipsisActive(myContainer));
+		//console.log("BubbleFamilyGenreChips | setOverflowActive",isEllipsisActive(myContainer));
 		//props.setOverflowActive(isEllipsisActive(myContainer))
 
 		//todo: while tryingn to use reactive var its updating incorrectly in InfoPanel before this useEffect executes

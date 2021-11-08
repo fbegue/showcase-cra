@@ -6,5 +6,12 @@
     height: 40px;
     z-index: 10;
     position: relative;
+    /*customized */
+    margin:0.2em;
+    line-height: 2;
     /*margin-bottom: 20px;*/
+}
+
+header .MuiSvgIcon-colorSecondary{
+    color:white
 }

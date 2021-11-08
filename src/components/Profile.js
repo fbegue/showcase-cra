@@ -1,4 +1,4 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect,useState} from 'react';
 import { GLOBAL_UI_VAR } from '../storage/withApolloProvider';
 import {useReactiveVar} from "@apollo/react-hooks";
 import Button from '@material-ui/core/Button';
@@ -6,6 +6,10 @@ import Typography from "@material-ui/core/Typography";
 import api from "../api/api";
 import CustomizedInputBase from "./utility/CustomizedInputBase";
 import {Context} from "../storage/Store";
+import logo from "../assets/sound_found.png";
+import logo_icon from "../assets/sound_found_logo_icon.png";
+import Player from "./Player";
+import {Control} from "../index";
 
 let api_address = "https://api.soundfound.io"
 let redirect_address = 'https://soundfound.io'
@@ -54,40 +58,43 @@ function Profile(props) {
 		GLOBAL_UI_VAR({access_token:false,refresh_token:false,user:null})
 	}
 
-
-	const [query, setQuery] = useState("")
-	const handleChange = (event) =>{
-		setQuery(event.target.value);
-	}
-	const handlepostInfo = () => {
-		api.postInfo(query)
-			.then(r =>{
-				console.log("postInfo complete",r);
-			},e=>{
-				console.error("postInfo error",e);
-			})
-	};
-
-	const handlepostInfo2 = () => {
-		api.postInfo2(query)
-			.then(r =>{
-				console.log("postInfo2 complete",r);
-			},e=>{
-				console.error("postInfo2 error",e);
-			})
-	};
-
 	const [globalState, globalDispatch] = useContext(Context);
 	function checkState(){
 		console.log("$globalstate",globalState);
 		console.log("$globalUI",globalUI);
 	}
 
-	return(
-		<div>
 
-			<div style={{"position":"absolute","top":"0px","left":"0px","zIndex":"30"}}>
-					<button onClick={checkState}>checkState</button>
+	let control = Control.useContainer()
+
+
+	const [shrink, setShrink] = useState(false);
+
+
+
+	useEffect(() => {
+		//console.log("resizeHeaderOnScroll");
+		const distanceY =  props.scrollTop,
+			shrinkOn = 1,
+			headerEl = document.getElementById("profile-header");
+		//console.log("resizeHeaderOnScroll",distanceY);
+
+		 if(distanceY < 400) {
+			//console.log("shrinkOff");
+			headerEl.classList.remove("smaller");
+			setShrink(false)
+		}else{
+			// console.log("shrinkOn");
+			 headerEl.classList.add("smaller");
+			 setShrink(true)
+		 }
+	}, [props.scrollTop])
+
+	return(
+		<div id={'profile-header'} style={{height:shrink ? '2.5em':'initial'}}>
+
+			<div style={{"position":"absolute","top":"0px","left":"0px","zIndex":"30",opacity:".5"}}>
+				<button onClick={checkState}>checkState</button>
 			</div>
 			{!(globalUI.access_token) &&
 			<div>
@@ -98,19 +105,37 @@ function Profile(props) {
 			</div>
 			}
 			{globalUI.access_token &&
-			<div>
 				<div style={{display:"flex"}}>
-					<div style={{marginLeft:"1em"}}><Typography variant="subtitle1" gutterBottom>
-						{globalUI.user.display_name}
-						<div><Button size="small" onClick={handleLogout} variant="contained">Logout</Button></div>
-					</Typography></div>
-					<div style={{marginLeft:"1em"}}>
-						<img src={globalUI.user.images[0].url} style={{width: 50, borderRadius: '50%'}}/>
-					</div>
-					{/*	{globalUI.user.id}*/}
-				</div>
+					{shrink ?
+						<div style={{width:"2.5em"}}><img style={{width: "inherit"}} src={logo_icon}/> </div>
+					:
+						<div style={{width:"4em"}}><img style={{width: "inherit"}} src={logo}/> </div>
+					}
 
-			</div>
+
+					{shrink ?
+						<div style={{marginLeft:"1em",height:"2em",position:"relative",top:"-5px"}}>
+							<img src={globalUI.user.images[0].url} style={{width: 50, borderRadius: '50%'}}/>
+						</div>
+						:
+						<div style={{display:"flex"}}>
+							<div style={{marginLeft:"1em"}}>
+								<Typography variant="subtitle1" gutterBottom>
+									{globalUI.user.display_name}
+									<div><Button size="small" onClick={handleLogout} variant="contained">Logout</Button></div>
+								</Typography>
+							</div>
+							<div style={{marginLeft:"1em",height:"2em"}}>
+								<img src={globalUI.user.images[0].url} style={{width: 50, borderRadius: '50%'}}/>
+							</div>
+						</div>
+					}
+
+					<div>
+						<Player token={globalUI.access_token} id={control.id} play={control.play}/>
+					</div>
+
+				</div>
 			}
 		</div>)
 }

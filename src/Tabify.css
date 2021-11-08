@@ -18,6 +18,12 @@
     min-width:110px !important
 }
 
+.tabs2 .MuiContainer-root {
+    padding:0px !important;
+}
+.tabs2 .MuiTab-root {
+    min-width:110px !important
+}
 
 
 .MuiAppBar-colorPrimary {

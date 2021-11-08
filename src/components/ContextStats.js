@@ -30,6 +30,7 @@ import IconButton from '@material-ui/core/IconButton';
 import RotateSpring from "./springs/RotateSpring";
 import PlaylistCheckboxes from './tiles/PlaylistCheckboxes'
 import { GLOBAL_UI_VAR } from '../storage/withApolloProvider';
+import util from '../util/util'
 import Paper from "@material-ui/core/Paper";
 import InputIcon from "@material-ui/icons/Input";
 import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
@@ -132,17 +133,18 @@ function ContextStats(props) {
 	const uHeight = 260;
 
 	const tiles = useReactiveVar(TILES);
+
+	//testing
+	util.useProduceData()
+	util.useProduceEvents()
+
 	//console.log("$tiles",tiles);
 
 	const [items, setItems] = useState(tiles);
 	const [tilesLoading, setTilesLoading] = useState(true);
 	//console.log("componentDidRun | ContextStats",{tiles:tiles});
 
-	//testing: is non-static data the issue?
-	//actually causes the problem sooner? idk
-	//const tiles = sampleTiles
 
-	// const {tiles} = util.useProduceData()
 
 
 	//testing: is using friendcontrol the issue?
@@ -354,7 +356,7 @@ function ContextStats(props) {
 			<div>
 
 			</div>
-			<div>
+			<div id={'test1'}>
 				{/*note: floating filter buttons*/}
 				<div>
 					{/*<button*/}
@@ -405,54 +407,71 @@ function ContextStats(props) {
 					{/*		<div> <img style={{height:"3em",marginRight:".5em"}} src={SwipeRight}/> </div>*/}
 					{/*	</div>*/}
 					{/*</div>*/}
-					<div style={{"width":"100%","height":"3em","backgroundColor":"lightblue","display":"flex","alignItems":"center",justifyContent:"flex-end"}}>
+					{/*<div style={{"width":"100%","height":"3em","backgroundColor":"lightblue","display":"flex","alignItems":"center",justifyContent:"flex-end"}}>*/}
 
-						<div style={{marginLeft:"1em"}}>Matched  {events.length} Events </div>
-						<div style={{position: "relative",zIndex:"2",transform: "scaleX(-1)"}}>
-							<img style={{"height":"2.5em","marginTop":"0.3em","marginRight":"0.5em","marginLeft":"-0.3em"}} src={DragHand}/>
-						</div>
-						<div >
-							<img style={{height:"3em",marginRight:".5em"}} src={SwipeRight}/>
-						</div>
+					{/*<div style={{marginLeft:"1em"}}>Matched  {events.length} Events </div>*/}
+					{/*<div style={{position: "relative",zIndex:"2",transform: "scaleX(-1)"}}>*/}
+					{/*	<img style={{"height":"2.5em","marginTop":"0.3em","marginRight":"0.5em","marginLeft":"-0.3em"}} src={DragHand}/>*/}
+					{/*</div>*/}
+					{/*<div >*/}
+					{/*	<img style={{height:"3em",marginRight:".5em"}} src={SwipeRight}/>*/}
+					{/*</div>*/}
 
-					</div>
+					{/*</div>*/}
 
 					<div>
-						<div style={{"marginLeft":"0em","border":"#e2e2e2 1px solid","borderRadius":"5px",display:"flex",alignItems: "center"}}>
-							{tabcontrol.section === 2 &&
-							getTabs()
-							}
-							{/*<div style={{flexGrow:"1"}}>{'\u00A0'}</div>*/}
-							<div style={{position:"relative",width:"7em",height:"4em","marginTop":"-.2em"}}>
-								{/*testing :disabled total length for now*/}
-								{/*<div>{items.length}/{tiles.length}</div>*/}
-								<div style={{display:'flex',flexDirection:"row"}}>
-									<div>
-										<IconButton aria-label="nav-prev">
-											<NavigateBeforeIcon style={{ fontSize: 50 }} onClick={() =>{setPage((prevState => {
-												return prevState !== 1 ? prevState - 1:prevState
-											}))}}/>
-										</IconButton>
+						<div style={{"marginLeft":"0em","border":"#e2e2e2 1px solid","borderRadius":"5px",display:"flex",alignItems: "center", justifyContent:"space-evenly"}}>
+							{/*testing:*/}
+							{/*{tabcontrol.section === 2 && getTabs()}*/}
 
-									</div>
-									<div style={{"display":"inline-block","position":"relative","marginLeft":"-1em","marginTop":"1.5em","fontSize":"20px",minWidth:"1.4em"}}>
-										{ tiles.length > 0 &&
-											<span>
-												{page}/{Math.ceil(tiles.length/pageSize)}
-											</span>
-										}
+							<div style={{display:"flex",flexDirection:"column",marginTop:"-2em"}}>
+								<div> Stats </div>
+								{/*<div style={{position: "relative",zIndex:"2",transform: "scaleX(-1)"}}>*/}
+								{/*	<img style={{"height":"2.5em","marginTop":"0.3em","marginRight":"0.5em","marginLeft":"-0.3em"}} src={DragHand}/>*/}
+								{/*</div>*/}
 
-									</div>
-									<div style={{marginLeft:"-1em"}}>
-										<IconButton aria-label="nav-next">
-											<NavigateNextIcon style={{ fontSize: 50 }} onClick={() =>{setPage((prevState => {
-												return prevState <= tiles.length/pageSize ? prevState + 1:prevState
-											}))}}/>
-										</IconButton>
-									</div>
+								<div style={{"transform":"scale(-1, 1)",marginTop:"-1em",marginLeft:"1em"}}>
+									<img style={{height:"3em"}} src={SwipeRight}/>
 								</div>
 
 							</div>
+
+							<div style={{display:'flex',flexDirection:"row",marginTop:"-1em",marginLeft:"-1em",width:"7em"}}>
+								<div>
+									<IconButton aria-label="nav-prev">
+										<NavigateBeforeIcon style={{ fontSize: 50 }} onClick={() =>{setPage((prevState => {
+											return prevState !== 1 ? prevState - 1:prevState
+										}))}}/>
+									</IconButton>
+								</div>
+								<div style={{"marginLeft":"-1em","marginTop":"1.5em",minWidth:"1.4em"}}>
+									{ tiles.length > 0 &&
+									<div style={{"display":"flex",flexDirection:"column",alignItems:"center"}}>
+										<div  style={{fontSize:"20px",fontWeight:"bold",marginBottom:".1em"}}>{page}/{Math.ceil(tiles.length/pageSize)}</div>
+										<div style={{fontSize:"15px"}}>20/{tiles.length} </div>
+									</div>
+
+									}
+
+								</div>
+								<div style={{marginLeft:"-1em"}}>
+									<IconButton aria-label="nav-next">
+										<NavigateNextIcon style={{ fontSize: 50 }} onClick={() =>{setPage((prevState => {
+											return prevState <= tiles.length/pageSize ? prevState + 1:prevState
+										}))}}/>
+									</IconButton>
+								</div>
+							</div>
+							<div style={{display:"flex",flexDirection:"column",marginTop:"-2em"}}>
+								<div style={{marginLeft:"1em"}}> {events.length} Events </div>
+								{/*<div style={{position: "relative",zIndex:"2",transform: "scaleX(-1)"}}>*/}
+								{/*	<img style={{"height":"2.5em","marginTop":"0.3em","marginRight":"0.5em","marginLeft":"-0.3em"}} src={DragHand}/>*/}
+								{/*</div>*/}
+								<div style={{marginTop:"-1em",marginLeft:"1em"}}>
+									<img style={{height:"3em"}} src={SwipeRight}/>
+								</div>
+							</div>
+
 						</div>
 					</div>
 
@@ -501,8 +520,8 @@ function ContextStats(props) {
 				open={gridControl.tileFilterOpen}
 				onClose={() => {}}
 				onOpen={() => {}}
-				PaperProps={{ style: { position: "absolute"} }}
-				BackdropProps={{ style: { position: "absolute" } }}
+				PaperProps={{ style: { position: "absolute",background:"rgb(255 255 255 / 75%)"} }}
+				BackdropProps={{ style: { position: "absolute"} }}
 				ModalProps={{
 					container: document.getElementById("drawer-container"),
 					style: { position: "absolute" }

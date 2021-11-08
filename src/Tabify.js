@@ -437,7 +437,7 @@ export default function Tabify() {
 
 	const handleTabChange = (event, tabindex) => {
 		console.log("handleTabChange",tabMap[tabcontrol.section][tabindex]);
-		//console.log(tabindex);
+		console.log(tabcontrol.tab);
 		tabcontrol.setActiveTab(tabindex);
 		statcontrol.setStats({name:Object.keys(tabMap[tabcontrol.section][tabindex])[0]})
 
@@ -630,7 +630,9 @@ export default function Tabify() {
 						<TabPanel   className={'tabs' + index} value={tabcontrol.section} index={index}>
 
 
-							{index !== 2 ? getTabs():""}
+							{/*testing:*/}
+							{getTabs()}
+							{/*{index !== 2 ? getTabs():""}*/}
 
 							<Accordion infoBound={gridControl.infoBound} ref={ref} i={0} setCollapse={gridControl.setCollapse} collapse={gridControl.collapse}
 									   content={

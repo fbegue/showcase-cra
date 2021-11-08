@@ -223,7 +223,7 @@ function PieChart3D(props) {
 		if(props.series[0].data.length > 0 && (elementRef.current.chart.series[0] ? elementRef.current.chart.series[0].name === 'Families':true))
 		{
 			console.log("$made update",elementRef.current.chart.options.chart.className);
-			//debugger;
+
 			//testing: playing around w/ proper init instead of junk data below
 			elementRef.current.chart.addSeries(props.series[0])
 			elementRef.current.chart.update({drilldown:props.drilldown})
@@ -258,7 +258,6 @@ function PieChart3D(props) {
 	//https://api.highcharts.com/highcharts/plotOptions.series.animation
 
 	useEffect(() => {
-		debugger;
 		if(friendscontrol.families.length > 0){
 			console.log("PieChart3D | family update",friendscontrol.families);
 			if( Highcharts.charts.length > 2){
