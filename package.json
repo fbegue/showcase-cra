@@ -1,6 +1,6 @@
 {
   "name": "showcase-cra",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "dependencies": {
     "@apollo/client": "^3.3.15",
@@ -50,6 +50,8 @@
     "web-vitals": "^1.0.1"
   },
   "scripts": {
+    "minor": "",
+    "push": "npm version minor --force && git add . && git commit -m",
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",
     "test": "react-app-rewired test",
