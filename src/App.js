@@ -1,3 +1,4 @@
+
 import React, {useState, useEffect, useRef, useContext} from 'react';
 import RedirectPage from './RedirectPage';
 
@@ -30,6 +31,7 @@ import {useSpring,animated} from "react-spring";
 import 'fontsource-roboto';
 import './App.css'
 import './components/tiles/Tiles.css'
+
 
 //testing: viewpager
 //import stylesViewPager from'./stylesViewPager.module.css'
@@ -285,7 +287,7 @@ function App(props) {
                     <div  style={{position: "sticky",top: "0px", "paddingTop":"0.5em","paddingBottom":"0.5em", borderBottom: "1px solid black", zIndex: "20",display:'flex',background:"#f0f0f0"}}>
                         <div>
 
-                            <Profile scrollTop={scrollTop}/>
+                            <Profile version={pjson.version} scrollTop={scrollTop}/>
                         </div>
                         {/*<div><ControlTest/></div>*/}
                         {/*<input value={code} onChange={(event) =>{setCode(event.target.value)}}  />*/}
@@ -373,4 +375,5 @@ function App(props) {
 }
 
 export default withStyles(styles)(App);
+var pjson = require('../package.json');
 // export default withStyles(styles)(withApolloProvider(App));

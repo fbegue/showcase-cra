@@ -94,7 +94,7 @@ function Profile(props) {
 		<div id={'profile-header'} style={{height:shrink ? '2.5em':'initial'}}>
 
 			<div style={{"position":"absolute","top":"0px","left":"0px","zIndex":"30",opacity:".5"}}>
-				<button onClick={checkState}>checkState</button>
+				<button onClick={checkState}>checkState {props.version}</button>
 			</div>
 			{!(globalUI.access_token) &&
 			<div>
