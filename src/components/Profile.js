@@ -95,7 +95,7 @@ function Profile(props) {
 
 			<div style={{"position":"absolute","top":"0px","left":"0px","zIndex":"30",opacity:".5"}}>
 				<button onClick={checkState}>checkState {props.version}</button>
-
+				
 			</div>
 			{!(globalUI.access_token) &&
 			<div>
