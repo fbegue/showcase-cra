@@ -2,7 +2,32 @@
 [class*="_ActionsRSWP"]{
    justify-content: flex-start;
 }
-/*adjust title/artist display for shrinked view*/
-[class*="_ActionsRSWP"]{
-   margin-left:3em;
+
+/*move text title & artist to right*/
+[class*="__nnvdcq"]{
+   padding-left: 55px !important;
 }
+
+/*only show devices when drawer is expanded*/
+[class*="_DevicesRSWP "]{
+   visibility: var(--displayDevices);
+}
+
+
+/*testing: move slider to bottom / show only w/ track selected*/
+/*(b/c otherwise it's just floating there... yeah idk about this)*/
+[class*="_SliderRSWP "]{
+   bottom:-96px;
+   visibility: var(--displaySlider);
+}
+/*testing:increase slider size*/
+[role="slider"]{
+   transform: scale(1.5) !important;
+}
+
+
+/*testing:?*/
+/*adjust title/artist display for shrinked view*/
+/*[class*="_ActionsRSWP"]{*/
+/*   margin-left:3em;*/
+/*}*/

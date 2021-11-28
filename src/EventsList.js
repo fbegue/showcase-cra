@@ -44,10 +44,12 @@ import {useImage} from 'react-image'
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import SwipeRight from "./assets/swipe-right.png";
 import DragHand from "./assets/noun_Drag Hand_230196.png";
+import ApplyPulse from "./components/springs/ApplyPulse";
+import FilterListIcon from "@material-ui/icons/FilterList";
 //import GenreChipsDumb from './components/chips/GenreChipsDumb.js'
-import './components/utility/CustomScroll/contextStats.scss'
-import "./components/utility/CustomScroll/FirstComp/customScroll.css";
-import CustomScroll from "react-custom-scroll";
+// import './components/utility/CustomScroll/contextStats.scss'
+// import "./components/utility/CustomScroll/FirstComp/customScroll.css";
+// import CustomScroll from "react-custom-scroll";
 
 function ChipsArray_dep(props) {
 	//const classes = useStyles();
@@ -154,16 +156,25 @@ function EventsList() {
 
 		//console.log("$showPlay",sub);
 		return <div>
-			<span className={'play-events'}>
+			<div className={'play-events'}>
+				{/*todo: assuming no genres = tried to locate in spotify but couldn't find it, so can't play*/}
+				<div style={{marginTop:"-.4em"}}>
 				{(sub.artist.genres.length >0 ?
 					<span>
-						{control.play && control.playArtist === sub.artist.id ? <PauseCircleOutlineIcon fontSize={'small'} onClick={() => handlePlay(sub.artist)}></PauseCircleOutlineIcon>
- 						: <PlayCircleOutlineIcon fontSize={'small'} onClick={() => handlePlay(sub.artist)}></PlayCircleOutlineIcon>
+						{control.play && control.playArtist === sub.artist.id ?
+							<ApplyPulse target={
+								<PauseCircleOutlineIcon fontSize={'inherit'} style={{fontSize:"30px"}} color={'secondary'} onClick={() => handlePlay(sub.artist)}></PauseCircleOutlineIcon>
+							}/>
+ 						:
+							<ApplyPulse target={
+								<PlayCircleOutlineIcon fontSize={'inherit'} style={{fontSize:"30px"}} color={'secondary'} onClick={() => handlePlay(sub.artist)}></PlayCircleOutlineIcon>
+							}/>
 						}
 					</span>:<div></div>
 					)}
-			</span>
-			<span>{sub.displayName}</span>
+				</div>
+				<div>{sub.displayName}</div>
+			</div>
 		</div>
 		// return <span>{sub.displayName}</span>
 		// return (sub.artist.spotifyTopFive ? <PlayCircleOutlineIcon onClick={() => handlePlay(sub.artist)}> </PlayCircleOutlineIcon>:{})
@@ -404,8 +415,10 @@ function EventsList() {
 		}
 
 		return(
-			<div className={'crazy-scroll'} style={{maxHeight:"33em"}}>
-			<CustomScroll>
+			<div style={{maxHeight:"33em"}}>
+			{/*	testing: disabled custom scroll attempt*/}
+			{/*<div className={'crazy-scroll'} style={{maxHeight:"33em"}}>*/}
+			{/*<CustomScroll>*/}
 				{
 					children.map(subOption => {
 						if (!subOption.childrenKey) {
@@ -559,7 +572,8 @@ function EventsList() {
 						);
 					})
 				}
-			</CustomScroll>
+			{/*</CustomScroll>*/}
+			{/*</div>*/}
 			</div>
 		)
 	}

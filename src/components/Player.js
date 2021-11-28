@@ -78,7 +78,7 @@ function Main(props) {
 		// from: { opacity: 0, color: 'red' },
 		opacity:  pstate ? 1 : .5,
 		// "filter": isDrawerShowing ? "brightness(.5)" : "brightness(1)",
-		width: pstate ? "17em" : "3em"
+		width: pstate ? "20em" : "3em"
 		// width: isDrawerShowing ? "2.2em":"22.5em"
 	});
 
@@ -91,6 +91,32 @@ function Main(props) {
 		// width: isDrawerShowing ? "22.5em" : "2.2em"
 		// width: isDrawerShowing ? "2.2em":"22.5em"
 	});
+
+
+	var root = document.querySelector(':root');
+
+
+		useEffect(() => {
+			if(props.id && props.play){
+				root.style.setProperty('--displaySlider','visible')
+			}
+			else{
+				root.style.setProperty('--displaySlider','hidden')
+			}
+
+		}, [props.id,props.play])
+
+
+	useEffect(() => {
+		if(pstate){
+			root.style.setProperty('--displayDevices','visible')
+		}
+		else{
+			root.style.setProperty('--displayDevices','hidden')
+		}
+
+	}, [pstate])
+
 
 	return(params ?
 		<div>
@@ -110,8 +136,9 @@ function Main(props) {
 			</animated.div>
 			<animated.div style={drawerSpringStyle}>
 				<div className="drawer">
-					<SpotifyPlayer token={params.access_token} uris={['spotify:track:' + props.id]} callback={callback} play={props.play}
-								   magnifySliderOnHover={false}/>
+					<SpotifyPlayer token={params.access_token} uris={props.id ? ['spotify:track:' + props.id]:[]} callback={callback} play={props.play}
+								   //testing: not working?
+								   magnifySliderOnHover={true}/>
 				</div>
 			</animated.div>
 		</div>

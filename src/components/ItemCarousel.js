@@ -1,5 +1,5 @@
 import ReactCoverCarousel from "react-cover-carousel";
-import React,{useRef,useEffect} from "react";
+import React,{useState,useEffect} from "react";
 
 //note: recall this package is OLD AF and should probably be replaced
 //src:
@@ -13,13 +13,14 @@ function Test(){
 }
 function ItemCarousel(props){
 
-	var images = [];
-	//var root = document.documentElement;
+	const [pages, setPages] = useState([]);
 
+	//var root = document.documentElement;
 	//todo: spent a non-zero amount of time trying to force this VERY OLD caro library to have text over images
 	//basically only way I came up with was using ::after w/ css vars but I can't access
 
 	var img = null;
+	var images = [];
 	props.artists.forEach((a,i) =>{
 		//
 		img = <img alt={a.artist.name} src={a.artist.images[0].url} onClickCapture={(e) =>{props.handleSelect(a.artist);e.preventDefault()}} ></img>
@@ -33,17 +34,17 @@ function ItemCarousel(props){
 	images.push(images[0])
 	images.push(images[1])
 
-
-	// {props.artists.map((item,i) => (
-	// 	<div>
-	// 		<div style={{height:"5em",width:"5em",position:"relative",zIndex:"2"}} key={item.artist.id}>{item.artist.name} ({item.value})
-	// 		</div>
-	// 		<img src={item.artist.images[0].url} style={{height:"5em",width:"5em",position:"absolute",zIndex:"1",marginTop:"-5em"}}></img>
-	// 	</div>
-	// ))}
+	//testing: trying to see if this library would handle in/out animations
+	// eslint-disable-next-line no-unused-expressions
+	pages.length === 0 ? setPages(images):{};
+	const modifyPages = () =>{
+		setPages((prev) =>{return prev.filter(r =>{return r !== prev[0]})})
+	}
 
 	return(
 		// <p>test css var</p>
+		<div>
+			<button onClick={() =>{modifyPages()}}/>
 		<ReactCoverCarousel
 			 enableHeading={true}
 			// width={'100%'}
@@ -66,9 +67,9 @@ function ItemCarousel(props){
 			maxPixelWidthForMobileMediaQuery={0}
 			zoomable={false}
 		>
-			{images}
+			{pages}
 		</ReactCoverCarousel>
-
+		</div>
 		)
 	// return (
 	// 	<div style={{display:"flex"}}>

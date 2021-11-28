@@ -6,7 +6,7 @@ import PulseSpinnerSpring from '../springs/PulseSpinnerSpring'
 import {Context} from "../../storage/Store";
 
 function FriendsDisplay(props) {
-	//console.log("FriendsDisplay | users",props.users);
+	console.log("FriendsDisplay | users",props.users);
 
 	const columns = 3;
 	//note: this width divided by # of columns = the width of one item

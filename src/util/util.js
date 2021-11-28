@@ -1,5 +1,4 @@
 /* eslint-disable no-unused-expressions */
-import Highcharts from 'highcharts'
 import _ from "lodash";
 // import ChipsArray from "../components/utility/ChipsArray";
 import React, {useContext,useState,useEffect} from "react";
@@ -9,11 +8,12 @@ import {Highlighter, StatControl,FriendsControl,Control,TabControl,PieControl} f
 import {Context} from "../storage/Store";
 import {useReactiveVar} from "@apollo/react-hooks";
 import {GLOBAL_UI_VAR,TILES,EVENTS_VAR,STATS,CHIPFAMILIES,CHIPGENRES,
-	CHIPGENRESRANKED,CHIPFAMILIESRANKED,PIEDATADRILLDOWN,PIEDATA,PIEDATAGUEST,PIEDATADRILLDOWNGUEST} from "../storage/withApolloProvider";
+	CHIPGENRESRANKED,CHIPFAMILIESRANKED,PIEDATADRILLDOWN,PIEDATA,
+	PIEDATAGUEST,PIEDATADRILLDOWNGUEST,CHIPGENRESCOLORMAP,CHIPGENRESCOMBINEDMAP} from "../storage/withApolloProvider";
 
 import {data1} from './testData'
 const uuid = require('react-uuid')
-
+var tinycolor = require("tinycolor2");
 const getPointSum = (data) =>{
 	var t=0;
 	data.forEach(s =>{t = t + s.data.length})
@@ -1394,7 +1394,7 @@ function useProduceEvents(){
 	//let highlighter = Highlighter.useContainer();
 	let friendscontrol = FriendsControl.useContainer()
 	let tabcontrol = TabControl.useContainer()
-	var piecontrol = PieControl.useContainer()
+	//var piecontrol = PieControl.useContainer()
 	const globalUI = useReactiveVar(GLOBAL_UI_VAR);
 	const piedata = useReactiveVar(PIEDATA);
 	const piedatadrilldown = useReactiveVar(PIEDATADRILLDOWN);
@@ -1747,14 +1747,51 @@ function useProduceEvents(){
 				// 	tempPieDataDrilldown.series.push({name:fname,id:fname,data:d})
 				// })
 
+				//todo: change packages from tinycolor to color (tinycolor didn't have alpha adjustments)
+
 				var getDrilldownData = (fmap,gmap,drilldown) =>{
-					Object.keys(fmap).forEach((fname) =>{
+					Object.keys(fmap).forEach((fname,i) =>{
 						var gs = genres.filter(gOb =>{return gOb.family_name === fname});
 						var d = []
-						gs.forEach(gOb =>{
+						var colorMap = {};
+						var mult = 3;
+						var offset = 20;
+
+						//note: to go from darkest to lightest, we have to lighten 1st half and darken 2nd half
+						//higher lighten value = lighter color, so we need to start with lightest color and adjust down
+						//for darken, just keep adding since > # = darker color
+						var lightest = (gs.length/2)*mult + offset; //largest I
+						var adjust = null;
+						gs.forEach((g,i) =>{
+							adjust = (i*mult)+offset
+							if(i <= gs.length/2){
+								colorMap[g.name] = tinycolor(familyColors[fname]).lighten(lightest - adjust).toString()
+							}
+							else{
+								//could have just broke this into 2 loops
+								//instead we'll just set (i) to inc like it did in lighten clause
+								var asi = i-gs.length/2
+								adjust = (asi*mult)+offset
+								colorMap[g.name] = tinycolor(familyColors[fname]).darken(adjust).toString()
+							}
+							// console.log(colorMap[g.name] );
+						})
+						CHIPGENRESCOLORMAP(colorMap)
+
+						//todo: don't feel like this needs to be done for EACH Object.keys(fmap) ?
+						//console.log("$colorMap",colorMap);
+						//debugger;
+						gs.forEach((gOb,gi) =>{
 							//because genres is the entire list for both users, it's possible
 							//the inputed user's map doesn't have an entry for it
-							gmap[gOb.name] ? d.push([gOb.name,Object.keys(gmap[gOb.name]).length]):{}
+							//testing: array format instead of normal objects?? why tho
+							//gmap[gOb.name] ? d.push([gOb.name,Object.keys(gmap[gOb.name]).length]):{}
+
+							//todo: set real colors on families, then use tinyColor to set genres based on family color
+							//https://github.com/bgrins/TinyColor
+
+							gmap[gOb.name] ? d.push({name:gOb.name,y:Object.keys(gmap[gOb.name]).length,color:colorMap[gOb.name]}):{}
+
 						})
 						d.sort((a,b) =>{return  b[1] - a[1]})
 
@@ -1770,14 +1807,15 @@ function useProduceEvents(){
 
 				getDrilldownData(familyArtistGuest,genreArtistGuest,tempPieDataDrilldownGuest)
 
+
 				var tempPieData  = [];
 				var tempPieDataGuest  = [];
 
 				var producePieData = function(map,destArr){
-					Object.keys(map).forEach(fam =>{
+					Object.keys(map).forEach((fam,i) =>{
 						//todo: bandaid (2) (null shouldn't be here)
 						if(fam !== 'null'){
-							destArr.push({name:fam,drilldown:fam,id:familyIdMap[fam],y:map[fam].length})
+							destArr.push({name:fam,drilldown:fam,id:familyIdMap[fam],y:map[fam].length,color:familyColors[fam]})
 						}
 					});
 					destArr.sort((a,b) =>{return  b.y - a.y})
@@ -1785,6 +1823,29 @@ function useProduceEvents(){
 
 				producePieData(familyArtist,tempPieData)
 				producePieData(familyArtistGuest,tempPieDataGuest)
+
+				var temp_combined_genreArtist  = {};
+				if(!(genreArtistGuest)){
+					temp_combined_genreArtist = genreArtistUser
+				}
+				else{
+					var temp_user = JSON.parse(JSON.stringify(genreArtistUser))
+					Object.keys(genreArtistGuest).forEach(gName =>{
+
+						//if temp_user doesn't have a genre that guest did, make a key entry for it
+						if(!(temp_user[gName])){temp_user[gName] = []}
+
+						//for every artist @ key = gName
+						genreArtistGuest[gName].forEach(a =>{
+							var foundArtist =_.find(temp_user[gName], {id:a.id});
+							!(foundArtist)? temp_user[gName].push(a):{};
+						})
+					})
+					temp_combined_genreArtist = temp_user
+				}
+
+				console.log("$temp_combined_genreArtist",temp_combined_genreArtist);
+				CHIPGENRESCOMBINEDMAP(temp_combined_genreArtist)
 
 
 

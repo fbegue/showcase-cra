@@ -5,6 +5,8 @@ import {GLOBAL_UI_VAR} from "../storage/withApolloProvider";
 import {Context, initUser} from "../storage/Store";
 import {Control} from "../index";
 import exampleFetchEvents from '../data/example/fetchEvents'
+
+import dan2_example from '../data/example/DanielNiemiec#2'
 function Dispatch(props) {
 
 	const globalUI = useReactiveVar(GLOBAL_UI_VAR);
@@ -101,6 +103,12 @@ function Dispatch(props) {
 			var friendsProms = [];
 			friendsProms.push(api.fetchSpotifyUsers({auth:globalUI}))
 
+			var fake =  function(){
+				return new Promise(function(done, fail) {
+					done(dan2_example)
+				})
+			}
+
 			globalUI.user.related_users.filter(r =>{return r.friend})
 				//testing: Dan only
 				 //.filter(r =>{return r.id === "123028477"})
@@ -108,13 +116,12 @@ function Dispatch(props) {
 				.filter(r =>{return r.id === "123028477#2"})
 			 // .filter(r =>{return r.display_name !== "Dustin Reinhart"})
 				.forEach(f =>{
-					friendsProms.push(api.fetchStaticUser( {auth:globalUI,friend:f}))
+					//testing: using example response on fetchStaticUser
+					//friendsProms.push(api.fetchStaticUser( {auth:globalUI,friend:f}))
+					friendsProms.push(fake())
 				})
-
-
 			console.log("setStatic...",friendsProms.length);
 			var frpr = await Promise.all(friendsProms)
-
 
 			//console.log("setStatic users fetched",fpr.length);
 			globalDispatch({type: 'init', payload:frpr[0],user: globalUI.user,context:'spotifyusers'});

@@ -375,7 +375,7 @@ function Social(props) {
 				style={{
 					//todo: have to set explcit height here?
 					//not undertstanding why it just doesn't adjust to content
-					height: "16.5em",
+					height: "18.5em",
 					border: "1px solid black",
 					position: "relative"
 				}}

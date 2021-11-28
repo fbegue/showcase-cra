@@ -91,25 +91,6 @@ const styles = theme => ({
     }
 });
 
-class Delayed extends React.Component {
-
-    constructor(props) {
-        super(props);
-        this.state = {hidden : true};
-    }
-
-    componentDidMount() {
-        setTimeout(() => {
-            this.setState({hidden: false});
-        }, this.props.waitBeforeShow);
-    }
-
-    render() {
-        return this.state.hidden ? '' : this.props.children;
-    }
-}
-
-
 function App(props) {
 
     const { classes } = props;
@@ -258,15 +239,38 @@ function App(props) {
     //src (need to update to @useGesture)
     //https://use-gesture.netlify.app/docs/state/
 
-    const bind = useDrag((state) => {
-        // console.log("drag",state.xy);
-        // console.log("drag",state.direction[1]);
-         if((state.direction[1] === -1  && state.xy[1] >415) ||  (state.direction[1] === 1 &&  state.xy[1] >260)){
-             //console.log("trigger");
-             setScrollTop(state.xy[1])
-         }
-    }, {})
+    // {...bind()}
 
+    // const bind = useDrag((state) =>
+    // {
+    //      //console.log("drag",state);
+    //     // console.log("drag",state.direction[1]);
+    //      if((state.direction[1] === -1  && state.xy[1] >415) ||  (state.direction[1] === 1 &&  state.xy[1] >260)){
+    //          //console.log("trigger");
+    //          setScrollTop(state.xy[1])
+    //      }
+    // }, {})
+
+    function useOnScreen(ref) {
+
+        const [isIntersecting, setIntersecting] = useState(false)
+
+        const observer = new IntersectionObserver(
+            ([entry]) => setIntersecting(entry.isIntersecting)
+        )
+
+        useEffect(() => {
+            //eslint-disable-next-line no-unused-expressions
+            ref.current  ? observer.observe(ref.current):{}
+            // Remove the observer as soon as the component is unmounted
+            return () => { observer.disconnect() }
+        }, [])
+
+        return isIntersecting
+    }
+
+    const ref = useRef()
+    const isVisible = useOnScreen(ref)
     return (
         <MuiThemeProvider theme={muiTheme}>
             <Store>
@@ -283,36 +287,18 @@ function App(props) {
                     </div>
                 </BrowserRouter>
                 {/* style={{overflow:"scroll"}} onScroll={getScrollData}*/}
-                <animated.div {...bind()}  className={'app'} >
-                    <div  style={{position: "sticky",top: "0px", "paddingTop":"0.5em","paddingBottom":"0.5em", borderBottom: "1px solid black", zIndex: "20",display:'flex',background:"#f0f0f0"}}>
-                        <div>
+                <animated.div className={'app'} >
 
-                            <Profile version={pjson.version} scrollTop={scrollTop}/>
+                    <div  style={{position: "sticky",top: "0px", "paddingTop":"0.5em","paddingBottom":"0.5em",
+                        borderBottom: "1px solid black", zIndex: "20",display:'flex',background:"#f0f0f0"}}>
+                        <div>
+                            <Profile version={pjson.version} scrollTop={isVisible}/>
                         </div>
                         {/*<div><ControlTest/></div>*/}
                         {/*<input value={code} onChange={(event) =>{setCode(event.target.value)}}  />*/}
                         {/*<button onClick={() =>{getAuth(code)}}>fake auth </button>*/}
 
                         {/*<div ref={containerRef} className={classnames(params)}>yeah don't work here either</div>*/}
-
-                        {/*todo: broke this player when I set GLOBAL_UI_VAR in refreshAuth*/}
-                        {/*tried to make it wait, but doesn't seem to matter. the tracing says
-                    that this is caused by my GLOBAL_UI_VAR set but I can't make sense of it... */}
-
-                        {/*{globalUI.access_token  &&*/}
-                        {/*<div style={playerStyle}>*/}
-                        {/*    <Player token={globalUI.access_token} id={control.id} play={control.play}/></div>*/}
-                        {/*}*/}
-
-                        {/*todo: forcing delay until I can figure it out*/}
-
-                        {/*<Delayed waitBeforeShow={2000}>*/}
-                        {/*{globalUI.access_token  &&*/}
-                        {/*<div >*/}
-                        {/*    <Player token={globalUI.access_token} id={control.id} play={control.play}/>*/}
-                        {/*    /!*<div>PLAYER</div>*!/*/}
-                        {/*</div>*/}
-                        {/*</Delayed>*/}
 
                     </div>
                     {/* className={gridControl.gridClass}*/}
@@ -325,8 +311,10 @@ function App(props) {
 
 
                             <div>
+                                {/*testing: not exactly what I was expecting but w/e*/}
+                                {/*outline:"1px solid blue"*/}
+                                <div ref={ref} style={{width:"10em",height:".1px"}}></div>
                                 {globalUI.access_token &&
-
                                   <Tabify/>
                                 // <Accordion setExpanded={setExpanded} expanded={expanded}
                                 //

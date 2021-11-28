@@ -15,6 +15,26 @@ let api_address = "https://api.soundfound.io"
 let redirect_address = 'https://soundfound.io'
 //const redirect_address = "https://master.d267e964bph18g.amplifyapp.com"
 
+
+class Delayed extends React.Component {
+
+	constructor(props) {
+		super(props);
+		this.state = {hidden : true};
+	}
+
+	componentDidMount() {
+		setTimeout(() => {
+			this.setState({hidden: false});
+		}, this.props.waitBeforeShow);
+	}
+
+	render() {
+		return this.state.hidden ? '' : this.props.children;
+	}
+}
+
+
 function Profile(props) {
 	//testing: detect origin and adjust redirect/api request off that
 	const t = window.location.toString();
@@ -73,29 +93,35 @@ function Profile(props) {
 
 
 	useEffect(() => {
-		//console.log("resizeHeaderOnScroll");
-		const distanceY =  props.scrollTop,
-			shrinkOn = 1,
-			headerEl = document.getElementById("profile-header");
+		console.log("resizeHeaderOnScroll",props.scrollTop);
+		// const distanceY =  props.scrollTop,
+		// 	shrinkOn = 1,
+		// 	headerEl = document.getElementById("profile-header");
 		//console.log("resizeHeaderOnScroll",distanceY);
-
-		 if(distanceY < 400) {
+		//  if(distanceY < 400) {
+		// 	//console.log("shrinkOff");
+		// 	headerEl.classList.remove("smaller");
+		// 	setShrink(false)
+		// }else{
+		// 	// console.log("shrinkOn");
+		// 	 headerEl.classList.add("smaller");
+		// 	 setShrink(true)
+		//  }
+		if(props.scrollTop) {
 			//console.log("shrinkOff");
-			headerEl.classList.remove("smaller");
 			setShrink(false)
 		}else{
-			// console.log("shrinkOn");
-			 headerEl.classList.add("smaller");
-			 setShrink(true)
-		 }
+			setShrink(true)
+		}
+
 	}, [props.scrollTop])
 
 	return(
-		<div id={'profile-header'} style={{height:shrink ? '2.5em':'initial'}}>
+		<div id={'profile-header'}>
 
 			<div style={{"position":"absolute","top":"0px","left":"0px","zIndex":"30",opacity:".5"}}>
 				<button onClick={checkState}>checkState {props.version}</button>
-				
+
 			</div>
 			{!(globalUI.access_token) &&
 			<div>
@@ -106,7 +132,7 @@ function Profile(props) {
 			</div>
 			}
 			{globalUI.access_token &&
-				<div style={{display:"flex"}}>
+				<div style={{display:"flex",height:shrink? "2.3em":"initial"}}>
 					{shrink ?
 						<div style={{width:"2.5em"}}><img style={{width: "inherit"}} src={logo_icon}/> </div>
 					:
@@ -133,7 +159,9 @@ function Profile(props) {
 					}
 
 					<div>
-						<Player token={globalUI.access_token} id={control.id} play={control.play}/>
+						
+								<Player token={globalUI.access_token} id={control.id} play={control.play}/>
+
 					</div>
 
 				</div>

@@ -44,10 +44,10 @@ import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
 // import "./utility/CustomScroll/FirstComp/customScroll.css";
 
 // c/p new dir w/ name change
-import './utility/CustomScroll/contextStats.scss'
-import "./utility/CustomScroll/FirstComp/customScroll.css";
-import CustomScroll from "react-custom-scroll";
-import DragHand from "../assets/noun_Drag Hand_230196.png";
+// import './utility/CustomScroll/contextStats.scss'
+// import "./utility/CustomScroll/FirstComp/customScroll.css";
+// import CustomScroll from "react-custom-scroll";
+
 
 function TabPanel(props) {
 	const { children, value, index, ...other } = props;
@@ -488,29 +488,31 @@ function ContextStats(props) {
 					{/*<div className={styles.list} style={{ height: "37em",minWidth:gridControl.gridClass === 'defaultGrid' ? '64em':'57em'}}>*/}
 					{/*minWidth:gridControl.gridClass === 'defaultGrid' ? '64em':'57em'*/}
 
-					<div className={'crazy-scroll'}>
-						<CustomScroll>
+					{/*testing: disabled cusotm scroll attempt*/}
+					{/*<div className={'crazy-scroll'}>*/}
+					{/*	<CustomScroll>*/}
 							<div className={styles.list} >
 								{transitions((style, item) => (
 									<a.div style={style} onClick={() =>{handleTileSelect(item)}}>
 										{item.type === "track" &&
 										<div className={tileSelectControl.tile && tileSelectControl.tile.id === item.id ? 'tile-selected':'tile-unselected' }>
 											<img height={120} src={item.album.images[0] && item.album.images[0].url}/>
-											<div style={{padding:"2px",background:"rgb(128 128 128 / .7)",position:"relative",top:"-43px",color:"white",height:"20px"}}>{item.name}</div>
+											{/*<div style={{padding:"2px",background:"rgb(128 128 128 / .7)",position:"relative",top:"-43px",color:"white",height:"20px"}}>{item.name}</div>*/}
+											<div className={'tile-text'}>{item.name}</div>
 										</div>
 										}
 										{item.type !== "track" &&
 										<div className={tileSelectControl.tile && tileSelectControl.tile.id === item.id ? 'tile-selected':'tile-unselected' }>
 											<img height={120} src={item.images[0] && item.images[0].url}/>
-											<div style={{padding:"2px",background:"rgb(128 128 128 / .7)",position:"relative",top:"-43px",color:"white",height:"20px"}}>{item.name}</div>
+											<div className={'tile-text'}>{item.name}</div>
 										</div>
 										}
 
 									</a.div>
 								))}
 							</div>
-						</CustomScroll>
-					</div>
+					{/*	</CustomScroll>*/}
+					{/*</div>*/}
 				</div>
 
 			</div>

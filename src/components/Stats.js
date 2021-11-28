@@ -22,9 +22,10 @@ import {families as systemFamilies,familyColors} from '../families'
 
 import {Control, TabControl, StatControl, GridControl, TileSelectControl} from "../index";
 import util from "../util/util";
-import PieGenreChips from "./chips/PieGenreChips";
+//import PieGenreChips from "./chips/PieGenreChips";
 import PieChart from "./Charts/PieChart";
 import SocialPairPie from "./Charts/PieChart3D/SocialPairPie";
+import HorizontalTransition from './springs/HorizontalTransition'
 
 import {a, useSpring} from "react-spring";
 import VictoryPieChart from "./Charts/VictoryPieChart";
@@ -45,6 +46,7 @@ import PieChips from "./chips/PieChips";
 import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
 import PieChart3D from "./Charts/PieChart3D/PieChart3D";
+
 
 
 //testing: static data
@@ -162,7 +164,7 @@ function Stats(props) {
 	//testing: static data (comment out)
 	const pieData = useReactiveVar(PIEDATA);
 	const pieSeriesDrilldown = useReactiveVar(PIEDATADRILLDOWN);
-
+	const tiles = useReactiveVar(TILES);
 
 	//console.log("Stats | pieData:",pieData);
 	//console.log("Stats | pieSeriesDrilldown:",pieSeriesDrilldown);
@@ -176,17 +178,17 @@ function Stats(props) {
 	*/
 
 	//useEffect(() => {
-		//console.log("detectWrap...");
+	//console.log("detectWrap...");
 
-		//testing: only calculates 3 chips wrapping for some reason?
-		//var wrappedItems = detectWrap1('genreChip');
-		//className={[classes.chip,"genreChip"].join(' ')}
-		// for (var k = 0; k < wrappedItems.length; k++) {
-		// 	wrappedItems[k].className = [wrappedItems[k].className,"wrapped"].join(' ')
-		// }
+	//testing: only calculates 3 chips wrapping for some reason?
+	//var wrappedItems = detectWrap1('genreChip');
+	//className={[classes.chip,"genreChip"].join(' ')}
+	// for (var k = 0; k < wrappedItems.length; k++) {
+	// 	wrappedItems[k].className = [wrappedItems[k].className,"wrapped"].join(' ')
+	// }
 
-		//testing: container doesn't see items in it
-		//detectWrap2('genreChipContainer');
+	//testing: container doesn't see items in it
+	//detectWrap2('genreChipContainer');
 	//},[chipGenres]);
 
 
@@ -434,26 +436,26 @@ function Stats(props) {
 			{/*testing: disabled whole drawer concept*/}
 
 			{/*testing: disabled permanent display*/}
-							{/*<div style={{"position":"absolute","top":"0px","left":"0px","zIndex":"6"}}>*/}
-						{/*	<button onClick={() =>{gridControl.setStatCollapse(!(gridControl.statCollapse))}}>statCollapse {gridControl.statCollapse.toString()}</button>*/}
-						{/*	<a.div  style={drawerProps}>*/}
-						{/*		<div style={{"position":"absolute","top":"0px","right":"0px","zIndex":"7"}}*/}
-						{/*			 onClick={() =>{handleToggleDrawer()}}>*/}
-						{/*			{*/}
-						{/*				tileSelectControl.isDrawerShowing ? <ExpandLessIcon fontSize={'large'}/>*/}
-						{/*					:	<ExpandMoreIcon fontSize={'large'}/>*/}
-						{/*			}*/}
-						{/*		</div>*/}
-						{/*		<div>*/}
-						{/*			/!*<div style={{border: "1px solid black",height:"1em"}}></div>*!/*/}
-						{/*			/!*todo: was thinking this content display was taken care of for me by the drawer but nooooo!?*!/*/}
-						{/*			/!*add delay on fade in*!/*/}
-						{/*			<div style={{display:tileSelectControl.isDrawerShowing ? "initial":"none"}}>*/}
-						{/*				<DisplayTile tile={tileSelectControl.tile}/>*/}
-						{/*			</div>*/}
-						{/*		</div>*/}
-						{/*	</a.div>*/}
-						{/*</div>*/}
+			{/*<div style={{"position":"absolute","top":"0px","left":"0px","zIndex":"6"}}>*/}
+			{/*	<button onClick={() =>{gridControl.setStatCollapse(!(gridControl.statCollapse))}}>statCollapse {gridControl.statCollapse.toString()}</button>*/}
+			{/*	<a.div  style={drawerProps}>*/}
+			{/*		<div style={{"position":"absolute","top":"0px","right":"0px","zIndex":"7"}}*/}
+			{/*			 onClick={() =>{handleToggleDrawer()}}>*/}
+			{/*			{*/}
+			{/*				tileSelectControl.isDrawerShowing ? <ExpandLessIcon fontSize={'large'}/>*/}
+			{/*					:	<ExpandMoreIcon fontSize={'large'}/>*/}
+			{/*			}*/}
+			{/*		</div>*/}
+			{/*		<div>*/}
+			{/*			/!*<div style={{border: "1px solid black",height:"1em"}}></div>*!/*/}
+			{/*			/!*todo: was thinking this content display was taken care of for me by the drawer but nooooo!?*!/*/}
+			{/*			/!*add delay on fade in*!/*/}
+			{/*			<div style={{display:tileSelectControl.isDrawerShowing ? "initial":"none"}}>*/}
+			{/*				<DisplayTile tile={tileSelectControl.tile}/>*/}
+			{/*			</div>*/}
+			{/*		</div>*/}
+			{/*	</a.div>*/}
+			{/*</div>*/}
 
 			{/*style={{paddingTop:"1em"}}*/}
 			<div >
@@ -472,7 +474,7 @@ function Stats(props) {
 					{/*className={gridControl.statCollapse ? 'fadeOut':'fadeIn'}*/}
 					<div >
 
-				        {/*note: big fold	*/}
+						{/*note: big fold	*/}
 						{/*{statcontrol.stats.name === 'friends' &&*/}
 						{/*todo: re-enable BubbleChart*/}
 						{/*<div style={{paddingRight:"1em"}}>*/}
@@ -533,11 +535,11 @@ function Stats(props) {
 						{/*todo: something odd going on with placement of entire stats = marginTops*/}
 						<div style={{"display":"flex",flexDirection:"column"}}>
 							{/*,marginTop:"2em"*/}
-							<div style={{"padding":"5px","zIndex":"5","flexGrow":"1","overflowY":"auto","overflowX":"hidden","maxHeight":"23.5em","minWidth":"7em"}}>
+							<div style={{"padding":"5px","zIndex":"5","flexGrow":"1","overflowY":"auto","overflowX":"hidden",height:"7.3em","minWidth":"7em"}}>
 								{/*<div><PieGenreChips families={chipFamilies} genres={chipGenres}/></div>*/}
 								{/*familyDisabled={false}*/}
 								{/*testing: MoreChips*/}
-								<PieChips families={chipFamilies} genresDisabled={false} occurred={false} clearable={false}  genres={chipGenres} flexDirection={'row'}/>
+								<PieChips families={chipFamilies}  genres={chipGenres} pieData={pieData || []} drilldown={pieSeriesDrilldown} genresDisabled={false} occurred={false} clearable={false} flexDirection={'row'}/>
 							</div>
 
 							{/*note: need this for flex-column to work*/}
@@ -548,36 +550,47 @@ function Stats(props) {
 
 								<div>
 									{tabcontrol.section === 1 &&
-									<div  id={'container'} style={{background:"lightblue",zIndex:2,position:"absolute",
-										height:"300px",
-										 width:"21em",
-										"marginLeft":"-.5em",
-									marginTop:"-5em"}}>
-										{/* animation: {duration: 2000}*/}
-										{/*todo: toggleing here rerenders child PieChart, which can cause it to lose drillddown state?*/}
-										<div onClick={() =>{setToggle(!(toggle))}} style={{border: toggle ? "1px solid red":"1px solid blue"}}>
-											{/*toggle {toggle}*/}
-										<PieChart3D series={[{name: 'Families-User', colorByPoint: true, data:pieData}]}
-													drilldown={pieSeriesDrilldown}/>
+									<div style={{display:"flex",flexDirection:"column"}}>
+										<div  id={'container'} style={{
+											//background:"lightblue",zIndex:2,
+											height:"300px",
+											//note: you need minWidth NOT width for flexbox to respect it (or use basis,grow and that all shit)
+											minWidth:"21em",
+											"marginLeft":"-.5em",
+											marginTop:"-12em"}}>
+											{/* animation: {duration: 2000}*/}
+											{/*todo: toggleing here rerenders child PieChart, which can cause it to lose drillddown state?*/}
+											<div onClick={() =>{setToggle(!(toggle))}} style={{border: toggle ? "1px solid red":"1px solid blue"}}>
+												{/*toggle {toggle}*/}
+												<PieChart3D series={[{name: 'Families-User', colorByPoint: true, data:pieData}]}
+															name={'user-only'} drilldown={pieSeriesDrilldown}/>
+											</div>
 										</div>
+
+										<HorizontalTransition tiles={tiles}/>
+
 									</div>
 									}
 
 									{tabcontrol.section === 2 &&
 
-									<div>
-										{/*data={{series: {name: 'Genres', colorByPoint: true, data:pieData, animation: {duration: 2000}}}}*/}
+
+									<div style={{display:"flex",flexDirection:"column"}}>
 										<SocialPairPie  />
+
+										<HorizontalTransition stylesFwd={{marginTop:"10em"}} tiles={tiles}/>
+
 									</div>
-									//
-									// <div  id={'container'} style={{background:"lightblue",zIndex:2,position:"absolute",
-									// 	height:"300px",
-									// 	width:"21em",
-									// 	"marginTop":"-5em","marginLeft":"-.5em"}}>
-									// 	{/* animation: {duration: 2000}*/}
-									// 	<PieChart3D series={[{name: 'Families', colorByPoint: true, data:pieData}]}
-									// 				drilldown={pieSeriesDrilldown}/>
-									// </div>
+
+										//
+										// <div  id={'container'} style={{background:"lightblue",zIndex:2,position:"absolute",
+										// 	height:"300px",
+										// 	width:"21em",
+										// 	"marginTop":"-5em","marginLeft":"-.5em"}}>
+										// 	{/* animation: {duration: 2000}*/}
+										// 	<PieChart3D series={[{name: 'Families', colorByPoint: true, data:pieData}]}
+										// 				drilldown={pieSeriesDrilldown}/>
+										// </div>
 
 									}
 								</div>

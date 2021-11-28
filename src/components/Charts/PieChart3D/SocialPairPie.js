@@ -92,7 +92,7 @@ const SocialPairPie = () =>{
 			{/*status {toggle}*/}
 			{/* onMouseDown={() =>{setToggle(3)}}*/}
 			<div style={{background:"lightblue",zIndex:2,position:"absolute",
-				height:"250px",width:"400px",marginLeft:"-2.5em"}}>
+				height:"250px",width:"400px",marginLeft:"-2.5em",marginTop:"-11em"}}>
 				<PieChart3D  name={'user'}
 							series={[{name: 'Families', colorByPoint: true, data:pieData}]}
 							drilldown={pieSeriesDrilldown}
@@ -101,7 +101,9 @@ const SocialPairPie = () =>{
 			{/* onMouseDown={() =>{setToggle(1)}}*/}
 			<div
 				 style={{background:"lightblue",zIndex:"1",position:"absolute",
-					 height:"250px",width:"400px",marginLeft:"-1em",marginTop:"6em"}}>
+					 height:"250px",width:"400px"
+					 ,marginLeft:"-1em",marginTop:"-6em"}}>
+					{/*,marginLeft:"20em", marginTop:"5em"}}>*/}
 				<PieChart3D name={'guest'}
 
 							series={[{name: 'Families', colorByPoint: true, data:pieDataGuest}]}

@@ -8,6 +8,7 @@ import _ from 'lodash'
 //import {PieControl} from "../../index";
 import {familyColors,families as systemFamilies} from '../../families'
 import {FriendsControl,Control} from "../../index";
+import makeChipStyle from "./makeChipStyle";
 //import OVERFLOW_VAR from '../../storage/withApolloProvider'
 
 //import MoreChips from "../utility/Menu/MoreChips";
@@ -19,6 +20,7 @@ const useStyles = makeStyles({
 		//this css prop is only visible when variant=default
 		// borderColor: "#7f7f7f",
 		borderColor:"#4e4949",
+		// "transition": "box-shadow 1s",
 		"&:hover": {
 			backgroundColor: "var(--background-color-hover)",
 			cursor:"pointer"
@@ -63,34 +65,12 @@ function BubbleFamilyGenreChips(props) {
 	let control = Control.useContainer()
 
 	//console.log("$BubbleFamilyGenreChips | props",props);
-
-
-	const makeStyle = (fam,which) =>{
-
-		fam === null? fam='unknown' :{};
-		//use fam to set colors
-		var defaultSt = {
-			"--background-color-hover": familyColors[fam + "2"],
-			"--background-color":  familyColors[fam],
-			"--box-shadow": "0 0 10px rgba(33, 203, 243, .3)"
-		};
-
-
-		//clicked simply keeps it's hover color
-		var clickedSt = {
-			"--background-color-hover": familyColors[fam],
-			"--background-color": familyColors[fam],
-			"--box-shadow":   "inset 0px 0px 5px black"
-		};
-		if(which === 'default'){return defaultSt}else{return clickedSt}
-	}
-
 	const map = {};
 	const map2 = {};
 	var initColorState = {};
 	//var initClickedState = {};
 	systemFamilies.forEach(fam =>{
-		map[fam] = {default: makeStyle(fam,'default'),clicked:makeStyle(fam,'clicked') }
+		map[fam] = {default: makeChipStyle(fam,'default'),clicked:makeChipStyle(fam,'clicked') }
 	})
 	systemFamilies.forEach(fam =>{
 		initColorState[fam] = map[fam]['default']
@@ -137,7 +117,7 @@ function BubbleFamilyGenreChips(props) {
 		if(props.occurred){
 
 			_genres.forEach(gOb =>{
-				map2[gOb.genre.name] = {default: makeStyle( gOb.genre.family_name,'default'),clicked:makeStyle(gOb.genre.family_name,'clicked')}
+				map2[gOb.genre.name] = {default: makeChipStyle( gOb.genre.family_name,'default'),clicked:makeChipStyle(gOb.genre.family_name,'clicked')}
 			})
 			_genres.forEach(gOb =>{
 				initGColorState[gOb.genre.name] = map2[gOb.genre.name]['default']
@@ -147,7 +127,7 @@ function BubbleFamilyGenreChips(props) {
 		}
 		else{
 			_genres.forEach(gOb =>{
-				map2[gOb.name] = {default: makeStyle(gOb.family_name,'default'),clicked:makeStyle(gOb.family_name,'clicked') }
+				map2[gOb.name] = {default: makeChipStyle(gOb.family_name,'default'),clicked:makeChipStyle(gOb.family_name,'clicked') }
 			})
 			_genres.forEach(gOb =>{
 				initGColorState[gOb.name] = map2[gOb.name]['default']

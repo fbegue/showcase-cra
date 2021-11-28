@@ -192,7 +192,7 @@ function InfoPanel(props) {
 	}
 	const getArtists = () =>{
 		var k = Object.values(tabIndexMap[tabcontrol.tab])[0].toLowerCase();
-		console.log("$k",k);
+		//console.log("$k",k);
 		if(k === 'artists'){
 			console.warn("missing top artists stats designation = defaults to albums");
 			k = 'albums'

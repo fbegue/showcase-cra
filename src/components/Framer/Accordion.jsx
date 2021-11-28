@@ -64,7 +64,10 @@ const Accordion = ({infoBound,collapse, setCollapse,content }) => {
         //testing: testing in codesandbox, it seems like the 'layout' property should auto-animate
         //changes to inner content (like height) but couldn't get it to work = just change position w/ margin
         //testing: marginTop: collapse ? infoBound -70:0
-        animate={{ backgroundColor: collapse ? "#FF0088" : "#0055FF",y: collapse ? 0:infoBound -80}}
+
+        // testing: height off on init friends render?
+        // animate={{ backgroundColor: collapse ? "#FF0088" : "#0055FF",y: collapse ? 0:infoBound -80}}
+        animate={{ backgroundColor: collapse ? "#FF0088" : "#0055FF",y: collapse ? 0:0}}
         transition={{ duration: 0.3 }}
         // onClick={() => setcollapse(collapse ? false : i)}
         onClick={() => setCollapse(collapse ? false : true)}

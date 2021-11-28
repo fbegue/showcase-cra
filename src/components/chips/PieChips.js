@@ -8,8 +8,10 @@ import _ from 'lodash'
 //import {PieControl} from "../../index";
 import {familyColors,families as systemFamilies} from '../../families'
 import {FriendsControl,Control} from "../../index";
+import makeChipStyle from "./makeChipStyle";
 //import OVERFLOW_VAR from '../../storage/withApolloProvider'
-
+import {CHIPGENRESCOLORMAP,CHIPGENRESCOMBINEDMAP} from '../../storage/withApolloProvider'
+import {useReactiveVar} from "@apollo/react-hooks";
 //import MoreChips from "../utility/Menu/MoreChips";
 const useStyles = makeStyles({
 	chip: {
@@ -19,6 +21,7 @@ const useStyles = makeStyles({
 		//this css prop is only visible when variant=default
 		// borderColor: "#7f7f7f",
 		borderColor:"#4e4949",
+
 		"&:hover": {
 			backgroundColor: "var(--background-color-hover)",
 			cursor:"pointer"
@@ -56,41 +59,35 @@ function useOnScreen(ref) {
 	return isIntersecting
 }
 
-function BubbleFamilyGenreChips(props) {
+function PieChips(props) {
 
 	const classes = useStyles();
 	let friendscontrol = FriendsControl.useContainer()
-	let control = Control.useContainer()
-
+	let control = Control.useContainer();
+	const chipGenresColorMap = useReactiveVar(CHIPGENRESCOLORMAP)
+	const chipGenresSharedMap= useReactiveVar(CHIPGENRESCOMBINEDMAP)
 	console.log("$PieChips | props",props);
+	//testing:
 
+	//let pieDataSum = props.pieData.reduce((prev,curr) =>{return {y:prev.y + curr.y}}).y
+	// let pieDataMap = {}; props.pieData.forEach(f =>{pieDataMap[f.name] = f.y;})
 
-	const makeStyle = (fam,which) =>{
-
-		fam === null? fam='unknown' :{};
-		//use fam to set colors
-		var defaultSt = {
-			"--background-color-hover": familyColors[fam + "2"],
-			"--background-color":  familyColors[fam],
-			"--box-shadow": "0 0 10px rgba(33, 203, 243, .3)"
-		};
-
-
-		//clicked simply keeps it's hover color
-		var clickedSt = {
-			"--background-color-hover": familyColors[fam],
-			"--background-color": familyColors[fam],
-			"--box-shadow":   "inset 0px 0px 5px black"
-		};
-		if(which === 'default'){return defaultSt}else{return clickedSt}
+	//note: reduce throws error on an empty array
+	let pieDataMap = {};
+	let pieDataSum = 0;
+	if(props.pieData.length > 0){
+		pieDataSum = props.pieData.reduce((prev,curr) =>{return {y:prev.y + curr.y}}).y
+		pieDataMap = _.reduce(props.pieData , function(obj,param) {
+			obj[param['name']] = param.y
+			return obj;
+		}, {});
 	}
-
 	const map = {};
 	const map2 = {};
 	var initColorState = {};
 	//var initClickedState = {};
 	systemFamilies.forEach(fam =>{
-		map[fam] = {default: makeStyle(fam,'default'),clicked:makeStyle(fam,'clicked') }
+		map[fam] = {default: makeChipStyle(fam,'default'),clicked:makeChipStyle(fam,'clicked') }
 	})
 	systemFamilies.forEach(fam =>{
 		initColorState[fam] = map[fam]['default']
@@ -144,7 +141,9 @@ function BubbleFamilyGenreChips(props) {
 		if(props.occurred){
 
 			_genres.forEach(gOb =>{
-				map2[gOb.genre.name] = {default: makeStyle( gOb.genre.family_name,'default'),clicked:makeStyle(gOb.genre.family_name,'clicked')}
+				map2[gOb.genre.name] = {
+					default: makeChipStyle(gOb.genre.family_name,'default', chipGenresColorMap[gOb.genre.name]),
+					clicked:makeChipStyle(gOb.genre.family_name,'clicked',chipGenresColorMap[gOb.genre.name])}
 			})
 			_genres.forEach(gOb =>{
 				initGColorState[gOb.genre.name] = map2[gOb.genre.name]['default']
@@ -154,7 +153,9 @@ function BubbleFamilyGenreChips(props) {
 		}
 		else{
 			_genres.forEach(gOb =>{
-				map2[gOb.name] = {default: makeStyle(gOb.family_name,'default'),clicked:makeStyle(gOb.family_name,'clicked') }
+				map2[gOb.name] = {
+					default: makeChipStyle(gOb.family_name,'default',chipGenresColorMap[gOb.name]),
+					clicked:makeChipStyle(gOb.family_name,'clicked',chipGenresColorMap[gOb.name]) }
 			})
 			_genres.forEach(gOb =>{
 				initGColorState[gOb.name] = map2[gOb.name]['default']
@@ -163,6 +164,21 @@ function BubbleFamilyGenreChips(props) {
 
 	}
 
+	//todo: should put this in above loop
+	_genres.forEach(gOb =>{
+		gOb.y = chipGenresSharedMap[gOb.name].length
+	})
+
+	var pieDataGenreSum = 0;
+	if(_genres.length > 0){
+		pieDataGenreSum = props.pieData.reduce((prev,curr) =>{return {y:prev.y + curr.y}}).y
+		// pieDataMap = _.reduce(props.pieData , function(obj,param) {
+		// 	obj[param['name']] = param.y
+		// 	return obj;
+		// }, {});
+	}
+
+	//todo: wtf was this for?
 	var varied = [];
 	if(props.genresFilter){
 		varied = _.intersectionBy(_genres,props.genresFilter,'id')
@@ -222,6 +238,7 @@ function BubbleFamilyGenreChips(props) {
 		if(!(_.find(friendscontrol.genres,r =>{return r.id === genre.id}))){
 
 			setGColor({ ...gcolor, [genre_name]: map[family_name]["clicked"] });
+
 
 			if(friendscontrol.families.indexOf(family_name) === -1){
 
@@ -314,39 +331,29 @@ function BubbleFamilyGenreChips(props) {
 
 		{/*<div ref={visRef}>{isVisible && `Yep, I'm on screen`}</div>*/}
 		<div  style={{display:"flex",flexDirection:props.flexDirection,flexWrap:"wrap"}}>
-			{toMap.filter(filterOut).map((fam,i) =>
+			{toMap.filter(filterOut).sort((a1,a2) =>{return  pieDataMap[a2] - pieDataMap[a1]}).map((fam,i) =>
 				<div  key={i} style={{display:"flex"}} onClick={() =>{handleClick(fam)}}>
 					<Chip
 						// className={classes.chip}
 						className={[classes.chip,"famChip"].join(' ')}
-						label={fam}
+						label={<span> {fam} <span style={{fontWeight:"bold"}}> {Math.round( pieDataMap[fam]/pieDataSum * 100) + "%"} </span></span>}
+						// label={fam + " (" +  Math.round( pieDataMap[fam]/pieDataSum * 100) + "%)"}
+						//	label={Math.round( pieDataMap[fam]/pieDataSum * 100) + "%" + " " + fam}
 						style={color[fam]}
 						key={i}
 					/>
 					{ props.removable ? <div style={{"left":"-8px","position":"relative"}}><HighlightOffIcon fontSize={'small'}/> </div> : ""}
 				</div>
 			)}
-			{ props.clearable ? <div  onClick={() =>{resetSelections()}}><HighlightOffIcon fontSize={'small'}/>Clear</div>:""}
-		</div>
-
-		{props.seperator ? <div style={{height:"1em"}}>{'\u00A0'}</div>:"" }
-
-
-		{/*className={'genreChipContainer'}*/}
-		{/*note: set height | height:"17em"*/}
-		{/*height:'4em' || 'initial'*/}
-		<div ref={ref => (myContainer= ref)}  style={{display:"flex",flexDirection:props.flexDirection,flexWrap:"wrap",
-			alignItems: props.alignItems || "initial",overflow:'hidden',
-			maxWidth: props.maxWidth || 'initial',paddingBottom:".5em"}} >
-			{props.pre}
-			{_genres.map((gOb,i) =>
+			{/*testing: */}
+			{_genres.sort((a,b) =>{return b.y - a.y}).map((gOb,i) =>
 				{
 					return (
 						<div key={i}  ref={refs.current[i]} onClick={() =>{handleGClick(gOb)}}>
 							<Chip
 								// className={[classes.chip,"genreChip"].join(' ')}
 								className={classes.chip}
-								 key={i}
+								key={i}
 
 								// className={'genreChip'}
 								variant={
@@ -355,7 +362,7 @@ function BubbleFamilyGenreChips(props) {
 										:"default"}
 								label={
 									props.occurred ? gOb.genre.name + " (" + gOb.occurred.toString() + ")"
-										: gOb.name
+										: gOb.name + " " + Math.round(chipGenresSharedMap[gOb.name].length/pieDataGenreSum * 100) + "%"
 								}
 
 								style={getGColor(gOb)}
@@ -368,7 +375,50 @@ function BubbleFamilyGenreChips(props) {
 					)
 				}
 			)}
+
+			{ props.clearable ? <div  onClick={() =>{resetSelections()}}><HighlightOffIcon fontSize={'small'}/>Clear</div>:""}
 		</div>
+
+		{props.seperator ? <div style={{height:"1em"}}>{'\u00A0'}</div>:"" }
+
+
+		{/*className={'genreChipContainer'}*/}
+		{/*note: set height | height:"17em"*/}
+		{/*height:'4em' || 'initial'*/}
+		{/*<div ref={ref => (myContainer= ref)}  style={{display:"flex",flexDirection:props.flexDirection,flexWrap:"wrap",*/}
+		{/*	alignItems: props.alignItems || "initial",overflow:'hidden',*/}
+		{/*	maxWidth: props.maxWidth || 'initial',paddingBottom:".5em"}} >*/}
+		{/*	{props.pre}*/}
+		{/*	{_genres.map((gOb,i) =>*/}
+		{/*		{*/}
+		{/*			return (*/}
+		{/*				<div key={i}  ref={refs.current[i]} onClick={() =>{handleGClick(gOb)}}>*/}
+		{/*					<Chip*/}
+		{/*						// className={[classes.chip,"genreChip"].join(' ')}*/}
+		{/*						className={classes.chip}*/}
+		{/*						 key={i}*/}
+
+		{/*						// className={'genreChip'}*/}
+		{/*						variant={*/}
+		{/*							props.varied ?*/}
+		{/*								_.find(varied, r =>{return r.id === gOb.id}) ? "outlined" :"default"*/}
+		{/*								:"default"}*/}
+		{/*						label={*/}
+		{/*							props.occurred ? gOb.genre.name + " (" + gOb.occurred.toString() + ")"*/}
+		{/*								: gOb.name*/}
+		{/*						}*/}
+
+		{/*						style={getGColor(gOb)}*/}
+		{/*						// style={initGColorState[gOb.name]}*/}
+		{/*						// style={gcolor[gOb.name]}*/}
+		{/*						// style={{"--background-color2":"blue"}}*/}
+		{/*					/>*/}
+		{/*					{ props.removable ? <div style={{"left":"-8px","position":"relative"}}><HighlightOffIcon fontSize={'small'}/> </div> : ""}*/}
+		{/*				</div>*/}
+		{/*			)*/}
+		{/*		}*/}
+		{/*	)}*/}
+		{/*</div>*/}
 		{/*<div style={{zIndex:50,height:"2em"}}>*/}
 		{/*	/!*{overflowActive.toString()}*!/*/}
 
@@ -378,7 +428,7 @@ function BubbleFamilyGenreChips(props) {
 	</div>)
 }
 
-BubbleFamilyGenreChips.propTypes = {
+PieChips.propTypes = {
 	//constrain the genres displayed by these families
 	families: PropTypes.array,
 	//don't apply any family constraints (still requires [] families)
@@ -400,5 +450,5 @@ BubbleFamilyGenreChips.propTypes = {
 
 
 }
-export default BubbleFamilyGenreChips;
+export default PieChips;
 
