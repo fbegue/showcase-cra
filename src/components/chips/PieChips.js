@@ -200,12 +200,23 @@ function PieChips(props) {
 		//if(!(_.find(friendscontrol.families,r =>{return r.id === fam}))){
 			setColor({ ...color, [fam]: map[fam]["clicked"] });
 			//piecontrol.setAllowUpdate(false)
-			friendscontrol.setFamilies((prevState => {return [...prevState,fam] }));
-			//testing:
-
+			friendscontrol.setFamilies((prevState => {
+				var ret = [...prevState,fam];return ret
+			}));
 		}else{
 			setColor({ ...color, [fam]: map[fam]["default"] });
-			friendscontrol.setFamilies((prevState => {return prevState.filter(r =>{return r !== fam}) }));
+			friendscontrol.setFamilies((prevState => {
+				var ret= prevState.filter(r =>{return r !== fam})
+				//testing: you can only do 1 family at a time rn anyways
+				//when all families are unclicked, deselect all genres
+				if(ret.length === 0){
+					debugger;
+					console.log("reset genres selection on family deselect");
+					friendscontrol.setGenres([]);
+					setGColor(initGColorState);
+				}
+				return ret
+			}));
 		}
 
 		//if it's not clicked yet, set the new color to clicked and update it's clicked status to true

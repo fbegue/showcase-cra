@@ -4548,8 +4548,8 @@ export default function List(props) {
 
 	return (
 		<div id={'HorizontalTransition'} style={props?.stylesFwd}>
-			<button onClick={remove}>remove</button>
-			<button onClick={add}>add</button> {rows.length}
+			{/*<button onClick={remove}>remove</button>*/}
+			{/*<button onClick={add}>add</button> {rows.length}*/}
 			<div className={styles.list} style={{ height }}>
 				{transitions((style, item, t, index) => (
 					<animated.div className={styles.card} style={{ zIndex: index, ...style }}>

@@ -1796,7 +1796,8 @@ function useProduceEvents(){
 						d.sort((a,b) =>{return  b[1] - a[1]})
 
 						//todo: bandaid (1) (null shouldn't be here)
-						if(fname !== 'null'){
+						//testing: prevent 0 length families
+						if(fname !== 'null' && d.length !== 0){
 							drilldown.series.push({name:fname,id:fname,data:d})
 						}
 

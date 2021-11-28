@@ -261,6 +261,7 @@ var options = {
 }
 
 function PieChart3D(props) {
+	var comp = "PieChart3D | ";
 	//console.log("PieChart3D | render",props);
 
 	var piecontrol = PieControl.useContainer()
@@ -351,21 +352,20 @@ function PieChart3D(props) {
 	}
 
 	useEffect(() => {
-		if(friendscontrol.families.length > 0){
-			console.log("PieChart3D | " + myChartName + " family update",friendscontrol.families);
-			// console.log("PieChart3D | " + myChartName ,props.series[0].data);
+		console.log(comp + myChartName + " update");
+		// console.log("PieChart3D | " + myChartName ,props.series[0].data);
 
-			if( Highcharts.charts.length > 2){
-				//testing:
-				//console.log("PieChart3D | Highcharts.charts.length",Highcharts.charts);
-				//debugger;
-			}
+		if( Highcharts.charts.length > 2){
+			//testing:
+			//console.log("PieChart3D | Highcharts.charts.length",Highcharts.charts);
+			//debugger;
+		}
 
-			//console.log("PieChart3D |" + myChartName+ " updates:",c.options.chart.className);
-			//testing: make it look for specific chart
+		function handleFamSelect(callback){
+			console.log(comp + myChartName + " family update",friendscontrol.families);
+			if(friendscontrol.families.length > 0){
+				var series = chartInstance.series[0];
 
-			if(chartInstance?.series && chartInstance.series[0]){
-				var series = chartInstance.series[0]
 				//todo: to use this array of selected families for drilldown
 				//doesn't really make sense = can't drilldown to more than one point
 				//debugger;
@@ -387,30 +387,16 @@ function PieChart3D(props) {
 					//debugger;
 				}
 			}else{
-				console.log("PieChart3D | " + myChartName + " couldn't process family update",chartInstance);
-				debugger;
+				//if update causes no families to be selected, we need to return to top view
+				elementRef.current.chart.drillUp()
 			}
-		}else{
-			//if update causes no families to be selected, we need to return to top view
-			elementRef.current.chart.drillUp()
+			callback ? callback():{};
 		}
-	},[friendscontrol.families]);
 
-	//todo: why did I think I needed to capture prev state? just compare to chart??
-	const [prev,setPrev] = useState([])
-
-
-	useEffect(() =>{
-
-		//always going to not be equal tho?
-		//if(friendscontrol.genres.length > 0){
-		//just need to select only one new genre
-		//if(prev.length === 0){
-
-		if(chartInstance && chartInstance.series && chartInstance.series[0]){
-			var series = chartInstance.series[0]
-
+		function handleGenreSelect(callback){
+			var series = chartInstance.series[0];console.log(comp + "handleGenreSelect found series",series.name);
 			var selected = series.data.filter(r =>{return r.sliced === true})
+			debugger;
 			if(friendscontrol.genres.length >0){
 				function multiGenreChip(){
 					//debugger
@@ -420,9 +406,16 @@ function PieChart3D(props) {
 					difGenres.forEach(gOb =>{
 						//find the point and select
 						//todo: SHOULD be guaranteed in 'shared' but not in 'combined'
-						debugger;
+
 						var p =_.find(series.data,{name:gOb.name})
-						p.slice(true)
+						if(p){
+							p.slice(true)
+						}else{
+							//todo: is this reporting the wrong chartname??
+							debugger;
+							console.log("PieChart3D | " + myChartName + " didn't have point for genre",gOb.name);
+						}
+
 					})
 					//debugger
 					//points in selected set but not in genres
@@ -442,27 +435,28 @@ function PieChart3D(props) {
 					p.slice(false)
 				})
 			}
-
-
-
-		}else{
-			console.log("PieChart3D | " + myChartName + " couldn't process family update",chartInstance);
-		//	debugger;
+			callback ? callback():{};
 		}
-		//}
-		//else{
-		//take difference of prev and current genres value to figure out what point to select/select
-		//}
-		//}//>0
 
-		setPrev(friendscontrol.genres)
+		if(chartInstance?.series && chartInstance.series[0]){
+			var series = chartInstance.series[0];console.log(comp + "useEffect found series",series);
+			debugger;
+			//if we find the current series is a family series, we want to process the famselect before the genre select
+			//otherwise, we need to handle the genre selection before famselect
+			//testing:
+			var familySeriesHardcode = ['Families-User',"Families"]
+			//it's a genre series
+			if(familySeriesHardcode.indexOf(series.name) === -1) {
+				handleGenreSelect(handleFamSelect)
+			}else{
+				handleFamSelect(handleGenreSelect)
+			}
 
-	},[friendscontrol.genres])
+		}
+	},[friendscontrol.families,friendscontrol.genres]);
 
-
-	// const setPieAngle = (angle) =>{
-	// 	elementRef.current.chart.update({plotOptions:{pie:{startAngle:angle}}})
-	// }
+	//todo: why did I think I needed to capture prev state? just compare to chart??
+	const [prev,setPrev] = useState([])
 
 	function moveToPoint(clickPoint){
 		var points = clickPoint.series.points;
@@ -490,7 +484,12 @@ function PieChart3D(props) {
 			if(gOb){
 				var point = _.find(series.points, { 'name': gOb.name });
 				//https://stackoverflow.com/questions/26932389/highcharts-rotate-pie-chart-aligning-the-clicked-section-to-a-fixed-point-180
-				moveToPoint(point)
+				if(!(point)){
+					console.log("PieChart3D | " + myChartName + " didn't have point for genre",gOb.name);
+				}else{
+					moveToPoint(point)
+				}
+
 			}else{
 				//friendscontrol.genres.length === 0
 				var point = series.points[0]
@@ -498,24 +497,6 @@ function PieChart3D(props) {
 			}
 		}
 	},[friendscontrol.genres])
-
-	//putting Firefox first means we'll measure what I consider 'backwards'
-	//so need to reverse order of input elements. b/c 0 is the top of the pie,
-	//I always add offset = starting point of
-
-	//testing: angleMap concept on browser data
-	// useEffect(() => {
-	//
-	// 	let angleMap = {
-	// 		Firefox:0 + offset,
-	// 		IE: .45 * 360 + offset
-	// 	}
-	// 	console.log(angleMap);
-	// 		setAngle(angleMap['IE'])
-	// },[])
-
-
-
 
 	const drillUp = () =>{
 		//console.log("chart",chart.chart.series[0]);
