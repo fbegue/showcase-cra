@@ -577,7 +577,6 @@ function Stats(props) {
 
 									<div style={{display:"flex",flexDirection:"column"}}>
 										<SocialPairPie  />
-
 										<HorizontalTransition stylesFwd={{marginTop:"10em"}} tiles={tiles}/>
 
 									</div>

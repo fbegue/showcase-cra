@@ -5,8 +5,8 @@ import {GLOBAL_UI_VAR} from "../storage/withApolloProvider";
 import {Context, initUser} from "../storage/Store";
 import {Control} from "../index";
 import exampleFetchEvents from '../data/example/fetchEvents'
-
 import dan2_example from '../data/example/DanielNiemiec#2'
+
 function Dispatch(props) {
 
 	const globalUI = useReactiveVar(GLOBAL_UI_VAR);
