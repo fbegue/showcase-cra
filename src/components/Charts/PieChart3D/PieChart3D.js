@@ -73,7 +73,7 @@ function syncCharts(e, chart) {
 				//so just check for potential undefined error (as opposed to reading nav state)
 
 				if (c && c.series.length > 0 && c !== chart) {
-					//debugger;
+
 					var series = c.series[0];
 
 					//note: account for possibly different ordered families' points
@@ -358,7 +358,6 @@ function PieChart3D(props) {
 		if( Highcharts.charts.length > 2){
 			//testing:
 			//console.log("PieChart3D | Highcharts.charts.length",Highcharts.charts);
-			//debugger;
 		}
 
 		function handleFamSelect(callback){
@@ -368,7 +367,7 @@ function PieChart3D(props) {
 
 				//todo: to use this array of selected families for drilldown
 				//doesn't really make sense = can't drilldown to more than one point
-				//debugger;
+
 				//testing: somehow guest chart instance series becomes the data for the drilldown instead?
 				//update: forgot to add this for single-user, where it was supposed to be
 				//patching with this check for now, but why??
@@ -381,10 +380,10 @@ function PieChart3D(props) {
 					}else{
 
 						console.log("PieChart3D | " + myChartName + " had series w/ not matching family",{chart:chartInstance,families:friendscontrol.families});
-						//debugger;
+						
 					}
 				}else{
-					//debugger;
+
 				}
 			}else{
 				//if update causes no families to be selected, we need to return to top view
@@ -396,13 +395,13 @@ function PieChart3D(props) {
 		function handleGenreSelect(callback){
 			var series = chartInstance.series[0];console.log(comp + "handleGenreSelect found series",series.name);
 			var selected = series.data.filter(r =>{return r.sliced === true})
-			debugger;
+
 			if(friendscontrol.genres.length >0){
 				function multiGenreChip(){
-					//debugger
+
 					//genres that don't exist in selected set
 					var difGenres = _.differenceBy(friendscontrol.genres,selected, 'name');
-					//debugger
+
 					difGenres.forEach(gOb =>{
 						//find the point and select
 						//todo: SHOULD be guaranteed in 'shared' but not in 'combined'
@@ -412,22 +411,22 @@ function PieChart3D(props) {
 							p.slice(true)
 						}else{
 							//todo: is this reporting the wrong chartname??
-							debugger;
+
 							console.log("PieChart3D | " + myChartName + " didn't have point for genre",gOb.name);
 						}
 
 					})
-					//debugger
+
 					//points in selected set but not in genres
 					var difPoints = _.differenceBy(selected,friendscontrol.genres, 'name');
-					//debugger
+
 
 					difPoints.forEach(gOb =>{
 						//find the point and deselect
 						var p =_.find(series.data,{name:gOb.name})
 						p.select()
 					})
-					//debugger
+
 				}
 				multiGenreChip()
 			}else{
@@ -440,7 +439,7 @@ function PieChart3D(props) {
 
 		if(chartInstance?.series && chartInstance.series[0]){
 			var series = chartInstance.series[0];console.log(comp + "useEffect found series",series);
-			debugger;
+
 			//if we find the current series is a family series, we want to process the famselect before the genre select
 			//otherwise, we need to handle the genre selection before famselect
 			//testing:
@@ -478,7 +477,7 @@ function PieChart3D(props) {
 	useEffect(() => {
 		let angleMap = {};
 		if(chartInstance && chartInstance.series && chartInstance.series[0]) {
-			debugger;
+
 			var series = chartInstance.series[0]
 			var gOb = friendscontrol.genres[friendscontrol.genres.length -1]
 			if(gOb){

@@ -192,7 +192,7 @@ function InfoPanel(props) {
 	}
 	const getArtists = () =>{
 		var k = Object.values(tabIndexMap[tabcontrol.tab])[0].toLowerCase();
-		//console.log("$k",k);
+		console.log("$k",k);
 		if(k === 'artists'){
 			console.warn("missing top artists stats designation = defaults to albums");
 			k = 'albums'
@@ -266,7 +266,8 @@ function InfoPanel(props) {
 						<div  style={{padding:"2px",color:"white",zIndex:'7',position:"relative","marginLeft":"auto","top":"-2em"}}>
 							<Paper elevation={3} style={{padding:".2em .5em .2em .5em",width:"fit-content"}}>
 								<Typography variant="subtitle1">
-									Top Genres
+									{/*Top Genres*/}
+									Genres
 								</Typography>
 							</Paper>
 						</div>

@@ -31,9 +31,14 @@ import RotateSpring from "./springs/RotateSpring";
 import PlaylistCheckboxes from './tiles/PlaylistCheckboxes'
 import { GLOBAL_UI_VAR } from '../storage/withApolloProvider';
 import util from '../util/util'
+import OpacityPulse from "./springs/OpacityPulse";
+import TouchAppIcon from '@material-ui/icons/TouchApp';
+import FloatingActionButton from "./utility/Fab";
 import Paper from "@material-ui/core/Paper";
 import InputIcon from "@material-ui/icons/Input";
 import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
+import Badge from "@material-ui/core/Badge";
+import EventIcon from "@material-ui/icons/Event";
 
 //todo: for some wild reason, after c/p customScroll.css",firstComp.scss  out to above FirstComp for gen use
 //that don't work - but importing them from another comp that uses them...works?
@@ -435,7 +440,7 @@ function ContextStats(props) {
 								</div>
 
 							</div>
-
+							{/*todo: is source of / should be using Pagination*/}
 							<div style={{display:'flex',flexDirection:"row",marginTop:"-1em",marginLeft:"-1em",width:"7em"}}>
 								<div>
 									<IconButton aria-label="nav-prev">
@@ -450,7 +455,6 @@ function ContextStats(props) {
 										<div  style={{fontSize:"20px",fontWeight:"bold",marginBottom:".1em"}}>{page}/{Math.ceil(tiles.length/pageSize)}</div>
 										<div style={{fontSize:"15px"}}>20/{tiles.length} </div>
 									</div>
-
 									}
 
 								</div>
@@ -462,13 +466,34 @@ function ContextStats(props) {
 									</IconButton>
 								</div>
 							</div>
-							<div style={{display:"flex",flexDirection:"column",marginTop:"-2em"}}>
-								<div style={{marginLeft:"1em"}}> {events.length} Events </div>
+							{/*,flexDirection:"column"*/}
+							<div style={{display:"flex",marginTop:"-.5em"}}>
+
 								{/*<div style={{position: "relative",zIndex:"2",transform: "scaleX(-1)"}}>*/}
 								{/*	<img style={{"height":"2.5em","marginTop":"0.3em","marginRight":"0.5em","marginLeft":"-0.3em"}} src={DragHand}/>*/}
 								{/*</div>*/}
-								<div style={{marginTop:"-1em",marginLeft:"1em"}}>
-									<img style={{height:"3em"}} src={SwipeRight}/>
+								<div style={{marginTop:"2.5em",marginLeft:"2em",position:"relative",left:"28px",transform:"scaleX(-1)"}}>
+									{/*todo: how to communicate swipe*/}
+									{/*ripples? https://www.npmjs.com/package/react-ripples*/}
+
+									<div> <img style={{height:"3em",opacity:.5}} src={SwipeRight}/></div>
+									{/*<div><OpacityPulse target={<img style={{height:"3em"}} src={SwipeRight}/>}/> </div>*/}
+									<div style={{position:"absolute",marginTop:"1em"}}><OpacityPulse target={<TouchAppIcon/>}/> </div>
+
+
+								</div>
+								{/*<div style={{marginLeft:"1em",marginTop:"2.5em"}}> {events.length} Events </div>*/}
+								<div style={{marginLeft:"-2em"}}>
+									<FloatingActionButton icon={
+										//src: https://v4.mui.com/components/badges/
+										<Badge color="secondary" max={999} badgeContent={events.length}
+											   anchorOrigin={{
+												   vertical: 'bottom',
+												   horizontal: 'right',
+											   }}>
+											<EventIcon />
+										</Badge>
+									}/>
 								</div>
 							</div>
 

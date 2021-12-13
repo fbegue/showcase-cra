@@ -131,13 +131,13 @@ let StatControl  = createContainer(useStats);
 
 function useTabs(initialState = 0) {
 
-    //note: initial pager page is in src/components/Framer/Pager.jsx
+    //note: library,friends
      const [section, setActiveSection] = useState(1);
     //note: artists, songs, etc.
     const [tab, setActiveTab] = useState(0);
-
-    const [data, setData] = useState('data1');
-    return { tab,setActiveTab,section,setActiveSection,data, setData }
+    //Pager.jsx page
+    const [page, setPage] = useState(2);
+    return { tab,setActiveTab,section,setActiveSection,page, setPage }
 }
 let TabControl  = createContainer(useTabs);
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, {useEffect, useState} from 'react'
 import { useSpring, animated } from '@react-spring/web'
 import styles from './RotateSpring.module.css'
 
@@ -17,6 +17,15 @@ export default function ApplyPulse(props) {
 		state = props.state
 		toggle = props.toggle
 	}
+
+	useEffect(() => {
+		const intervalId = setInterval(() => {  //assign interval to a variable to clear it.
+			setShrink(prevState => !prevState)
+		}, 1000)
+
+		return () => clearInterval(intervalId); //This is important
+
+	}, [])
 
 	return (
 		<div className={styles.container} onClick={() => toggle(!state)}

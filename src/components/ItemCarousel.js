@@ -7,70 +7,65 @@ import React,{useState,useEffect} from "react";
 
 import './ItemCarousel.css'
 
-
-function Test(){
-	return <div>test</div>
-}
 function ItemCarousel(props){
-
+	var comp = "ItemCarousel | "
+	console.log(comp,props);
 	const [pages, setPages] = useState([]);
 
 	//var root = document.documentElement;
 	//todo: spent a non-zero amount of time trying to force this VERY OLD caro library to have text over images
 	//basically only way I came up with was using ::after w/ css vars but I can't access
 
-	var img = null;
-	var images = [];
-	props.artists.forEach((a,i) =>{
-		//
-		img = <img alt={a.artist.name} src={a.artist.images[0].url} onClickCapture={(e) =>{props.handleSelect(a.artist);e.preventDefault()}} ></img>
+	useEffect(() =>{
+		var img = null;
+		var images = [];
+		props.artists.forEach((a,i) =>{
+			img = <img alt={a.artist.name} src={a.artist.images[0].url} onClickCapture={(e) =>{props.handleSelect(a.artist);e.preventDefault()}} ></img>
 
-		//https://stackoverflow.com/questions/56071265/css-pseudo-class-disappears-after-variable-value-update-via-js
-		//root.style.setProperty("--caroText" + i, '"' + a.artist.name + '"');
-		images.push(img)
-	})
+			//https://stackoverflow.com/questions/56071265/css-pseudo-class-disappears-after-variable-value-update-via-js
+			//root.style.setProperty("--caroText" + i, '"' + a.artist.name + '"');
+			images.push(img)
+		})
+		setPages(images)
+	},[props.artists])
 
-	//testing: with 2 more images
-	images.push(images[0])
-	images.push(images[1])
-
-	//testing: trying to see if this library would handle in/out animations
-	// eslint-disable-next-line no-unused-expressions
-	pages.length === 0 ? setPages(images):{};
 	const modifyPages = () =>{
 		setPages((prev) =>{return prev.filter(r =>{return r !== prev[0]})})
 	}
 
 	return(
-		// <p>test css var</p>
 		<div>
-			<button onClick={() =>{modifyPages()}}/>
-		<ReactCoverCarousel
-			 enableHeading={true}
-			// width={'100%'}
-			height={210}
-			// height={window.innerHeight/2}
-			displayQuantityOfSide={1}
-			// navigation={true}
-			enableScroll={true}
-			activeImageIndex={1}
-			activeImageStyle={{
-				margin: '-1em',
-			}}
-			activeFigureScale={1.5}
-			otherFigureScale={1}
-			otherFigureRotation={20}
-			// mediaQueries={{}}
-			infiniteScroll={true}
-			transitionSpeed={700}
-			//note: disable mobile-always-vertical-stacked behavior
-			maxPixelWidthForMobileMediaQuery={0}
-			zoomable={false}
-		>
-			{pages}
-		</ReactCoverCarousel>
+			{pages.length > 0 &&
+			<div>
+				<button onClick={() =>{modifyPages()}}/>
+				<ReactCoverCarousel
+					enableHeading={true}
+					// width={'100%'}
+					height={210}
+					// height={window.innerHeight/2}
+					displayQuantityOfSide={1}
+					// navigation={true}
+					enableScroll={true}
+					activeImageIndex={1}
+					activeImageStyle={{
+						margin: '-1em',
+					}}
+					activeFigureScale={1.5}
+					otherFigureScale={1}
+					otherFigureRotation={20}
+					// mediaQueries={{}}
+					infiniteScroll={true}
+					transitionSpeed={700}
+					//note: disable mobile-always-vertical-stacked behavior
+					maxPixelWidthForMobileMediaQuery={0}
+					zoomable={false}
+				>
+					{pages}
+				</ReactCoverCarousel>
+			</div>
+			}
 		</div>
-		)
+	)
 	// return (
 	// 	<div style={{display:"flex"}}>
 	// 		{props.artists.map((item,i) => (

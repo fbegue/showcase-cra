@@ -9,7 +9,7 @@ import {
 	CHIPGENRES,
 	PIEDATADRILLDOWN,
 	PIEDATA,
-	CHIPGENRESRANKED
+	CHIPGENRESRANKED, EVENTS_VAR
 } from '../storage/withApolloProvider';
 import RedoIcon from "@material-ui/icons/Redo";
 import PieChartIcon from "@material-ui/icons/PieChart";
@@ -165,6 +165,8 @@ function Stats(props) {
 	const pieData = useReactiveVar(PIEDATA);
 	const pieSeriesDrilldown = useReactiveVar(PIEDATADRILLDOWN);
 	const tiles = useReactiveVar(TILES);
+	const events = useReactiveVar(EVENTS_VAR);
+
 
 	//console.log("Stats | pieData:",pieData);
 	//console.log("Stats | pieSeriesDrilldown:",pieSeriesDrilldown);
@@ -395,9 +397,7 @@ function Stats(props) {
 
 
 	const [ref, bounds] = useMeasure()
-
-	console.log("$gotbounds",bounds.height);
-
+	//console.log("$gotbounds",bounds.height);
 	const drawerProps = useSpring({
 		// top: show ? 200 : 0,
 		position: "absolute",
@@ -458,7 +458,8 @@ function Stats(props) {
 			{/*</div>*/}
 
 			{/*style={{paddingTop:"1em"}}*/}
-			<div >
+			<div>
+				{/*<div style={{background:"grey",zIndex:10,position:"absolute",right:0}}>{events.length} events</div>*/}
 				{/*<div style={{flexGrow:"1"}}></div>*/}
 				{/*style={{display:"flex",flexDirection:"column"}} */}
 				{/*style={{top: "-4em",position: "relative",height: "21em",zIndex:1}}*/}

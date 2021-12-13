@@ -1544,6 +1544,9 @@ function useProduceEvents(){
 						}
 
 
+						if(!(r.genres)){
+							debugger;
+						}
 						r.genres.forEach(g =>{
 							genreArtist[g.name] ? genreArtist[g.name].push(r):genreArtist[g.name] = [r]
 							if(r.shared){
@@ -1659,9 +1662,19 @@ function useProduceEvents(){
 
 				//filter out by date/metro and sort by date
 
-
+				var debugEvents = false
+				if(debugEvents){
+					debugger;
+				}
 				function byDate(e){
-					return (new Date(e.start.datetime) >= control.startDate) && (control.endDate ? (new Date(e.start.datetime) <= control.endDate):true)
+					var validStart = new Date(e.start.datetime) >= control.startDate;
+					var validEnd = control.endDate ? (new Date(e.start.datetime) <= control.endDate):true
+
+					// if (!(validStart && validEnd)){
+					// 	debugger;
+					// }
+
+					return validStart && validEnd
 				}
 				events = events.filter(e =>cids.indexOf(e.metro_id) !== -1)
 					.filter(byDate)
@@ -1671,12 +1684,16 @@ function useProduceEvents(){
 				//noticed when testin large cleveland pull - if my date range was real small it would start to duplicate event entries?
 				events = _.sortedUniqBy(events,e =>{return e.id})
 
+
 				//---------------------------------------------------------------------------------
 				//note: series of different filters to apply to events set
 
-				//note: for speed, mark the performances with all possible filtered categories
-				//then later, based on control values, actually apply the filter
+				//note: for speed, mark the performances with all possible filtered categories using previously generated maps
+				//genreArtist => genre_match
+				// relatedArtist => related_match
+				// allArtist => exact_match
 
+				//then later, based on control values, actually apply the filter
 
 				events.forEach(e =>{
 					e.friends = [];
@@ -1780,7 +1797,7 @@ function useProduceEvents(){
 
 						//todo: don't feel like this needs to be done for EACH Object.keys(fmap) ?
 						//console.log("$colorMap",colorMap);
-						//debugger;
+
 						gs.forEach((gOb,gi) =>{
 							//because genres is the entire list for both users, it's possible
 							//the inputed user's map doesn't have an entry for it
@@ -1942,6 +1959,10 @@ function useProduceEvents(){
 				//when we've selected a genre OR FAMILY to filter on
 
 
+				if(debugEvents){
+					debugger;
+				}
+
 				if(friendscontrol.genres.length > 0){
 					console.log("$$friendscontrol.genres overrides genreSens",friendscontrol.genres);
 					events = events.filter(e =>{
@@ -1969,13 +1990,16 @@ function useProduceEvents(){
 
 						return some;
 					})
-				}else if(friendscontrol.families.length > 0){
+				}
+				else if(friendscontrol.families.length > 0){
 					console.log("$$friendscontrol.families overrides genreSens",friendscontrol.families);
 					events = events.filter(e =>{
 						var some = false;
 						for(var x = 0; x < e.performance.length;x++) {
 							var a = e.performance[x].artist;
 							if (friendscontrol.families.indexOf(a.familyAgg) !== -1) {
+								//todo: where am I using this flag? is it just here for completeness
+								//(like every present event should have a reason why it was matched to active dataset_
 								a.useSelectedFamilyMatch = true;
 								some = true;
 								break;
@@ -1986,11 +2010,15 @@ function useProduceEvents(){
 						return some;
 					})
 				}else{
+					if(debugEvents){
+						debugger;
+					}
 					events = events.filter(e =>{
 						var some = false;
 						for(var x = 0; x < e.performance.length;x++) {
 							var a = e.performance[x].artist;
 
+							//todo: disabled sensitivity selection for now (defaults to 'related')
 							if(control.genreSens === 'exact'){
 								if(a.genre_match.length > 0){
 									a.useExactGenreMatch = true;
@@ -1998,9 +2026,10 @@ function useProduceEvents(){
 								}
 							}else if(control.genreSens === 'related'){
 								//if the familyAgg of any of the performances has been alluded to in familyArtist, we keep it
-								if(Object.keys(familyArtist).indexOf(a.familyAgg) !== -1){
+								if(Object.keys(familyArtist).indexOf(a.familyAgg) !== -1) {
 									a.useRelatedGenreMatch = true;
-									some = true;break;
+									some = true;
+									break;
 								}
 							}
 						}
@@ -2008,7 +2037,9 @@ function useProduceEvents(){
 					})
 				}
 
-
+				if(debugEvents){
+					debugger;
+				}
 				//note: control.artistSens
 				events = events.filter(e =>{
 					var some = false;
@@ -2024,6 +2055,9 @@ function useProduceEvents(){
 					}
 					return some
 				})
+				if(debugEvents){
+					debugger;
+				}
 
 				//---------------------------------------------------------------------------------
 

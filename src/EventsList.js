@@ -45,7 +45,10 @@ import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import SwipeRight from "./assets/swipe-right.png";
 import DragHand from "./assets/noun_Drag Hand_230196.png";
 import ApplyPulse from "./components/springs/ApplyPulse";
+import MoreVertIcon from '@material-ui/icons/MoreVert';
+import Switch from '@material-ui/core/Switch';
 import FilterListIcon from "@material-ui/icons/FilterList";
+import Pagination from "./components/utility/Pagination";
 //import GenreChipsDumb from './components/chips/GenreChipsDumb.js'
 // import './components/utility/CustomScroll/contextStats.scss'
 // import "./components/utility/CustomScroll/FirstComp/customScroll.css";
@@ -92,16 +95,60 @@ var oldId = null;
 
 const useStylesFamilies = makeStyles(familyStyles);
 
-function EventsList() {
+function EventsList(props) {
+	var comp = "EventsList |"
+
 	//const classesPlay = useStyles();
 
 	// this method sets the current state of a menu item i.e whether
 	// it is in expanded or collapsed or a collapsed state
 
 	const [state, setState] = useState({});
+	const [friendsFilterOn, setFriendsFilterOn] = useState(false);
 	const [globalState, globalDispatch] = useContext(Context);
 	const globalUI = useReactiveVar(GLOBAL_UI_VAR);
-	const events = useReactiveVar(EVENTS_VAR);
+	const events= useReactiveVar(EVENTS_VAR);
+	console.log(comp + " events",events);
+	//testing: after applying this filter, the events that were left couldn't be expanded?
+	//no error, just not there. didn't really investigate...
+
+
+	const [page, setPage] = React.useState(1);
+	const [pageSize, setPageSize] = React.useState(5);
+	const [items, setItems] = useState(events);
+	//var _r = JSON.parse(JSON.stringify(events))
+	//on
+	var _r = events;
+
+	//todo: componentize along w/ Pagination
+	useEffect(() => {
+		//note: on every render, first process event list control values
+
+		function eventControlsFilter(e){
+			if(friendsFilterOn){return e.friends?.length >0}
+			else{return true}
+		}
+
+		/** note:
+		 * 	_r is the total # of events
+		 * items are items on 1 page
+		 * */
+
+		_r = _r.filter(eventControlsFilter)
+		//note: items.length/pageSize === total # of pages
+		if(_r.length > pageSize){
+			if(page === 1){
+				_r = _r.slice(0,pageSize)
+			}else{
+				// console.log("slice start index",pageSize*(page - 1));
+				// console.log("slice end index",(page)*pageSize);
+				_r = _r.slice(pageSize*(page - 1),(page)*pageSize)
+			}
+		}
+		console.log("setEvents",_r);
+		setItems(_r)
+	}, [page,_r])
+
 	const chipGenres = useReactiveVar(CHIPGENRES);
 
 	let control = Control.useContainer()
@@ -309,9 +356,10 @@ function EventsList() {
 			t = t + m.displayName;
 			control.metro.length - 1 > i ? t = t  + "|":{};
 		})
-
-
-		return t + " | " + 	DateTime.fromISO(control.startDate).toFormat('LLL d') + " - " + DateTime.fromISO(control.endDate)
+		return t
+	}
+	function getDate(){
+		return DateTime.fromISO(control.startDate).toFormat('LLL d') + " - " + DateTime.fromISO(control.endDate)
 	}
 
 	var classes = {menuHeader:"menuHeader",list:"list",root:"root",nested:"nested"};
@@ -322,7 +370,6 @@ function EventsList() {
 	function getFamilyClass(event){
 		//console.log("$event",event);
 		//console.log("getFamilyClass",event.performance[0].displayName + " | " +event.performance[0].artist.familyAgg);
-		//debugger;
 
 		//go thru all performances and determine what family to represent it with
 		var eventAgg = [];
@@ -373,6 +420,7 @@ function EventsList() {
 
 	const [openNew, setOpenNew] = useState({});
 
+
 	function handler(children,key) {
 
 		// var moment = function(dt,format){
@@ -402,10 +450,10 @@ function EventsList() {
 
 			return props.rec.user.images[0].url
 			? <Tooltip title={props.rec.reason}>
-					<img style={{width: "50px",borderRadius: "50%"}} src={props.rec.user.images[0].url} />
+					<img style={{width: "50px",height:"50px",borderRadius: "50%"}} src={props.rec.user.images[0].url} />
 				</Tooltip>
 			: <Tooltip title={props.rec.reason}>
-					<img style={{width: "50px",borderRadius: "50%"}} src={fallback} />
+					<img style={{width: "50px",height:"50px",borderRadius: "50%"}} src={fallback} />
 				</Tooltip>
 			// return <Suspense fallback={""}>
 			// 	<Tooltip title={props.rec.reason}>
@@ -420,6 +468,7 @@ function EventsList() {
 			{/*<div className={'crazy-scroll'} style={{maxHeight:"33em"}}>*/}
 			{/*<CustomScroll>*/}
 				{
+					//testing:
 					children.map(subOption => {
 						if (!subOption.childrenKey) {
 							return (
@@ -593,7 +642,6 @@ function EventsList() {
 		return <div>agg:{c_familyAgg} genres:{c_genres} eventsWithOne: {c_eventsWithOne} total: {events.length} </div>
 	}
 
-	const tiles = useReactiveVar(TILES);
 
 	return (
 		<div style={{display:"flex",flexDirection:"column"}}>
@@ -609,33 +657,77 @@ function EventsList() {
 
 			<div>
 				{/*todo: componentize w/ reverse on in ContextStats */}
-				<div style={{"width":"100%","height":"3em","backgroundColor":"lightblue","display":"flex","alignItems":"center",justifyContent:"flex-start"}}>
-					<div style={{"transform":"rotate(180deg)"}}>
-						<img style={{height:"3em",marginRight:".5em"}} src={SwipeRight}/>
-					</div>
-					<div style={{position: "relative",zIndex:"2"}}>
-						<img style={{"height":"2.5em","marginTop":"0.3em","marginRight":"0.5em","marginLeft":"-0.3em"}} src={DragHand}/>
-					</div>
-					<div style={{marginLeft:"1em"}}>Matched {tiles.length} Items </div>
-				</div>
+				{/*testing: idk - gotta be a better way to communicate with w/out using up so much space*/}
+				{/*<div style={{"width":"100%","height":"3em","backgroundColor":"lightblue","display":"flex","alignItems":"center",justifyContent:"flex-start"}}>*/}
+
+					{/*<div style={{"transform":"rotate(180deg)"}}>*/}
+					{/*	<img style={{height:"3em",marginRight:".5em"}} src={SwipeRight}/>*/}
+					{/*</div>*/}
+					{/*<div style={{position: "relative",zIndex:"2"}}>*/}
+					{/*	<img style={{"height":"2.5em","marginTop":"0.3em","marginRight":"0.5em","marginLeft":"-0.3em"}} src={DragHand}/>*/}
+					{/*</div>*/}
+					{/*<div style={{marginLeft:"1em"}}>Matched {tiles.length} Items </div>*/}
+				{/*</div>*/}
 				<List>
 					<ListItem button divider key={'locdate'} onClick={handleClickConfig}>
-						<ListItemText primary={<div style={{background:'#80808026',display:"inline-block"}}>{getTitle()}</div>} />
+						<ListItemText primary={
+							<div style={{display:"flex"}}>
+
+								<div style={{flexGrow:"1",alignSelf:"center"}}>
+									{/*todo: going to use spring floating menu here*/}
+									{/*todo: also, still propogates 'list row clicked' shadowing*/}
+
+									<div onClick={(e) => {
+										e.stopPropagation();
+										//setDisabledRipple(true);
+									}}>
+										<Pagination setPage={setPage} page={page} pageSize={pageSize} records={_r}/>
+									</div>
+
+
+									{/*<div><MoreVertIcon/></div>*/}
+									{/*testing: put somewhere else*/}
+									{/*<div>Friends Liked*/}
+									{/*	<Switch*/}
+									{/*		checked={friendsFilterOn}*/}
+									{/*		// onChange={() =>{setFriendsFilterOn(prev => !(prev))}}*/}
+									{/*		color="secondary"*/}
+									{/*		onClick={(e) => {*/}
+									{/*			e.stopPropagation();*/}
+									{/*			setFriendsFilterOn(prev => !(prev));*/}
+									{/*			//setDisabledRipple(true);*/}
+									{/*		}}*/}
+									{/*	/>*/}
+									{/*</div>*/}
+
+								</div>
+
+								<div style={{flexGrow:"1"}}>{'\u00A0'}</div>
+								<div style={{display:"flex"}}>
+									<div style={{maxWidth:"5em",marginRight:".5em",display:"flex",flexDirection:"column"}}>
+										<div style={{color:"#0055ff"}}>{_r.length} events </div>
+										{/*<div style={{color:"#0055ff"}}>{events.filter(EventControlsFilter).length} events </div>*/}
+										<div style={{alignSelf:"flex-end" }}> found in:</div>
+									</div>
+									<div style={{background:'#80808026',display:"flex",flexDirection:"column",maxWidth:"10em"}}>
+										<div>{getTitle()}</div>
+										<div>{getDate()}</div>
+									</div>
+								</div>
+
+							</div>} />
 						{open ? <ExpandLess /> : <ExpandMore />}
 					</ListItem>
 					<Collapse key={'locdate-collapse'}  in={open} timeout="auto" unmountOnExit>
 						<Map default={{"displayName":"Columbus", "id":9480}}></Map>
 					</Collapse>
+
 					<ListItem id={'events-collapse'} key={'events'} button divider onClick={handleClickConfig2}>
-						{/*<ListItemText primary={<div>Events ({events.length})*/}
-						{/*	/!*{getCoverage(events)}*!/*/}
-						{/*</div>} />*/}
-						{/*<div style={{"marginLeft":"93%"}}>{open2 ? <ExpandLess /> : <ExpandMore />}</div>*/}
 					</ListItem>
 					<Collapse  key={'events-collapse'}  in={open2} timeout="auto" unmountOnExit>
-						<div style={{marginTop:"1em",marginBottom:"1em"}} key={'special'}><CreatePlay/></div>
-						{/*{handler(globalState.events)}*/}
-						{handler(events)}
+						{/*todo: put this in a menu along w/ other event things*/}
+						{/*<div style={{marginTop:"1em",marginBottom:"1em"}} key={'special'}><CreatePlay/></div>*/}
+						{handler(items)}
 					</Collapse>
 				</List>
 			</div>

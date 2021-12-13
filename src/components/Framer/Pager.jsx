@@ -5,6 +5,7 @@ import './Pager.css'
 import Stats from "../Stats";
 import ContextStats from "../ContextStats";
 import EventsList from "../../EventsList";
+import {TabControl} from '../../index'
 // import { images } from "./image-data";
 
 const variants = {
@@ -41,8 +42,8 @@ const swipePower = (offset,velocity) => {
 
 const Pager = () => {
 
-  //note: initial page 1st
-  const [[page, direction], setPage] = useState([0, 0]);
+  let tabcontrol = TabControl.useContainer()
+  const [[page, direction], setPage] = useState([tabcontrol.page, 0]);
 
 
   // We only have 3 pages, but we paginate them absolutely (ie 1, 2, 3, 4, 5...) and

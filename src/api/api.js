@@ -2,12 +2,14 @@
 //import $ from 'jquery';
 import {useReactiveVar} from "@apollo/react-hooks";
 import {GLOBAL_UI_VAR} from "../storage/withApolloProvider";
+import _ from 'lodash'
 import React from "react";
 import {api_address }from '../components/Profile'
 //testing:
 //let api_address = "http://localhost:8888"
 // let api_address = "https://api.soundfound.io/api"
 // let api_address = "https://api.soundfound.io"
+
 let counter = 0
 const fakeDatabase = {
     todos: [
@@ -283,6 +285,43 @@ var fetchSpotifyUsers =  function(req){
 
 //event methods
 
+function getEventsCoverage(events,flag){
+    var c_familyAgg = 0,c_genres = 0,c_eventsWithOne = 0;var ptotal = 0;
+    var genreNoFam = [];var eventsLen = JSON.parse(JSON.stringify(events)).length
+
+    var toSplice = []
+    events.forEach((e,i,arr) =>{
+        var ec = 0;
+
+        //note: only here b/c I'm lazy and won't update cached events fetch example!
+        new Date(e.start.datetime) <= new Date() ? arr.splice(i, 1):{}
+
+        e.performance.forEach(p =>{
+            //todo: handle events w/ no family (artist could still be related?)
+            //todo: handle events w/ no family but has genres (which don't have any families :/)
+           p.artist.familyAgg? c_familyAgg++ :(flag === 'hasFamily' ? arr.splice(i, 1):{});
+            // else{flag === 'hasFamily' ? toSplice.push(e):{}}
+
+            p.artist.familyAgg ? ec++ :{};
+            p.artist.genres.length > 0 ? c_genres++ :{};
+            !( p.artist.familyAgg) && p.artist.genres.length > 0 ? genreNoFam.push(p):{}
+            ptotal++
+
+        })
+
+        ec > 0 ? c_eventsWithOne++:{};
+    })
+    // toSplice = _.uniqBy(toSplice,'id')
+    // // console.log("toSplice",toSplice);
+    // events = _.difference(events, toSplice);
+
+    flag === 'hasFamily' ? console.log("pruned",eventsLen - events.length):{};
+    //console.log("$genreNoFam",genreNoFam);
+   return {perfArtistWithFamilyAgg:c_familyAgg + "/" + ptotal, perfArtistWithGenre:c_genres+ "/" + ptotal,
+        eventWithAtLeastOneGenre: c_eventsWithOne + "/" + events.length}
+
+}
+
 var fetchEvents =  function(req){
     return new Promise(function(done, fail) {
 
@@ -311,24 +350,7 @@ var fetchEvents =  function(req){
             .then(function(res){
                 //console.log("retrieved: ",res);
 
-                function getCoverage(events){
-                    var c_familyAgg = 0,c_genres = 0,c_eventsWithOne = 0;var ptotal = 0;
-                    events.forEach(e =>{
-                        var ec = 0;
-                        e.performance.forEach(p =>{
-                            p.artist.familyAgg ? c_familyAgg++ :{};
-                            p.artist.familyAgg ? ec++ :{};
-                            p.artist.genres.length > 0 ? c_genres++ :{};
-                            ptotal++
-
-                        })
-                        ec > 0 ? c_eventsWithOne++:{};
-
-                    })
-                    return {perfArtistWithFamilyAgg:c_familyAgg + "/" + ptotal, perfArtistWithGenre:c_genres+ "/" + ptotal,
-                        eventWithAtLeastOneGenre: c_eventsWithOne + "/" + events.length}
-                }
-                console.log("getCoverage (events init):",getCoverage(res));
+                console.log("getCoverage (events init):",getEventsCoverage(res));
 
                 done(res)
             })
@@ -571,6 +593,7 @@ export default {
     fetchPlaylists,
     fetchPlaylistsResolved,
     fetchEvents,
+    getEventsCoverage,
     getSavedTracks,
     getMySavedTracksLast,
     getMyFollowedArtists,

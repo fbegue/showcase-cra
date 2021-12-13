@@ -66,7 +66,7 @@ function PieChips(props) {
 	let control = Control.useContainer();
 	const chipGenresColorMap = useReactiveVar(CHIPGENRESCOLORMAP)
 	const chipGenresSharedMap= useReactiveVar(CHIPGENRESCOMBINEDMAP)
-	console.log("$PieChips | props",props);
+	//console.log("$PieChips | props",props);
 	//testing:
 
 	//let pieDataSum = props.pieData.reduce((prev,curr) =>{return {y:prev.y + curr.y}}).y
@@ -210,7 +210,7 @@ function PieChips(props) {
 				//testing: you can only do 1 family at a time rn anyways
 				//when all families are unclicked, deselect all genres
 				if(ret.length === 0){
-					debugger;
+
 					console.log("reset genres selection on family deselect");
 					friendscontrol.setGenres([]);
 					setGColor(initGColorState);

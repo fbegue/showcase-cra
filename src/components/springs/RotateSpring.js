@@ -29,6 +29,7 @@ export default function RotateSpring(props) {
 		// reset: shrink,
 		from: { opacity: 1, color: 'red' },
 		to: { opacity: .5, color: 'blue' },
+
 		duration:5000,
 		delay:1000
 	})

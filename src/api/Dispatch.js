@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-expressions */
 import React, {useContext, useEffect,useState} from 'react';
 import api from "../api/api.js"
 import {useReactiveVar} from "@apollo/react-hooks";
@@ -20,6 +21,68 @@ function Dispatch(props) {
 	async function asyncDispatch() {
 		console.log("START DISPATCH");
 		try{
+			//===============================================================
+			//profile and library building
+
+			//figure out if we've seen this user before - if so this'll do a quick fetch, if not we're going to resolve and then store
+			//note: param name = friend, b/c mostly used to fetch them
+			var me = await api.fetchStaticUser({auth:globalUI,friend: globalUI.user})
+
+			//testing: if this is a new user, our globalUI.user will currently only be spotify data
+			//so need to init it here
+			!(globalUI.user.related_users) ? globalUI.user.related_users = me.related_users:{};
+
+			// var artistsPay = [];
+			// artistsPay = artistsPay.concat(r[0]).concat(r[1].artists);
+
+			globalDispatch({type: 'init', payload:{artists:me.artists.artists,stats:null},user: globalUI.user,context:'artists'});
+			globalDispatch({type: 'init', payload:me.albums,user: globalUI.user,context:'albums'});
+
+
+			//note: to keep init payload signatures consistent, I reconstruct it below
+			//followedArtists: 			{stats:null,artists:[]}
+			//getTopArtists : 			[]
+			//getRecentlyPlayedTracks:	[]
+			//getSavedTracks:			{stats:{},tracks:[]}
+			//getSavedAlbums:			{stats:{},albums:[]}
+
+			// var fpr = await api.fetchPlaylistsResolved(req)
+			// console.log("r.stat",fpr.stats);
+			// globalDispatch({type: 'init', payload: fpr,user: globalUI.user,context:'playlists'});
+
+
+
+			//testing: old individual api calls
+			// var userProms = [];
+			// var fake =  function(){
+			// 	return new Promise(function(done, fail) {
+			// 		done([])
+			// 	})
+			// }
+			//todo: re-enable (thought I fixed in backend already?)
+			// userProms.push(api.getTopArtists(req))
+			// userProms.push(fake(req))
+			// userProms.push(api.getMyFollowedArtists(req))
+			// userProms.push(api.getMySavedAlbums(req))
+			// var r = await Promise.all(userProms)
+
+			//todo:
+			//control.setDataLoaded(true)
+
+			//todo: we're fetching this twice
+			//testing: tracks as a separate step from fetchuser
+			var userProms2 = [];
+			userProms2.push(api.getRecentlyPlayedTracks(req))
+			userProms2.push(api.getSavedTracks(req))
+			let r2 = await Promise.all(userProms2)
+
+			var tracksPay = {tracks:[]};
+
+			//todo: what is this getRecentlyPlayedTracks = {tracks:[],artists:[]} ARTISTS here?
+			tracksPay.tracks = tracksPay.tracks.concat(r2[0].tracks);tracksPay.tracks = tracksPay.tracks.concat(r2[1].tracks);
+			tracksPay.stats = r2[1].stats
+
+			globalDispatch({type: 'init', payload:tracksPay,user: globalUI.user,context:'tracks'});
 
 			//===============================================================
 			//events and users
@@ -27,9 +90,11 @@ function Dispatch(props) {
 
 
 			console.log("ONE TIME EVENT FETCH");
-			//testing: wtf is wrong with this now
+			//testing: static data to eval marking w/ friends
 			//var fer = await api.fetchEvents({metros:control.metro})
 			var fer = exampleFetchEvents;
+			console.log(api.getEventsCoverage(fer,'hasFamily'));
+
 			//testing:
 			//fer = fer.slice(0,50)
 			globalDispatch({type: 'update_events', payload: fer,context:'events', control:control});
@@ -43,59 +108,6 @@ function Dispatch(props) {
 			// 	})
 			// }
 			// await NEVER()
-
-
-
-			//===============================================================
-			//library
-
-			// var fpr = await api.fetchPlaylistsResolved(req)
-			// console.log("r.stat",fpr.stats);
-			// globalDispatch({type: 'init', payload: fpr,user: globalUI.user,context:'playlists'});
-
-
-			var userProms = [];
-			userProms.push(api.getTopArtists(req))
-			userProms.push(api.getMyFollowedArtists(req))
-			//userProms.push(api.getRecentlyPlayedTracks(req))
-			// userProms.push(api.getSavedTracks(req))
-
-			//testing: why the fuck is everything so slow / bombing again? :(
-			 userProms.push(api.getMySavedAlbums(req))
-			var r = await Promise.all(userProms)
-
-			//all these artist's have 'sources' so they all end up in here together
-			//note: to keep init payload signatures consistent, I reconstruct it below
-			//note: stats:
-			//followedArtists: 			{stats:null,artists:[]}
-			//getTopArtists : 			none
-			//getRecentlyPlayedTracks:	none
-			//getSavedTracks:			{stats:{},tracks:[]}
-			//getSavedAlbums:			{stats:{},albums:[]}
-			var artistsPay = [];
-			artistsPay = artistsPay.concat(r[0]).concat(r[1].artists);
-
-
-			globalDispatch({type: 'init', payload:{artists:artistsPay,stats:null},user: globalUI.user,context:'artists'});
-			 globalDispatch({type: 'init', payload:r[2],user: globalUI.user,context:'albums'});
-			//control.setDataLoaded(true)
-
-
-			//===============================================================
-			//testing: call tracks before staticFetch
-
-			var userProms2 = [];
-			userProms2.push(api.getRecentlyPlayedTracks(req))
-			userProms2.push(api.getSavedTracks(req))
-			let r2 = await Promise.all(userProms2)
-
-			var tracksPay = {tracks:[]};
-
-			//todo: what is this getRecentlyPlayedTracks = {tracks:[],artists:[]} ARTISTS here?
-			tracksPay.tracks = tracksPay.tracks.concat(r2[0].tracks);tracksPay.tracks = tracksPay.tracks.concat(r2[1].tracks);
-			tracksPay.stats = r2[1].stats
-
-			globalDispatch({type: 'init', payload:tracksPay,user: globalUI.user,context:'tracks'});
 
 			//===============================================================
 			//fetch friends profiles + global users
