@@ -37,7 +37,7 @@ function ItemCarousel(props){
 		<div>
 			{pages.length > 0 &&
 			<div>
-				<button onClick={() =>{modifyPages()}}/>
+				{/*<button onClick={() =>{modifyPages()}}/>*/}
 				<ReactCoverCarousel
 					enableHeading={true}
 					// width={'100%'}

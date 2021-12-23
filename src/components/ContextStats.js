@@ -23,7 +23,7 @@ import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import Drawer from "@material-ui/core/Drawer";
 import FilterListIcon from '@material-ui/icons/FilterList';
 import BubbleFamilyGenreChips from "./chips/BubbleFamilyGenreChips";
-import SwipeRight from '../assets/swipe-right.png'
+// import SwipeRight from '../assets/swipe-right.png'
 import {tabMap} from "../Tabify";
 import IconButton from '@material-ui/core/IconButton';
 //import FilterGenreChips from "./chips/FilterGenreChips";
@@ -33,7 +33,7 @@ import { GLOBAL_UI_VAR } from '../storage/withApolloProvider';
 import util from '../util/util'
 import OpacityPulse from "./springs/OpacityPulse";
 import TouchAppIcon from '@material-ui/icons/TouchApp';
-import FloatingActionButton from "./utility/Fab";
+//import FloatingActionButton from "./utility/FloatingActionButton";
 import Paper from "@material-ui/core/Paper";
 import InputIcon from "@material-ui/icons/Input";
 import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
@@ -198,7 +198,7 @@ function ContextStats(props) {
 	// const [query, setQuery] = React.useState("");
 
 	const [page, setPage] = React.useState(1);
-	const [pageSize, setPageSize] = React.useState(20);
+	const [pageSize, setPageSize] = React.useState(12);
 
 //-----------------------------------------------
 
@@ -242,6 +242,15 @@ function ContextStats(props) {
 		//todo: put tiles here to capture on-load set
 		//but DOES print a extra sus $tiles....
 	}, [friendscontrol.compare,tiles,friendscontrol.query,friendscontrol.families,friendscontrol.genres,page,friendscontrol.checkboxes])
+
+	const getTilesTotal = () =>{
+		var start = pageSize*(page - 1);
+		var end = (page)*pageSize;
+		if(page === 1){start = 1;}
+		if(page*pageSize > tiles.length){end = tiles.length}
+		return <div>{start}-{end} of {tiles.length} </div>
+		//return "" + start + "-" + end + " of " + tiles.length
+	}
 
 	//store displayed query here, and delay an update to global query
 	//i.e. debounce the keystrokes
@@ -355,6 +364,8 @@ function ContextStats(props) {
 
 
 	const [fstate, toggle] = useState(true)
+
+
 	return(
 		<div>
 			{/*testing:*/}
@@ -429,40 +440,40 @@ function ContextStats(props) {
 							{/*testing:*/}
 							{/*{tabcontrol.section === 2 && getTabs()}*/}
 
-							<div style={{display:"flex",flexDirection:"column",marginTop:"-2em"}}>
-								<div> Stats </div>
-								{/*<div style={{position: "relative",zIndex:"2",transform: "scaleX(-1)"}}>*/}
-								{/*	<img style={{"height":"2.5em","marginTop":"0.3em","marginRight":"0.5em","marginLeft":"-0.3em"}} src={DragHand}/>*/}
-								{/*</div>*/}
+							{/*<div style={{display:"flex",flexDirection:"column",marginTop:"-2em"}}>*/}
+							{/*	/!*<div> Stats </div>*!/*/}
+							{/*	/!*<div style={{position: "relative",zIndex:"2",transform: "scaleX(-1)"}}>*!/*/}
+							{/*	/!*	<img style={{"height":"2.5em","marginTop":"0.3em","marginRight":"0.5em","marginLeft":"-0.3em"}} src={DragHand}/>*!/*/}
+							{/*	/!*</div>*!/*/}
 
-								<div style={{"transform":"scale(-1, 1)",marginTop:"-1em",marginLeft:"1em"}}>
-									<img style={{height:"3em"}} src={SwipeRight}/>
-								</div>
+							{/*	/!*<div style={{"transform":"scale(-1, 1)",marginTop:"-1em",marginLeft:"1em"}}>*!/*/}
+							{/*	/!*	<img style={{height:"3em"}} src={SwipeRight}/>*!/*/}
+							{/*	/!*</div>*!/*/}
 
-							</div>
+							{/*</div>*/}
 							{/*todo: is source of / should be using Pagination*/}
-							<div style={{display:'flex',flexDirection:"row",marginTop:"-1em",marginLeft:"-1em",width:"7em"}}>
-								<div>
+							<div style={{display:'flex',flexDirection:"row",marginTop:"-1em",marginLeft:"-1em",width:"15em"}}>
+								<div onClick={() =>{setPage((prevState => {
+									return prevState !== 1 ? prevState - 1:prevState
+								}))}}>
 									<IconButton aria-label="nav-prev">
-										<NavigateBeforeIcon style={{ fontSize: 50 }} onClick={() =>{setPage((prevState => {
-											return prevState !== 1 ? prevState - 1:prevState
-										}))}}/>
+										<NavigateBeforeIcon style={{ fontSize: 50 }} />
 									</IconButton>
 								</div>
 								<div style={{"marginLeft":"-1em","marginTop":"1.5em",minWidth:"1.4em"}}>
 									{ tiles.length > 0 &&
 									<div style={{"display":"flex",flexDirection:"column",alignItems:"center"}}>
 										<div  style={{fontSize:"20px",fontWeight:"bold",marginBottom:".1em"}}>{page}/{Math.ceil(tiles.length/pageSize)}</div>
-										<div style={{fontSize:"15px"}}>20/{tiles.length} </div>
+										<div style={{fontSize:"15px"}}>{getTilesTotal()} </div>
 									</div>
 									}
 
 								</div>
-								<div style={{marginLeft:"-1em"}}>
+								<div style={{marginLeft:"-1em"}} onClick={() =>{setPage((prevState => {
+									return prevState <= tiles.length/pageSize ? prevState + 1:prevState
+								}))}}>
 									<IconButton aria-label="nav-next">
-										<NavigateNextIcon style={{ fontSize: 50 }} onClick={() =>{setPage((prevState => {
-											return prevState <= tiles.length/pageSize ? prevState + 1:prevState
-										}))}}/>
+										<NavigateNextIcon style={{ fontSize: 50 }} />
 									</IconButton>
 								</div>
 							</div>
@@ -472,29 +483,29 @@ function ContextStats(props) {
 								{/*<div style={{position: "relative",zIndex:"2",transform: "scaleX(-1)"}}>*/}
 								{/*	<img style={{"height":"2.5em","marginTop":"0.3em","marginRight":"0.5em","marginLeft":"-0.3em"}} src={DragHand}/>*/}
 								{/*</div>*/}
-								<div style={{marginTop:"2.5em",marginLeft:"2em",position:"relative",left:"28px",transform:"scaleX(-1)"}}>
-									{/*todo: how to communicate swipe*/}
-									{/*ripples? https://www.npmjs.com/package/react-ripples*/}
+								{/*<div style={{marginTop:"2.5em",marginLeft:"2em",position:"relative",left:"28px",transform:"scaleX(-1)"}}>*/}
+								{/*	/!*todo: how to communicate swipe*!/*/}
+								{/*	/!*ripples? https://www.npmjs.com/package/react-ripples*!/*/}
+								{/*	<div> <img style={{height:"3em",opacity:.5,transform: "scaleX(-1)"}} src={SwipeRight}/></div>*/}
+								{/*	/!*<div><OpacityPulse target={<img style={{height:"3em"}} src={SwipeRight}/>}/> </div>*!/*/}
+								{/*	/!*testing:*!/*/}
+								{/*	/!*<div style={{position:"absolute",marginTop:"1em"}}><OpacityPulse target={<TouchAppIcon/>}/> </div>*!/*/}
 
-									<div> <img style={{height:"3em",opacity:.5}} src={SwipeRight}/></div>
-									{/*<div><OpacityPulse target={<img style={{height:"3em"}} src={SwipeRight}/>}/> </div>*/}
-									<div style={{position:"absolute",marginTop:"1em"}}><OpacityPulse target={<TouchAppIcon/>}/> </div>
 
-
-								</div>
+								{/*</div>*/}
 								{/*<div style={{marginLeft:"1em",marginTop:"2.5em"}}> {events.length} Events </div>*/}
-								<div style={{marginLeft:"-2em"}}>
-									<FloatingActionButton icon={
-										//src: https://v4.mui.com/components/badges/
-										<Badge color="secondary" max={999} badgeContent={events.length}
-											   anchorOrigin={{
-												   vertical: 'bottom',
-												   horizontal: 'right',
-											   }}>
-											<EventIcon />
-										</Badge>
-									}/>
-								</div>
+								{/*<div style={{marginLeft:"-2em"}}>*/}
+								{/*	<FloatingActionButton icon={*/}
+								{/*		//src: https://v4.mui.com/components/badges/*/}
+								{/*		<Badge color="secondary" max={999} badgeContent={events.length}*/}
+								{/*			   anchorOrigin={{*/}
+								{/*				   vertical: 'bottom',*/}
+								{/*				   horizontal: 'right',*/}
+								{/*			   }}>*/}
+								{/*			<EventIcon />*/}
+								{/*		</Badge>*/}
+								{/*	}/>*/}
+								{/*</div>*/}
 							</div>
 
 						</div>

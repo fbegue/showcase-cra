@@ -136,24 +136,24 @@ export default function Tabify() {
 	//note: to be used as a base for every request
 
 	//todo: put user in
-	let req = {auth:globalUI};
-
-	function useDidUpdateEffect(fn,inputs) {
-		const didMountRef = useRef(false);
-		console.log("$useDidUpdateEffect");
-		useEffect(() => {
-			if (didMountRef.current)
-			{ 	console.log("2nd mount w/ token change!!");
-				fn()
-			}
-			else{
-				console.log("$current",true);
-				didMountRef.current = true;
-
-			}
-
-		}, inputs);
-	}
+	// let req = {auth:globalUI};
+	//
+	// function useDidUpdateEffect(fn,inputs) {
+	// 	const didMountRef = useRef(false);
+	// 	console.log("$useDidUpdateEffect");
+	// 	useEffect(() => {
+	// 		if (didMountRef.current)
+	// 		{ 	console.log("2nd mount w/ token change!!");
+	// 			fn()
+	// 		}
+	// 		else{
+	// 			console.log("$current",true);
+	// 			didMountRef.current = true;
+	//
+	// 		}
+	//
+	// 	}, inputs);
+	// }
 
 
 	//prevent useeffect from triggering on first render
@@ -568,27 +568,29 @@ export default function Tabify() {
 
 	//const [infoBound, setInfoBound] = React.useState(0);
 	const [infoCollapse, setInfoCollapse] = React.useState(false);
-	const [ref, bounds] = useMeasure()
+
+	//todo: disabled
+	//const [ref, bounds] = useMeasure()
 
 	//console.log("$gotbounds",bounds.height);
 	//console.log("$infoBounds",infoBound);
 
-	const drawerExpandProps = useSpring({
-		// top: show ? 200 : 0,
-		outline:"1px dashed purple",
-		position: "absolute",
-		left: 0,
-		right:0,
-		backgroundColor: "#808080",
-		//testing: seems like infopane's dynamic drawer height messes with my ability to calculate correctly here
-		//so I pass it back + also provide some offset value (which makes sense I think...)
-		 height: infoCollapse ? 268 :bounds.height,
-		//height:'40em',
-		minWidth:"23em",
-		paddingTop:".2em",
-		paddingBottom:".2em",
-		overflow:'visible'
-	});
+	// const drawerExpandProps = useSpring({
+	// 	// top: show ? 200 : 0,
+	// 	outline:"1px dashed purple",
+	// 	position: "absolute",
+	// 	left: 0,
+	// 	right:0,
+	// 	backgroundColor: "#808080",
+	// 	//testing: seems like infopane's dynamic drawer height messes with my ability to calculate correctly here
+	// 	//so I pass it back + also provide some offset value (which makes sense I think...)
+	// 	 height: infoCollapse ? 268 :bounds.height,
+	// 	//height:'40em',
+	// 	minWidth:"23em",
+	// 	paddingTop:".2em",
+	// 	paddingBottom:".2em",
+	// 	overflow:'visible'
+	// });
 
 
 
@@ -627,14 +629,11 @@ export default function Tabify() {
 					{/*todo: further parameterize to allow for "My Profile" content*/}
 
 					{mapNum.map((index) =>
-						<TabPanel   className={'tabs' + index} value={tabcontrol.section} index={index}>
-
-
+						<TabPanel key={index}   className={'tabs' + index} value={tabcontrol.section} index={index}>
 							{/*testing:*/}
-							{getTabs()}
-							{/*{index !== 2 ? getTabs():""}*/}
-
-							<Accordion infoBound={gridControl.infoBound} ref={ref} i={0} setCollapse={gridControl.setCollapse} collapse={gridControl.collapse}
+							{/*{getTabs()}*/}
+							{/*ref={ref}*/}
+							<Accordion infoBound={gridControl.infoBound}  i={0} setCollapse={gridControl.setCollapse} collapse={gridControl.collapse}
 									   content={
 										   <div style={{background:'pink',width:width}}>
 											   {index !== 2 ?

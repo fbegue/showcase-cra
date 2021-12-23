@@ -4,8 +4,9 @@ import api from "../api/api.js"
 import {useReactiveVar} from "@apollo/react-hooks";
 import {GLOBAL_UI_VAR} from "../storage/withApolloProvider";
 import {Context, initUser} from "../storage/Store";
-import {Control} from "../index";
+import {Control,StatControl} from "../index";
 import exampleFetchEvents from '../data/example/fetchEvents'
+import {tabMap} from "../Tabify";
 // import dan2_example from '../data/example/DanielNiemiec#2'
 
 function Dispatch(props) {
@@ -15,7 +16,7 @@ function Dispatch(props) {
 	const [count, setCount] = useState(0);
 
 	let control = Control.useContainer();
-
+	let statcontrol = StatControl.useContainer();
 	let req = {auth:globalUI};
 
 	async function asyncDispatch() {
@@ -36,6 +37,10 @@ function Dispatch(props) {
 			// artistsPay = artistsPay.concat(r[0]).concat(r[1].artists);
 
 			globalDispatch({type: 'init', payload:{artists:me.artists.artists,stats:null},user: globalUI.user,context:'artists'});
+
+			//testing: as soon as artists is here, set it as default
+			statcontrol.setStats({name:"artists_saved"})
+
 			globalDispatch({type: 'init', payload:me.albums,user: globalUI.user,context:'albums'});
 
 

@@ -12,8 +12,8 @@ import ExpandLessIcon from "@material-ui/icons/ExpandLess";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import DisplayDetailRow from "./tiles/DisplayDetailRow";
 import BubbleFamilyGenreChips from "./chips/BubbleFamilyGenreChips";
-
-
+import Select from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem';
 function InfoPanel(props) {
 
 	let statcontrol = StatControl.useContainer();
@@ -199,17 +199,42 @@ function InfoPanel(props) {
 		}
 		return globalState[globalUI.user.id + "_" + k +"_stats"].artists_top
 	}
+
+	const [selectVal,setSelectVal] = useState(null)
 	return(
 		<div>
 			{
+				//todo: I'm waiting for _tracks_stats b/c it's the last one to load?
 				globalState[globalUI.user.id + "_tracks_stats"] &&
 				<div style={{display:"flex",flexDirection:"column"}}>
 					<div>
-						<div style={{padding:"2px",position:"relative",zIndex:2,color:"white",height:"20px",width:"6.2em",marginLeft:"auto"}}>
+						<div style={{padding:"2px",position:"relative",zIndex:2,color:"white",height:"20px",width:"8em",marginLeft:"auto"}}>
 							<Paper elevation={3}>
-								<Typography variant="subtitle1">
-									Top Artists
-								</Typography>
+								{/*todo: hookup to tab change interface*/}
+								<Select
+									labelId="demo-simple-select-label"
+									id="demo-simple-select"
+									value={selectVal}
+									onChange={() =>{setSelectVal()}}
+									MenuProps={{
+										anchorOrigin: {
+											vertical: "bottom",
+											horizontal: "left"
+										},
+										transformOrigin: {
+											vertical: "top",
+											horizontal: "left"
+										},
+										getContentAnchorEl: null
+									}}
+								>
+									<MenuItem value={20}>Recent Artists </MenuItem>
+									<MenuItem value={30}>Recent Tracks</MenuItem>
+									<MenuItem value={10}>Top Artists</MenuItem>
+								</Select>
+								{/*<Typography variant="subtitle1">*/}
+								{/*	Top Artists*/}
+								{/*</Typography>*/}
 							</Paper>
 						</div>
 						{/*<ListArtistPanels artists={globalState[globalUI.user.id + "_tracks_stats"].artists_top} />*/}

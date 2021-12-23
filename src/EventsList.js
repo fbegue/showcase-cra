@@ -359,7 +359,7 @@ function EventsList(props) {
 		return t
 	}
 	function getDate(){
-		return DateTime.fromISO(control.startDate).toFormat('LLL d') + " - " + DateTime.fromISO(control.endDate)
+		return DateTime.fromISO(control.startDate).toFormat('LLL d') + " - " + DateTime.fromISO(control.endDate).toFormat('LLL d')
 	}
 
 	var classes = {menuHeader:"menuHeader",list:"list",root:"root",nested:"nested"};

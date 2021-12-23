@@ -65,8 +65,11 @@ function FriendsDisplay(props) {
 		"width": 125,
 		"height": 97.5
 	}
-	items.push(t1)
-	items.push(t2)
+
+	//testing: why on earth are these giving me duplicate key errors???
+	// items.push(t1)
+	// items.push(t2)
+
 	// items.push({...t1,"id": "T3123028477","display_name": "First Lastt3"})
 	// items.push({...t1,"id": "T4123028477","display_name": "First Lastt4"})
 	// items.push({...t1,"id": "T5123028477","display_name": "First Lastt5"})

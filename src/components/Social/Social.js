@@ -34,6 +34,7 @@ import BubbleFamilyGenreChips from "../chips/BubbleFamilyGenreChips";
 import Paper from "@material-ui/core/Paper";
 import {tabMap} from "../../Tabify";
 import FilterListIcon from "@material-ui/icons/FilterList";
+import StackedBarDrill from "../Charts/StackedBarDrill";
 
 const useStyles = makeStyles((theme) => ({
 	root: {
@@ -376,7 +377,7 @@ function Social(props) {
 					//todo: have to set explcit height here?
 					//not undertstanding why it just doesn't adjust to content
 					height: "18.5em",
-					border: "1px solid black",
+					outline: "1px solid orange",
 					position: "relative"
 				}}
 			>
@@ -493,9 +494,9 @@ function Social(props) {
 							{/*		</Typography>*/}
 							{/*	</Paper>*/}
 							{/*</div>*/}
-							<div>
-								<BubbleFamilyGenreChips families={ chipFamiliesRanked[0] ? [chipFamiliesRanked[0].family_name]:[]} familyDisabled={true} occurred={true} clearable={false} genres={[]} flexDirection={'column'}/>
-							</div>
+							{/*<div>*/}
+							{/*	<BubbleFamilyGenreChips families={ chipFamiliesRanked[0] ? [chipFamiliesRanked[0].family_name]:[]} familyDisabled={true} occurred={true} clearable={false} genres={[]} flexDirection={'column'}/>*/}
+							{/*</div>*/}
 							{/*todo: not sure why BubbleFamilyGenreChips is creeping up here*/}
 							<div style={{padding:"2px",color:"white",height:"20px",width:"9.2em",marginBottom:"1em"}}>
 								<Paper elevation={3}>
@@ -514,6 +515,9 @@ function Social(props) {
 				}
 			</div>
 
+			<div id={'stats'}>
+				<StackedBarDrill/>
+			</div>
 		</div>
 
 	)

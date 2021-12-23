@@ -19,12 +19,11 @@ import {Control, FriendsControl, GridControl} from './index'
 //todo: this EVENTS_VAR here just to push that count out is no good
 import { GLOBAL_UI_VAR,EVENTS_VAR} from './storage/withApolloProvider';
 import {useQuery,useReactiveVar} from "@apollo/react-hooks";
-
 import SplitPane from "react-split-pane";
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
-
 import { withStyles } from '@material-ui/core/styles';
 import { createMuiTheme } from '@material-ui/core/styles';
+ import SwipeRight from './assets/swipe-right.png'
 // import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
 import { ThemeProvider as MuiThemeProvider } from '@material-ui/core/styles';
 import EventIcon from '@material-ui/icons/Event';
@@ -46,7 +45,7 @@ import './components/tiles/Tiles.css'
 import Accordion from "./components/Framer/Accordion";
 import Pager from "./components/Framer/Pager";
 import {motion} from "framer-motion";
-import FloatingActionButton from "./components/utility/Fab";
+import FloatingActionButton from "./components/utility/FloatingActionButton";
 
 
 //testing:
@@ -305,16 +304,22 @@ function App(props) {
                     {/*</div>*/}
 
                     <div  style={{position: "fixed",bottom:0,right:0,paddingRight:"1em",paddingLeft:"1em",zIndex:20}}>
-                        <FloatingActionButton icon={
-                            //src: https://v4.mui.com/components/badges/
-                            <Badge color="secondary" max={999} badgeContent={events.length}
-                                anchorOrigin={{
-                                    vertical: 'bottom',
-                                    horizontal: 'right',
-                                }}>
-                                <EventIcon />
-                            </Badge>
-                        }/>
+                        {/*transform: "scaleX(-1)"*/}
+                        <div><img style={{height:"3em",opacity:.5,marginTop:"2em",zIndex:25,marginLeft:"1.5em"}} src={SwipeRight}/></div>
+                        <div style={{zIndex:20}}>
+                            <FloatingActionButton icon={
+                                //src: https://v4.mui.com/components/badges/
+                                <Badge color="secondary" max={999} badgeContent={events.length}
+                                       anchorOrigin={{
+                                           vertical: 'bottom',
+                                           horizontal: 'right',
+                                       }}>
+                                    <EventIcon />
+                                </Badge>
+                            }/>
+                        </div>
+
+
                     </div>
 
 
