@@ -1,39 +1,13 @@
 import React, {useContext, useEffect,useState} from 'react';
-import Typography from "@material-ui/core/Typography";
-import {GLOBAL_UI_VAR,CHIPGENRESRANKED} from "../storage/withApolloProvider";
-import {Context} from "../storage/Store";
-import {FriendsControl, StatControl, TabControl, TileSelectControl} from "../index";
+import {GLOBAL_UI_VAR,CHIPGENRESRANKED} from "../../storage/withApolloProvider";
+import {Context} from "../../storage/Store";
+import {FriendsControl, StatControl, TabControl, TileSelectControl} from "../../index";
 import {useReactiveVar} from "@apollo/react-hooks";
-import Paper from '@material-ui/core/Paper';
-import ItemCarousel from './ItemCarousel'
 import useMeasure from "react-use-measure";
 import {a, useSpring} from "react-spring";
-import ExpandLessIcon from "@material-ui/icons/ExpandLess";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import DisplayDetailRow from "./tiles/DisplayDetailRow";
-import BubbleFamilyGenreChips from "./chips/BubbleFamilyGenreChips";
-import Select from '@material-ui/core/Select';
-import MenuItem from '@material-ui/core/MenuItem';
-import {makeStyles,createStyles} from "@material-ui/core/styles";
-
-const useStyles = makeStyles((theme) => ({
-	// formControl: {
-	// 	margin: theme.spacing(1),
-	// 	minWidth: 120
-	// },
-	// selectEmpty: {
-	// 	marginTop: theme.spacing(2)
-	// },
-	rootFirstSelect: {
-		paddingLeft: "10px",
-		backgroundColor:"white",
-	},
-	// rootSecondSelect: {
-	// 	padding: "10px 80px"
-	// }
-}));
-
-function InfoPanel(props) {
+import DisplayDetailRow from "../tiles/DisplayDetailRow";
+import BubbleFamilyGenreChips from "../chips/BubbleFamilyGenreChips";
+function AnimatedHeightDrawer(props) {
 
 	let statcontrol = StatControl.useContainer();
 	let friendscontrol = FriendsControl.useContainer()
@@ -120,7 +94,7 @@ function InfoPanel(props) {
 				_statCards.push({
 					label: "Favorite Artists",
 					// value: <ListArtists artists={source.artists_top} />,
-				//	value: <ListArtistPanels artists={source.artists_top} />,
+					//	value: <ListArtistPanels artists={source.artists_top} />,
 					// width: "240px"
 				})
 
@@ -180,6 +154,7 @@ function InfoPanel(props) {
 		position: "absolute",
 		left: 0,
 		right:0,
+		bottom: 10,
 		backgroundColor: "#808080",
 		//note: spring doesn't do auto, so you need to calculate it
 		//note: mixing bounds.height (integer) w/ string measures (em) throws:
@@ -188,6 +163,7 @@ function InfoPanel(props) {
 
 		//note: 74px = height of 2 rows I guess?
 		//note: + the height of the handle + 30
+		// height: tileSelectControl.isDrawerShowing ? bounds.height  : 74,
 		height: tileSelectControl.isDrawerShowing ? bounds.height  : 74,
 		minWidth:"23em",
 		paddingTop:".2em",
@@ -195,93 +171,15 @@ function InfoPanel(props) {
 		overflow:'hidden'
 	});
 
-	useEffect(() => {
-		props.setInfoBound(bounds.height)
-	},[bounds.height]);
+	//testing:
+	// useEffect(() => {
+	// 	props.setInfoBound(bounds.height)
+	// },[bounds.height]);
 
-
-//todo: need to centralize these
-
-	var tabIndexMap = {
-		0:{"artists_saved":"Artists"},
-		// 1:{"playlists":"Playlists"},
-		1:{"tracks_saved":"Tracks"},
-		2:{"albums_saved":"Albums"}
-	}
-	const getArtists = () =>{
-		var k = Object.values(tabIndexMap[tabcontrol.tab])[0].toLowerCase();
-		console.log("$k",k);
-		if(k === 'artists'){
-			console.warn("missing top artists stats designation = defaults to albums");
-			k = 'albums'
-		}
-		return globalState[globalUI.user.id + "_" + k +"_stats"].artists_top
-	}
-
-
-	// const [selectVal,setSelectVal] = useState('artists_top')
-	// const handleChange = (event) =>{
-	// 	setSelectVal(event.target.value);
-	// }
-	//
-	// const classes= useStyles()
 	return(
 		<div>
-			{
-				//todo: I'm waiting for _tracks_stats b/c it's the last one to load?
-				globalState[globalUI.user.id + "_tracks_stats"] &&
-				<div style={{display:"flex",flexDirection:"column"}}>
-					<div>
-						{/*testing: float to right: marginLeft:"auto"*/}
-						{/*<div style={{padding:"2px",position:"relative",zIndex:2,color:"white",backgroundColor:"white",maxWidth:"9em"}}>*/}
-							{/*<Paper>*/}
-								{/*todo: moved to contextStats*/}
-						{/*note: anchor API https://github.com/mui-org/material-ui/issues/12208*/}
-						{/*<Select*/}
-						{/*	classes={{ root: classes.rootFirstSelect }}*/}
-						{/*	labelId="demo-simple-select-label"*/}
-						{/*	id="demo-simple-select"*/}
-						{/*	value={selectVal}*/}
-						{/*	onChange={handleChange}*/}
-						{/*	MenuProps={{*/}
-						{/*		elevation:3,*/}
-						{/*		anchorOrigin: {*/}
-						{/*			vertical: "bottom",*/}
-						{/*			horizontal: "left"*/}
-						{/*		},*/}
-						{/*		transformOrigin: {*/}
-						{/*			vertical: "top",*/}
-						{/*			horizontal: "left"*/}
-						{/*		},*/}
-						{/*		getContentAnchorEl: null*/}
-						{/*	}}*/}
-						{/*>*/}
-						{/*	<MenuItem value={'artists_saved'}>  <span style={{paddingRight:".5em"}}>Artists</span></MenuItem>*/}
-						{/*	<MenuItem value={'tracks_recent'}>Recent Tracks</MenuItem>*/}
-						{/*	<MenuItem value={'artists_top'}>Top Artists</MenuItem>*/}
-						{/*</Select>						*/}
-							{/*</Paper>*/}
-								{/*<Typography variant="subtitle1">*/}
-								{/*	Top Artists*/}
-								{/*</Typography>*/}
-
-						{/*</div>*/}
-						{/*<ListArtistPanels artists={globalState[globalUI.user.id + "_tracks_stats"].artists_top} />*/}
-
-							<ItemCarousel style={{marginTop:"-1em"}} artists={getArtists()} handleSelect={handleCarouselItemSelect} />
-						</div>
-
-					<div id={'drawer'}>
-						{/*<button onClick={() =>{gridControl.setStatCollapse(!(gridControl.statCollapse))}}>statCollapse {gridControl.statCollapse.toString()}</button>*/}
+			<div id={'drawer'}>
 						<a.div  style={{...drawerProps}}>
-						{/*<div>*/}
-							{/*<div   style={{"position":"absolute","top":"0px","right":"0px","zIndex":"7"}}*/}
-							{/*	   onClick={() =>{handleToggleDrawer()}}>*/}
-							{/*	{*/}
-							{/*		tileSelectControl.isDrawerShowing ? <ExpandLessIcon fontSize={'large'}/>*/}
-							{/*			:	<ExpandMoreIcon fontSize={'large'}/>*/}
-							{/*	}*/}
-							{/*</div>*/}
 							<div ref={ref}>{
 								tileSelectControl.tile?
 									<div>
@@ -304,45 +202,9 @@ function InfoPanel(props) {
 										<BubbleFamilyGenreChips families={[]} familyDisabled={true} occurred={true} clearable={false}  genres={chipGenresRanked} flexDirection={'row'}/>
 									</div>
 							}
-								{/*<div id={'handle'} style={{background:'#f53177',height:30,zIndex:500,position:"relative",width:"100%"}}>*/}
-								{/*	<button onClick={() =>{props.setInfoCollapse(prev => !(prev))}}>collapse summary</button>*/}
-								{/*</div>*/}
 							</div>
-
 						</a.div>
-						{/*</div>*/}
 					</div>
-
-					{/*note: need this height = default drawer height to prevent layout shift between drawer open/close to do this*/}
-					<div style={{display:"flex",height:74}}>
-						{	!(tileSelectControl.tile) &&
-						//
-						<div  style={{padding:"2px",color:"white",zIndex:'7',position:"relative","marginLeft":"auto","top":"-2em"}}>
-							<Paper elevation={3} style={{padding:".2em .5em .2em .5em",width:"fit-content"}}>
-								<Typography variant="subtitle1">
-									{/*Top Genres*/}
-									Genres
-								</Typography>
-							</Paper>
-						</div>
-						}
-					</div>
-
-
-					{/*testing: playing around w/ detecting overflow and reacting to it w/ a 'more' popover*/}
-					<div>
-						{/*<TransitionChips setOverflowActive={setOverflowActive} item={tileSelectControl.tile} />*/}
-						{/*<div style={{"marginTop":"-3em","float":"right"}}>*/}
-						{/*	{ overflowActive ? <MoreChips  /> : "here"}*/}
-						{/*</div>*/}
-
-						{/*<BubbleFamilyGenreChips families={[]} familyDisabled={true} occurred={true} clearable={false}  genres={chipGenresRanked} flexDirection={'row'}/>*/}
-						{/*<Paper elevation={3} style={{padding:"3px"}}>*/}
-						{/*	<ChipsArray chipData={genres}/>*/}
-						{/*</Paper>*/}
-					</div>
-				</div>
-			}
 		</div>
 
 		//testing: maybe this stat cards thing wasn't as flexible as I need it to be?
@@ -382,5 +244,5 @@ function InfoPanel(props) {
 		// </div>
 	)
 }
-export default InfoPanel;
+export default AnimatedHeightDrawer;
 

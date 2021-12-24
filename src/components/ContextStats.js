@@ -39,7 +39,11 @@ import InputIcon from "@material-ui/icons/Input";
 import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
 import Badge from "@material-ui/core/Badge";
 import EventIcon from "@material-ui/icons/Event";
-
+import AnimatedHeightDrawer from './utility/AnimatedHeightDrawer'
+import Select from "@material-ui/core/Select";
+import MenuItem from "@material-ui/core/MenuItem";
+import {makeStyles} from "@material-ui/core/styles";
+import Dot from './chips/Dot'
 //todo: for some wild reason, after c/p customScroll.css",firstComp.scss  out to above FirstComp for gen use
 //that don't work - but importing them from another comp that uses them...works?
 //import {FirstComp} from './utility/CustomScroll/FirstComp/FirstComp'
@@ -73,6 +77,24 @@ function TabPanel(props) {
 		</div>
 	);
 }
+
+
+const useStyles = makeStyles((theme) => ({
+	// formControl: {
+	// 	margin: theme.spacing(1),
+	// 	minWidth: 120
+	// },
+	// selectEmpty: {
+	// 	marginTop: theme.spacing(2)
+	// },
+	rootFirstSelect: {
+		paddingLeft: "10px",
+		backgroundColor:"white",
+	},
+	// rootSecondSelect: {
+	// 	padding: "10px 80px"
+	// }
+}));
 
 function ContextStats(props) {
 
@@ -364,14 +386,16 @@ function ContextStats(props) {
 
 
 	const [fstate, toggle] = useState(true)
+	const [selectVal,setSelectVal] = useState('artists_saved')
+	const handleChange = (event) =>{
+		setSelectVal(event.target.value);
+		statcontrol.setStats({name:event.target.value})
+	}
 
+	const classes= useStyles()
 
 	return(
 		<div>
-			{/*testing:*/}
-			<div>
-
-			</div>
 			<div id={'test1'}>
 				{/*note: floating filter buttons*/}
 				<div>
@@ -386,16 +410,27 @@ function ContextStats(props) {
 
 					{/*todo: thought Paper would give me some free box shadowing?*/}
 					{/*<Paper elevation={3}>*/}
-					<button
-						//note: zindex - huh
-						style={{ border: "1px solid red", position: "absolute", zIndex: "10000",transform:"rotate(90deg)",marginTop:"30em",
-							boxShadow: "0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23)"}}
-						onClick={() => {
-							toggleDrawer();
-						}}
-					>
-						<RotateSpring toggle={toggle} state={fstate} target={<FilterListIcon fontSize={'inherit'} style={{fontSize:"30px"}} color={'secondary'} />}/>
-					</button>
+					<div style={{position: "absolute", zIndex: "10000",marginTop:"30em"}}>
+						<button
+							//note: zindex - huh
+							style={{ border: "1px solid red",transform:"rotate(90deg)",
+								boxShadow: "0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23)"}}
+							onClick={() => {
+								toggleDrawer();
+							}}
+						>
+							<RotateSpring toggle={toggle} state={fstate} target={<FilterListIcon fontSize={'inherit'} style={{fontSize:"30px"}} color={'secondary'} />}/>
+						</button>
+						<div style={{display:"flex",marginTop:"-.2em",marginLeft:".5em"}}>
+							{friendscontrol.families.map((fam,i) =>
+								<div  style={{marginLeft:i !== 0 ? ".25em":"initial"}}>
+									<Dot family={fam}/>
+								</div>
+							)}
+						</div>
+					</div>
+
+
 					{/*</Paper>*/}
 				</div>
 
@@ -449,8 +484,34 @@ function ContextStats(props) {
 							{/*	/!*<div style={{"transform":"scale(-1, 1)",marginTop:"-1em",marginLeft:"1em"}}>*!/*/}
 							{/*	/!*	<img style={{height:"3em"}} src={SwipeRight}/>*!/*/}
 							{/*	/!*</div>*!/*/}
-
 							{/*</div>*/}
+
+							{/*note: anchor API https://github.com/mui-org/material-ui/issues/12208*/}
+							<Select
+								classes={{ root: classes.rootFirstSelect }}
+								labelId="demo-simple-select-label"
+								id="demo-simple-select"
+								value={selectVal}
+								onChange={handleChange}
+								MenuProps={{
+									elevation:3,
+									anchorOrigin: {
+										vertical: "bottom",
+										horizontal: "left"
+									},
+									transformOrigin: {
+										vertical: "top",
+										horizontal: "left"
+									},
+									getContentAnchorEl: null
+								}}
+							>
+								<MenuItem value={'artists_saved'}>Saved Artists</MenuItem>
+								<MenuItem value={'artists_top'}>Top Artists</MenuItem>
+								<MenuItem value={'tracks_top'}>  <span style={{paddingRight:".5em"}}>Top Tracks</span></MenuItem>
+								<MenuItem value={'tracks_recent'}>Recent Tracks</MenuItem>
+
+							</Select>
 							{/*todo: is source of / should be using Pagination*/}
 							<div style={{display:'flex',flexDirection:"row",marginTop:"-1em",marginLeft:"-1em",width:"15em"}}>
 								<div onClick={() =>{setPage((prevState => {
@@ -623,6 +684,8 @@ function ContextStats(props) {
 				</div>
 
 			</Drawer>
+
+			<AnimatedHeightDrawer/>
 
 			{/*}*/}
 

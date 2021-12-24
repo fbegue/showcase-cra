@@ -41,6 +41,7 @@ function ItemCarousel(props){
 				<ReactCoverCarousel
 					enableHeading={true}
 					// width={'100%'}
+					navigation={true}
 					height={210}
 					// height={window.innerHeight/2}
 					displayQuantityOfSide={1}

@@ -102,10 +102,12 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const tabMap = {
-	0:{
-		0:{"home":"Home"},
-		1:{"tracks_recent":"Recently Saved Tracks"},
-		2:{"artists_top":"Top Artists"}},
+	0: {
+		0: {"home": "Home"},
+		1: {"artists_top": "Top Artists"},
+		2: {"tracks_top": "Top Tracks"},
+		3: {"tracks_recent": "Recently Played Tracks"}
+	},
 	1:{
 		0:{"artists_saved":"Artists"},
 		// 1:{"playlists":"Playlists"},
@@ -626,32 +628,28 @@ export default function Tabify() {
 			</AppBar>
 			{/*<a.div style={{...drawerExpandProps}}>*/}
 				<div >
-					{/*todo: further parameterize to allow for "My Profile" content*/}
 
+					{/*todo: disabled for now*/}
+					{/*<InfoPanel setInfoBound={gridControl.setInfoBound} setInfoCollapse={setInfoCollapse}/>*/}
+
+					{/*todo: further parameterize to allow for "My Profile" content*/}
 					{mapNum.map((index) =>
 						<TabPanel key={index}   className={'tabs' + index} value={tabcontrol.section} index={index}>
 							{/*testing:*/}
 							{/*{getTabs()}*/}
 							{/*ref={ref}*/}
-							<Accordion infoBound={gridControl.infoBound}  i={0} setCollapse={gridControl.setCollapse} collapse={gridControl.collapse}
-									   content={
-										   <div style={{background:'pink',width:width}}>
-											   {index !== 2 ?
-											   <>
-												   {/*{*/}
-													{/*   infoCollapse &&*/}
-													{/*   <div id={'handle'} style={{background:'#f53177',height:30,zIndex:500,position:"relative",width:"100%"}}>*/}
-													{/*	   <button onClick={() =>{setInfoCollapse(prev => !(prev))}}>expand summary</button>*/}
-													{/*   </div>*/}
-												   {/*}*/}
-												   <InfoPanel setInfoBound={gridControl.setInfoBound} setInfoCollapse={setInfoCollapse}/>
-											   </>:
-												   <Social/>
-											   }
-										   </div>
-									   }
-							/>
-
+							{index === 2 ?
+								<Accordion infoBound={gridControl.infoBound} i={0} setCollapse={gridControl.setCollapse}
+										   collapse={gridControl.collapse}
+										   content={
+											   <div style={{background: 'pink', width: width}}>
+												   <Social />
+											   </div>
+										   }
+								/> : <div style={{marginTop:"4em"}}>
+									&nbsp;
+								</div>
+							}
 						</TabPanel>
 					)}
 

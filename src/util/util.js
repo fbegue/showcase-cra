@@ -1827,6 +1827,7 @@ function useProduceEvents(){
 
 
 				var tempPieData  = [];
+				var tempBarData  = [];
 				var tempPieDataGuest  = [];
 
 				var producePieData = function(map,destArr){
@@ -1839,8 +1840,29 @@ function useProduceEvents(){
 					destArr.sort((a,b) =>{return  b.y - a.y})
 				}
 
+				var produceBarData = function(tempPieData,tempPieDataGuest,tempBarData){
+					console.log("produceBarData",tempPieData);
+					var users = [];users.push(globalUI.user)
+					var friends = globalUI.user.related_users.filter(r =>{return r.friend === true})
+						//todo: dataset isn't setup to do multiple users yet (extra dan filter)
+						.filter(r =>{return r.id === "123028477#2"})
+					friends.forEach(f =>{
+						users.push({...f,...globalState[f.id]})
+					})
+					// users = users.concat(globalUI.user.related_users.filter(r =>{return r.friend === true}))
+					tempPieData.forEach(famOb =>{
+						users.forEach(u =>{
+							debugger
+						})
+					})
+				}
+
+
+
 				producePieData(familyArtist,tempPieData)
 				producePieData(familyArtistGuest,tempPieDataGuest)
+				produceBarData(tempPieData,tempPieDataGuest,tempBarData)
+
 
 				var temp_combined_genreArtist  = {};
 				if(!(genreArtistGuest)){
@@ -1864,8 +1886,6 @@ function useProduceEvents(){
 
 				console.log("$temp_combined_genreArtist",temp_combined_genreArtist);
 				CHIPGENRESCOMBINEDMAP(temp_combined_genreArtist)
-
-
 
 
 				//todo: looks like I've set the state correctly but it fucks up
