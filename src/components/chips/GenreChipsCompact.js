@@ -41,25 +41,10 @@ const useStyles = makeStyles({
 	}
 });
 
+//todo: for barData - was just to lazy to be assed with modifying this so forked it here
+//(just got rid of percentage calcs based on what was props.piedata)
 
-function useOnScreen(ref) {
-
-	const [isIntersecting, setIntersecting] = useState(false)
-
-	const observer = new IntersectionObserver(
-		([entry]) => setIntersecting(entry.isIntersecting)
-	)
-
-	useEffect(() => {
-		observer.observe(ref.current)
-		// Remove the observer as soon as the component is unmounted
-		return () => { observer.disconnect() }
-	}, [])
-
-	return isIntersecting
-}
-
-function PieChips(props) {
+function GenreChipsCompact(props) {
 
 	const classes = useStyles();
 	let friendscontrol = FriendsControl.useContainer()
@@ -75,9 +60,9 @@ function PieChips(props) {
 	//note: reduce throws error on an empty array
 	let pieDataMap = {};
 	let pieDataSum = 0;
+
 	if(props.pieData.length > 0){
 		pieDataSum = props.pieData.reduce((prev,curr) =>{return {y:prev.y + curr.y}}).y
-		debugger;
 		pieDataMap = _.reduce(props.pieData , function(obj,param) {
 			obj[param['name']] = param.y
 			return obj;
@@ -348,7 +333,7 @@ function PieChips(props) {
 					<Chip
 						// className={classes.chip}
 						className={[classes.chip,"famChip"].join(' ')}
-						label={<span> {fam} <span style={{fontWeight:"bold"}}> {Math.round( pieDataMap[fam]/pieDataSum * 100) + "%"} </span></span>}
+						label={fam}
 						// label={fam + " (" +  Math.round( pieDataMap[fam]/pieDataSum * 100) + "%)"}
 						//	label={Math.round( pieDataMap[fam]/pieDataSum * 100) + "%" + " " + fam}
 						style={color[fam]}
@@ -366,21 +351,12 @@ function PieChips(props) {
 								// className={[classes.chip,"genreChip"].join(' ')}
 								className={classes.chip}
 								key={i}
-
-								// className={'genreChip'}
 								variant={
 									props.varied ?
 										_.find(varied, r =>{return r.id === gOb.id}) ? "outlined" :"default"
 										:"default"}
-								label={
-									props.occurred ? gOb.genre.name + " (" + gOb.occurred.toString() + ")"
-										: gOb.name + " " + Math.round(chipGenresSharedMap[gOb.name].length/pieDataGenreSum * 100) + "%"
-								}
-
+								label={gOb.name}
 								style={getGColor(gOb)}
-								// style={initGColorState[gOb.name]}
-								// style={gcolor[gOb.name]}
-								// style={{"--background-color2":"blue"}}
 							/>
 							{ props.removable ? <div style={{"left":"-8px","position":"relative"}}><HighlightOffIcon fontSize={'small'}/> </div> : ""}
 						</div>
@@ -390,57 +366,11 @@ function PieChips(props) {
 
 			{ props.clearable ? <div  onClick={() =>{resetSelections()}}><HighlightOffIcon fontSize={'small'}/>Clear</div>:""}
 		</div>
-
 		{props.seperator ? <div style={{height:"1em"}}>{'\u00A0'}</div>:"" }
-
-
-		{/*className={'genreChipContainer'}*/}
-		{/*note: set height | height:"17em"*/}
-		{/*height:'4em' || 'initial'*/}
-		{/*<div ref={ref => (myContainer= ref)}  style={{display:"flex",flexDirection:props.flexDirection,flexWrap:"wrap",*/}
-		{/*	alignItems: props.alignItems || "initial",overflow:'hidden',*/}
-		{/*	maxWidth: props.maxWidth || 'initial',paddingBottom:".5em"}} >*/}
-		{/*	{props.pre}*/}
-		{/*	{_genres.map((gOb,i) =>*/}
-		{/*		{*/}
-		{/*			return (*/}
-		{/*				<div key={i}  ref={refs.current[i]} onClick={() =>{handleGClick(gOb)}}>*/}
-		{/*					<Chip*/}
-		{/*						// className={[classes.chip,"genreChip"].join(' ')}*/}
-		{/*						className={classes.chip}*/}
-		{/*						 key={i}*/}
-
-		{/*						// className={'genreChip'}*/}
-		{/*						variant={*/}
-		{/*							props.varied ?*/}
-		{/*								_.find(varied, r =>{return r.id === gOb.id}) ? "outlined" :"default"*/}
-		{/*								:"default"}*/}
-		{/*						label={*/}
-		{/*							props.occurred ? gOb.genre.name + " (" + gOb.occurred.toString() + ")"*/}
-		{/*								: gOb.name*/}
-		{/*						}*/}
-
-		{/*						style={getGColor(gOb)}*/}
-		{/*						// style={initGColorState[gOb.name]}*/}
-		{/*						// style={gcolor[gOb.name]}*/}
-		{/*						// style={{"--background-color2":"blue"}}*/}
-		{/*					/>*/}
-		{/*					{ props.removable ? <div style={{"left":"-8px","position":"relative"}}><HighlightOffIcon fontSize={'small'}/> </div> : ""}*/}
-		{/*				</div>*/}
-		{/*			)*/}
-		{/*		}*/}
-		{/*	)}*/}
-		{/*</div>*/}
-		{/*<div style={{zIndex:50,height:"2em"}}>*/}
-		{/*	/!*{overflowActive.toString()}*!/*/}
-
-			{/*{ overflowActive ? <MoreChips/> : "here"}*/}
-		{/*</div>*/}
-
 	</div>)
 }
 
-PieChips.propTypes = {
+GenreChipsCompact.propTypes = {
 	//constrain the genres displayed by these families
 	families: PropTypes.array,
 	//don't apply any family constraints (still requires [] families)
@@ -462,5 +392,5 @@ PieChips.propTypes = {
 
 
 }
-export default PieChips;
+export default GenreChipsCompact;
 

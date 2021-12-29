@@ -11,10 +11,16 @@ function EventImageFader(props){
 	// ]
 	var urls = [];
 	for(var x = 0; x < props.item.performance.length;x++){
-		var id = props.item.performance[x].artist.artistSongkick_id || props.item.performance[x].artist.id
-		if(id){urls.push("http://images.sk-static.com/images/media/profile_images/artists/" + id  + "/huge_avatar")}
+		var id = props.item.performance[x].artist.artistSongkick_id || props.item.performance[x].artist.id;
+		//todo: this changed on me (which I guess I shouldn't be that surprised about)
+		//so going to need to store artist images in performance.artist as well
+
+		// if(id){urls.push("http://images.sk-static.com/images/media/profile_images/artists/" + id  + "/huge_avatar")}
+		if(id){urls.push("https://i.scdn.co/image/ab6761610000e5eb9e8aff3467b8389440c34eb2")}
+
 	}
 
+	//debugger;
 	if(urls.length === 0){urls.push("https://via.placeholder.com/150")}
 
 	//-----------------------------------------------------------------------------------------

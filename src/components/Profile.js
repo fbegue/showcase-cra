@@ -94,7 +94,8 @@ function Profile(props) {
 
 
 	useEffect(() => {
-		console.log("resizeHeaderOnScroll",props.scrollTop);
+		//console.log("resizeHeaderOnScroll",props.scrollTop);
+
 		// const distanceY =  props.scrollTop,
 		// 	shrinkOn = 1,
 		// 	headerEl = document.getElementById("profile-header");

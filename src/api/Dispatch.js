@@ -96,8 +96,8 @@ function Dispatch(props) {
 
 			console.log("ONE TIME EVENT FETCH");
 			//testing: static data to eval marking w/ friends
-			//var fer = await api.fetchEvents({metros:control.metro})
-			var fer = exampleFetchEvents;
+			var fer = await api.fetchEvents({metros:control.metro})
+			//var fer = exampleFetchEvents;
 			console.log(api.getEventsCoverage(fer,'hasFamily'));
 
 			//testing:

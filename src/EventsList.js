@@ -49,6 +49,8 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 import Switch from '@material-ui/core/Switch';
 import FilterListIcon from "@material-ui/icons/FilterList";
 import Pagination from "./components/utility/Pagination";
+import SimplePopover from "./components/utility/Popover";
+import CreatePlaylist from "./CreatePlaylist";
 //import GenreChipsDumb from './components/chips/GenreChipsDumb.js'
 // import './components/utility/CustomScroll/contextStats.scss'
 // import "./components/utility/CustomScroll/FirstComp/customScroll.css";
@@ -105,7 +107,7 @@ function EventsList(props) {
 
 	const [state, setState] = useState({});
 	const [friendsFilterOn, setFriendsFilterOn] = useState(false);
-	const [globalState, globalDispatch] = useContext(Context);
+	//const [globalState, globalDispatch] = useContext(Context);
 	const globalUI = useReactiveVar(GLOBAL_UI_VAR);
 	const events= useReactiveVar(EVENTS_VAR);
 	console.log(comp + " events",events);
@@ -155,7 +157,6 @@ function EventsList(props) {
 	let statcontrol = StatControl.useContainer()
 
 
-
 	function handlePlay(item) {
 		console.log("$handlePlay",item);
 		api.getArtistTopTracks(({auth:globalUI,artist:item}))
@@ -181,7 +182,6 @@ function EventsList(props) {
 	function handleClick(item) {
 		setState(prevState => ({ [item]: !prevState[item] }));
 	}
-
 
 	function unHolyDrill(item){
 		//console.log("$unHolyDrill",item);
@@ -227,110 +227,6 @@ function EventsList(props) {
 		// return (sub.artist.spotifyTopFive ? <PlayCircleOutlineIcon onClick={() => handlePlay(sub.artist)}> </PlayCircleOutlineIcon>:{})
 	};
 
-
-
-	const [openSnack, setOpenSnack] = React.useState(false);
-
-	function makeName(){
-		// console.log("makeName",control);
-		var m = control.startDate.month
-		var d = control.startDate.day
-		//todo: convert to name of metro
-		return getTitle() + "-" + m + "-" + d
-	}
-
-	const [name, setName] = useState(makeName());
-
-	useEffect(() => {
-		setName(makeName())
-	}, [control.metro,control.startDate,control.endDate]);
-
-
-	// useEffect(() => {
-	// 		console.log("UPDATING ON SENS SELECT",{control});
-	// 		globalDispatch({type: 'update_events', payload: [],context:'events', control:control,stats:statcontrol});
-	// },[control.genreSens,control.artistSens])
-
-
-	function playlistFromEvents(){
-		var songs = [];
-		//console.log(name);
-		//todo: push more songs w/ a smaller event set?
-		globalState.events.forEach(e =>{
-			e.performance.forEach(p =>{
-				if(p.artist.spotifyTopFive){
-					songs.push(p.artist.spotifyTopFive[0])
-				}
-			})
-		})
-		console.log("playlistFromEvents",songs);
-		api.createPlaylist({auth:globalUI,songs:songs,playlist:{name:name}})
-			.then(r =>{
-				console.log("createPlaylist success");
-				setOpenSnack(true);
-			})
-	}
-
-	//todo: maybe make this like a row of buttons? idk
-	function CreatePlay(){
-
-		function handleSetName(e){
-			console.log(e.target.value);
-			setName(e.target.value)
-		}
-
-		const handleCloseSnack = (event, reason) => {
-			if (reason === 'clickaway') {return;}
-			setOpenSnack(false);
-		};
-
-		return (
-			<div style={{display:"flex"}} >
-				<div style={{marginRight:"1em"}}>
-					<Snackbar
-						anchorOrigin={{
-							vertical: 'bottom',
-							horizontal: 'left',
-						}}
-						open={openSnack}
-						autoHideDuration={4000}
-						message={"Created Playlist '" + name + "'!"}
-						onClose={handleCloseSnack}
-						action={
-							<React.Fragment>
-								<IconButton size="small" aria-label="close" color="inherit" onClick={handleCloseSnack}>
-									<CloseIcon fontSize="small" />
-								</IconButton>
-							</React.Fragment>
-						}
-					/>
-					<Button size="small" onClick={playlistFromEvents} variant="contained">
-						<div style={{display:"flex"}}>
-							<div ><PlaylistAddIcon fontSize={'small'}/> </div>
-							<div>Save Playlist</div>
-						</div>
-					</Button>
-				</div>
-				<div>
-					<form className={classes.root} noValidate autoComplete="off">
-						{/*<TextField value={name} onChange={(e) =>{setName(e.target.value)}} id="standard-basic" label="" />*/}
-						<TextField value={name} onChange={handleSetName} id="standard-basic" label="" />
-					</form>
-				</div>
-
-				{/*todo: thinking about putting this in a floating-filter similar to genres in ContextStats*/}
-				{/*<div>*/}
-				{/*	/!*todo: what a mess*/}
-				{/*	1) this needs to be memo'd to stop rerenders caused by handleChange results, but can't find any working examples*/}
-				{/*	2) really made a fuckery of the mapping here*!/*/}
-				{/*	artistSens {control.artistSens}*/}
-				{/*	genreSens {control.genreSens}*/}
-				{/*	<SliderEvents map={control.mapArtist} defaultValue={control.rmapArtist[control.artistSens]} handleChange={(v) =>{control.setArtistSens(v)}}/>*/}
-				{/*	<SliderEvents2 map={control.map} defaultValue={control.rmap[control.genreSens]} handleChange={(v) =>{control.setGenreSens(v)}}/>*/}
-				{/*</div>*/}
-			</div>
-		)
-	}
 
 
 	const [open, setOpen] = React.useState(false);
@@ -677,27 +573,47 @@ function EventsList(props) {
 									{/*todo: going to use spring floating menu here*/}
 									{/*todo: also, still propogates 'list row clicked' shadowing*/}
 
+									<div style={{display:"flex"}}>
+										<div>
+											{/*testing: weird spacing (b/c it's expecting text content)*/}
+											{/*<Button variant="outlined" startIcon={<MoreVertIcon/>}></Button>*/}
+											{/*testing: no outline*/}
+											{/*<IconButton aria-label="more"><MoreVertIcon /></IconButton>*/}
+											<SimplePopover content={
+												<div  key={'special'}><CreatePlaylist control={control}/></div>
+											}/>
+										</div>
+										<div>Friends Liked
+											<Switch
+												checked={friendsFilterOn}
+												// onChange={() =>{setFriendsFilterOn(prev => !(prev))}}
+												color="secondary"
+												onClick={(e) => {
+													e.stopPropagation();
+													setFriendsFilterOn(prev => !(prev));
+													//setDisabledRipple(true);
+												}}
+											/>
+										</div>
+									</div>
+
 									<div onClick={(e) => {
 										e.stopPropagation();
 										//setDisabledRipple(true);
 									}}>
 										<Pagination setPage={setPage} page={page} pageSize={pageSize} records={_r}/>
 									</div>
+									{/*<div style={{marginTop:"1em",marginBottom:"1em"}} key={'special'}><CreatePlay/></div>*/}
 
-
-									{/*<div><MoreVertIcon/></div>*/}
-									{/*testing: put somewhere else*/}
-									{/*<div>Friends Liked*/}
-									{/*	<Switch*/}
-									{/*		checked={friendsFilterOn}*/}
-									{/*		// onChange={() =>{setFriendsFilterOn(prev => !(prev))}}*/}
-									{/*		color="secondary"*/}
-									{/*		onClick={(e) => {*/}
-									{/*			e.stopPropagation();*/}
-									{/*			setFriendsFilterOn(prev => !(prev));*/}
-									{/*			//setDisabledRipple(true);*/}
-									{/*		}}*/}
-									{/*	/>*/}
+									{/*note: advanced event filters that change how events are produced from dataset */}
+									{/*<div>*/}
+									{/*	/!*todo: what a mess*/}
+									{/*	1) this needs to be memo'd to stop rerenders caused by handleChange results, but can't find any working examples*/}
+									{/*	2) really made a fuckery of the mapping here*!/*/}
+									{/*	artistSens {control.artistSens}*/}
+									{/*	genreSens {control.genreSens}*/}
+									{/*	<SliderEvents map={control.mapArtist} defaultValue={control.rmapArtist[control.artistSens]} handleChange={(v) =>{control.setArtistSens(v)}}/>*/}
+									{/*	<SliderEvents2 map={control.map} defaultValue={control.rmap[control.genreSens]} handleChange={(v) =>{control.setGenreSens(v)}}/>*/}
 									{/*</div>*/}
 
 								</div>
@@ -725,8 +641,6 @@ function EventsList(props) {
 					<ListItem id={'events-collapse'} key={'events'} button divider onClick={handleClickConfig2}>
 					</ListItem>
 					<Collapse  key={'events-collapse'}  in={open2} timeout="auto" unmountOnExit>
-						{/*todo: put this in a menu along w/ other event things*/}
-						{/*<div style={{marginTop:"1em",marginBottom:"1em"}} key={'special'}><CreatePlay/></div>*/}
 						{handler(items)}
 					</Collapse>
 				</List>

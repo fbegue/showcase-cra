@@ -353,7 +353,7 @@ function ContextStats(props) {
 	}
 
 	const handleTileSelect = (item) =>{
-		console.log("handleTileSelect");
+		console.log("handleTileSelect",item);
 
 		if(tileSelectControl.tile && tileSelectControl.tile.id === item.id){
 			tileSelectControl.setDrawerShowing(false);

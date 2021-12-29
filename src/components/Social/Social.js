@@ -5,7 +5,13 @@ import api from "../../api/api";
 import {Context, initUser} from "../../storage/Store";
 import {StatControl, Control, FriendsControl, PaneControl, TabControl} from "../../index";
 import {useReactiveVar} from "@apollo/react-hooks";
-import {CHIPFAMILIESRANKED, CHIPGENRESRANKED, GLOBAL_UI_VAR, STATS, TILES} from "../../storage/withApolloProvider";
+import {
+	CHIPFAMILIES,
+	CHIPFAMILIESRANKED,
+	CHIPGENRES,
+	CHIPGENRESRANKED,
+	GLOBAL_UI_VAR
+} from "../../storage/withApolloProvider";
 import { makeStyles } from '@material-ui/core/styles';
 import styles from './Social.tiles.module.css'
 import './Social.css'
@@ -35,7 +41,8 @@ import Paper from "@material-ui/core/Paper";
 import {tabMap} from "../../Tabify";
 import FilterListIcon from "@material-ui/icons/FilterList";
 import StackedBarDrill from "../Charts/StackedBarDrill";
-
+import {BARDATA,BARDRILLDOWNMAP} from "../../storage/withApolloProvider";
+import GenreChipsCompact from "../chips/GenreChipsCompact";
 const useStyles = makeStyles((theme) => ({
 	root: {
 		width: '100%',
@@ -81,12 +88,12 @@ function Social(props) {
 
 	const [globalState, globalDispatch] = useContext(Context);
 	const globalUI = useReactiveVar(GLOBAL_UI_VAR);
-	const stats = useReactiveVar(STATS);
 	let control = Control.useContainer();
 	let friendscontrol = FriendsControl.useContainer();
 	const chipGenresRanked = useReactiveVar(CHIPGENRESRANKED);
 	const chipFamiliesRanked = useReactiveVar(CHIPFAMILIESRANKED);
-
+	const barData = useReactiveVar(BARDATA);
+	const barDrillMap = useReactiveVar(BARDRILLDOWNMAP);
 
 	let statcontrol = StatControl.useContainer();
 	let tabcontrol = TabControl.useContainer()
@@ -255,27 +262,6 @@ function Social(props) {
 	// 		)
 	// }
 
-	const [statCards, setStatCards] = React.useState([]);
-
-
-	useEffect(() => {
-		var _statCards = [];
-		//testing: going to let util set these up for me depending on context
-
-		// if(stats['max']){
-		// 	_statCards.push({label: "Top Family", value: stats['max'].name, width: "200px"})
-		// 	// var user = globalState[globalUI.user.id + "_artists"];
-		// 	// var guest = globalState[selectedUser.id + "_artists"];
-		// 	// var shared = _.intersectionBy([{ 'x': 1 }], [{ 'x': 2 }, { 'x': 1 }], 'x');
-		// 	console.log("_statCards");
-		// 	// _statCards.push({label: "Shared Saved Artists", value: source.created, width: "120px"})
-		// 	// _statCards.push({label: "Shared Saved Albums", value: source.followed, width: "120px"})
-		// 	// _statCards.push({label: "Shared Saved Songs", value: source.followed, width: "120px"})
-		// 	setStatCards(_statCards)
-		// }
-
-	},[selectedUser,stats])
-	//[selectedUser]
 
 	const elementRef = useRef();
 	const [tref,setTRef] = React.useState(null);
@@ -369,6 +355,10 @@ function Social(props) {
 	// 	</div>
 	// 	)
 	// }
+
+	const chipFamilies = useReactiveVar(CHIPFAMILIES);
+	const chipGenres = useReactiveVar(CHIPGENRES);
+
 	const [tstate, toggle] = useState(true);
 	return(
 		<div>
@@ -469,22 +459,6 @@ function Social(props) {
 					{/*<div><UserTile item={selectedUser} single={true} size={["200px","200px"]} /> </div>*/}
 					{/* style={{"position":"absolute","zIndex":"1"}}*/}
 					<div><UserTile item={selectedUser} single={true} size={["auto","16em"]} /> </div>
-
-
-						{/*testing: sort of ditched this card idea*/}
-						{/*<div style={{display:"flex", flexWrap:"wrap"}}>*/}
-						{/*	{statCards.map((item,i) => (*/}
-						{/*		<div key={item.label} style={{width:item.width, padding:"5px"}}>*/}
-						{/*			<Card>*/}
-						{/*				<CardContent>*/}
-						{/*					<Typography variant="subtitle1" component={'span'} >{item.label}:{'\u00A0'}</Typography>*/}
-						{/*					*/}
-						{/*					<Typography variant="subtitle1" component={'span'} ><span style={{color:'#3f51b5'}}>{item.value}</span></Typography>*/}
-						{/*				</CardContent>*/}
-						{/*			</Card>*/}
-						{/*		</div>*/}
-						{/*	))}*/}
-						{/*</div>*/}
 						<div style={{"zIndex":"2",marginLeft:"11.5em"}} id={'guestStats'}>
 							{/*testing: meh*/}
 							{/*<div style={{padding:"2px",color:"white",height:"20px",width:friendscontrol.families.length > 0? "9.2em":"5.3em",marginBottom:"1em"}}>*/}
@@ -516,7 +490,19 @@ function Social(props) {
 			</div>
 
 			<div id={'stats'}>
-				<StackedBarDrill/>
+
+				<div style={{"display":"flex",flexDirection:"column"}}>
+					{/*,marginTop:"2em"*/}
+					<div style={{"padding":"5px","zIndex":"5","flexGrow":"1","overflowY":"auto","overflowX":"hidden",height:"7.3em","minWidth":"7em"}}>
+						<GenreChipsCompact families={chipFamilies}  genres={chipGenres} pieData={barData || []}  genresDisabled={false} occurred={false} clearable={false} flexDirection={'row'}/>
+					</div>
+					<div>
+						{barData.length > 0  &&
+						<StackedBarDrill barData={barData} barDrillMap={barDrillMap}/>
+						}
+					</div>
+					</div>
+
 			</div>
 		</div>
 
