@@ -53,32 +53,54 @@ function CreatePlaylist(props){
 	//todo: obviously grody
 	function getEventsArtistsTotal(){
 		var c = 0;
-		globalState.events.forEach(e =>{
-			e.performance.forEach(p =>{
-				c+=1
-			})
-		})
+		props.items.forEach(e =>{e.performance.forEach(p =>{c+=1})})
 		return c
 	}
 
 	function playlistFromEvents(num){
-		var songs = [];
+
 		//console.log(name);
 		//todo: push more songs w/ a smaller event set?
-		debugger;
-		globalState.events.forEach(e =>{
+		var promises = [];
+		// globalState.events.forEach(e =>{
+		// 	e.performance.forEach(p =>{
+		// 		promises.push(api.getArtistTopTracks(({auth:globalUI,artist:p.artist})))
+		// 		// if(p.artist.spotifyTopFive){
+		// 		// 	songs.push(p.artist.spotifyTopFive[num])
+		// 		// }
+		// 	})
+		// })
+
+		props.items.forEach(e =>{
 			e.performance.forEach(p =>{
-				if(p.artist.spotifyTopFive){
-					songs.push(p.artist.spotifyTopFive[num])
-				}
+				promises.push(api.getArtistTopTracks(({auth:globalUI,artist:p.artist})))
+				// if(p.artist.spotifyTopFive){
+				// 	songs.push(p.artist.spotifyTopFive[num])
+				// }
 			})
 		})
-		console.log("playlistFromEvents",songs);
-		api.createPlaylist({auth:globalUI,songs:songs,playlist:{name:name}})
-			.then(r =>{
-				console.log("createPlaylist success");
-				setOpenSnack(true);
+
+		Promise.all(promises).then(r =>{
+			console.log(r);
+			var songs = [];
+			r.forEach(atracks =>{
+				//note: may not have 5, but end index doesn't need to exist (will just take what it has)
+				!(atracks.failure) ? songs = songs.concat(atracks.slice(0,songNum)):{};
 			})
+			console.log("createPlaylist...",songs.length);
+			api.createPlaylist({auth:globalUI,songs:songs,playlist:{name:name}})
+				.then(r =>{
+					console.log("createPlaylist success");
+					setOpenSnack(true);
+				})
+
+		},e =>{
+			console.log(e);
+			debugger
+		})
+
+
+
 	}
 
 	const [songNum, setSongNum] = React.useState(1);
@@ -142,7 +164,8 @@ function CreatePlaylist(props){
 						<MenuItem value={3}>4</MenuItem>
 						<MenuItem value={3}>5</MenuItem>
 					</Select>
-					<span> track each of </span> {getEventsArtistsTotal()} artists
+					{/*todo: sometimes I can't get 5 */}
+					<span> track{songNum > 1 ? 's':''} each of </span> {getEventsArtistsTotal()} artists
 				</form>
 			</div>
 		</div>

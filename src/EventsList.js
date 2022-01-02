@@ -51,6 +51,7 @@ import FilterListIcon from "@material-ui/icons/FilterList";
 import Pagination from "./components/utility/Pagination";
 import SimplePopover from "./components/utility/Popover";
 import CreatePlaylist from "./CreatePlaylist";
+import util from "./util/util";
 //import GenreChipsDumb from './components/chips/GenreChipsDumb.js'
 // import './components/utility/CustomScroll/contextStats.scss'
 // import "./components/utility/CustomScroll/FirstComp/customScroll.css";
@@ -99,7 +100,7 @@ const useStylesFamilies = makeStyles(familyStyles);
 
 function EventsList(props) {
 	var comp = "EventsList |"
-
+	util.useProduceEvents()
 	//const classesPlay = useStyles();
 
 	// this method sets the current state of a menu item i.e whether
@@ -199,6 +200,11 @@ function EventsList(props) {
 		return false;
 	};
 
+	const openInNewTab = (url) => {
+		const newWindow = window.open(url, '_blank', 'noopener,noreferrer')
+		if (newWindow) newWindow.opener = null
+	}
+
 	function showPlay(sub){
 
 		//console.log("$showPlay",sub);
@@ -207,7 +213,13 @@ function EventsList(props) {
 				{/*todo: assuming no genres = tried to locate in spotify but couldn't find it, so can't play*/}
 				<div style={{marginTop:"-.4em"}}>
 				{(sub.artist.genres.length >0 ?
-					<span>
+					<div style={{display:"flex"}}>
+						<div>
+							<img onClick={() => openInNewTab("spotify:artist:" + sub.artist.id)} src={spotifyLogo}
+								 style={{"position":"absolute",left:"-2em",zIndex:"10",height:"1.5em",width:"1.5em"}}
+							/>
+						</div>
+						<div>
 						{control.play && control.playArtist === sub.artist.id ?
 							<ApplyPulse target={
 								<PauseCircleOutlineIcon fontSize={'inherit'} style={{fontSize:"30px"}} color={'secondary'} onClick={() => handlePlay(sub.artist)}></PauseCircleOutlineIcon>
@@ -217,7 +229,8 @@ function EventsList(props) {
 								<PlayCircleOutlineIcon fontSize={'inherit'} style={{fontSize:"30px"}} color={'secondary'} onClick={() => handlePlay(sub.artist)}></PlayCircleOutlineIcon>
 							}/>
 						}
-					</span>:<div></div>
+						</div>
+					</div>:<div></div>
 					)}
 				</div>
 				<div>{sub.displayName}</div>
@@ -399,12 +412,17 @@ function EventsList(props) {
 								</div>
 							);
 						}
+
 						return (
 							<div className={getFamilyClass(subOption)}>
 								{/*<div>ListItem  key={subOption.id}  </div>*/}
 								<ListItem  key={subOption.id}  button onClick={() => handleClick(subOption.id)}>
 									<div style={{marginRight:"5em",marginBottom:"4em"}}>
-										{unHolyDrill(subOption) && <img src={spotifyLogo} style={{"position":"absolute","left":"62px","top":"2px",zIndex:"10",height:"1em",width:"1em"}} />}
+										{/*testing: what did this every mean tho? that AT LEAST one artist in this perf is linked to spotify (and therefore playable)?*/}
+										{/*just seems a bit weird*/}
+										{/*{unHolyDrill(subOption) &&*/}
+										{/*<img src={spotifyLogo} style={{"position":"absolute","left":"62px","top":"2px",zIndex:"10",height:"1em",width:"1em"}} />*/}
+										{/*}*/}
 										<EventImageFader item={subOption}/>
 									</div>
 									<ListItemText
@@ -580,7 +598,7 @@ function EventsList(props) {
 											{/*testing: no outline*/}
 											{/*<IconButton aria-label="more"><MoreVertIcon /></IconButton>*/}
 											<SimplePopover content={
-												<div  key={'special'}><CreatePlaylist control={control}/></div>
+												<div  key={'special'}><CreatePlaylist items={items} control={control}/></div>
 											}/>
 										</div>
 										<div>Friends Liked

@@ -9,54 +9,27 @@ function EventImageFader(props){
 	// 	"http://images.sk-static.com/images/media/profile_images/artists/85293/huge_avatar",
 	// 	"http://images.sk-static.com/images/media/profile_images/artists/177426/huge_avatar"
 	// ]
+
 	var urls = [];
+	var artistUrls = [];
+	//console.log("p",props.item.performance);
 	for(var x = 0; x < props.item.performance.length;x++){
 		var id = props.item.performance[x].artist.artistSongkick_id || props.item.performance[x].artist.id;
-		//todo: this changed on me (which I guess I shouldn't be that surprised about)
-		//so going to need to store artist images in performance.artist as well
+		var  spotifyId = props.item.performance[x].artist.id;
 
-		// if(id){urls.push("http://images.sk-static.com/images/media/profile_images/artists/" + id  + "/huge_avatar")}
-		if(id){urls.push("https://i.scdn.co/image/ab6761610000e5eb9e8aff3467b8389440c34eb2")}
-
+		//testing:testTransparent
+		var testTransparent = "https://images.sk-static.com/images/media/profile_images/artists/10179632/huge_avatar"
+		// if(id){urls.push("https://images.sk-static.com/images/media/profile_images/artists/" + id  + "/huge_avatar")}
+		if(id){urls.push(x === 1 ? testTransparent:"https://images.sk-static.com/images/media/profile_images/artists/" + id  + "/huge_avatar")}
+		if(spotifyId){artistUrls.push(props.item.performance[x].artist.images[0].url)}
 	}
 
-	//debugger;
-	if(urls.length === 0){urls.push("https://via.placeholder.com/150")}
+	// if(urls.length === 0){urls.push("https://via.placeholder.com/150")}
+	// console.log("urls",urls);
+	// console.log("artistUrls",artistUrls);
 
 	//-----------------------------------------------------------------------------------------
-	//todo: prevent white-only default images from returning
-	//basically need to check if the img returned is all white by inspecting pixel colors :(
-	//https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/getImageData
-	//issue now is CORS - could maybe get around this somehow but seems like the source server needs
-	//to allow this, not just me setting headers
-	//https://stackoverflow.com/questions/22097747/how-to-fix-getimagedata-error-the-canvas-has-been-tainted-by-cross-origin-data
 
-	//example white image / valid image
-	//http://images.sk-static.com/images/media/profile_images/artists/9392084/huge_avatar
-	//http://images.sk-static.com/images/media/profile_images/artists/93920/huge_avatar
-
-	//currently this is returning all 0s which I assume is just b/c it couldn't access anything
-
-	// if(props.item.id ===39600437){
-	// 	//console.log("urls",urls);
-	// 	var img = document.createElement('img');img.src = urls[1] + '?' + new Date().getTime();img.id ='9999';
-	// 	//img.setAttribute('crossOrigin', '');
-	// 	img.crossOrigin = "Anonymous";
-	// 	//var img = document.getElementById('9999');
-	// 	var canvas = document.createElement('canvas');
-	// 	canvas.width = img.width;
-	// 	canvas.height = img.height;
-	// 	canvas.getContext('2d').drawImage(img, 0, 0, img.width, img.height);
-	// 	var pixelData = canvas.getContext('2d').getImageData(1, 1, 1, 1).data;
-	// 	console.log("pixelData",pixelData);
-	// }
-
-	// canvas.width = img.width;
-	// canvas.height = img.height;
-	// canvas.getContext('2d').drawImage(img, 0, 0, img.width, img.height);
-	// -----------------------------------------------------------------------------------------
-
-	//console.log("$urls",urls);
 	const [index, set] = useState(0)
 	const transitions = useTransition(index, {
 		key: index,
@@ -73,18 +46,38 @@ function EventImageFader(props){
 		return () => clearTimeout(t)
 	}, [])
 
-	//height:"5em",width:"5em"
 	return (
-		<div className="flex fill center">
-			{transitions((style, i) => (
-				<a.div
-					 className={styles.bg}
-					style={{
-						...style,
-						backgroundImage: `url(${urls[i]})`
-					}}
-				/>
-			))}
+		//note: prevent displaying transparent sk response pics
+		//after much fucking around, realized that I'll just put them on top of each other
+		//if the sk one is transparent, it just won't show up!
+		<div>
+			{/*style={{outline:"10px solid blue"}}*/}
+			<div className="flex fill center">
+				{transitions((style, i) => (
+					<a.div
+						className={styles.bg}
+						style={{
+							...style,
+							backgroundImage: `url(${urls[i]})`
+						}}
+					/>
+				))}
+			</div>
+			<div>
+				{/*<img src={t}/>*/}
+			</div>
+			{/* style={{outline:"10px solid orange",marginTop:"-5em"}} */}
+			<div className="flex fill center">
+				{transitions((style, i) => (
+					<a.div
+						className={styles.bg}
+						style={{
+							...style,
+							backgroundImage: `url(${artistUrls[i]})`
+						}}
+					/>
+				))}
+			</div>
 		</div>
 	)
 

@@ -136,7 +136,7 @@ function useTabs(initialState = 0) {
     //note: artists, songs, etc.
     const [tab, setActiveTab] = useState(0);
     //Pager.jsx page
-    const [page, setPage] = useState(1);
+    const [page, setPage] = useState(2);
     return { tab,setActiveTab,section,setActiveSection,page, setPage }
 }
 let TabControl  = createContainer(useTabs);

@@ -1022,7 +1022,6 @@ function useProduceEvents(){
 	// const piedatadrilldownguest = useReactiveVar(PIEDATADRILLDOWNGUEST);
 
 	const [globalState, globalDispatch] = useContext(Context);
-	//const events = useReactiveVar(EVENTS_VAR);
 	//console.log("$useProduceEvents",control.dataLoaded);
 
 
@@ -1314,9 +1313,10 @@ function useProduceEvents(){
 
 				CHIPGENRES(genres)
 
+				//==================================================================
 				//note:REF6: filter out by date/metro and sort by date
 
-				var debugEvents = false
+				var debugEvents = false && events.length > 0
 				if(debugEvents){
 					debugger;
 				}
@@ -1333,7 +1333,6 @@ function useProduceEvents(){
 				//todo: strange error here when ... my date result returns to little of # of results?
 				//noticed when testin large cleveland pull - if my date range was real small it would start to duplicate event entries?
 				events = _.sortedUniqBy(events,e =>{return e.id})
-
 
 				//---------------------------------------------------------------------------------
 				//note: series of different filters to apply to events set
@@ -1844,6 +1843,8 @@ function useProduceEvents(){
 									a.useRelatedGenreMatch = true;
 									some = true;
 									break;
+								}else{
+									if(debugEvents){console.log("no fam match",a);}
 								}
 							}
 						}
@@ -1884,8 +1885,7 @@ function useProduceEvents(){
 		},
 		[statcontrol.stats.name,statcontrol.mode,
 			friendscontrol.compare,friendscontrol.families,friendscontrol.genres,friendscontrol.selectedTabIndex,friendscontrol.sourceFilter,friendscontrol.checkboxes,friendscontrol.query,
-			control.metro,control.startDate,control.endDate,control.genreSens,control.artistSens,
-			tables['events']
+			control.metro,control.startDate,control.endDate,control.genreSens,control.artistSens,control.dataLoaded
 		]
 	)
 

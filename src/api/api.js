@@ -285,40 +285,54 @@ var fetchSpotifyUsers =  function(req){
 
 //event methods
 
-function getEventsCoverage(events,flag){
-    var c_familyAgg = 0,c_genres = 0,c_eventsWithOne = 0;var ptotal = 0;
-    var genreNoFam = [];var eventsLen = JSON.parse(JSON.stringify(events)).length
+function coverageFilterEvents(events){
+    var c_familyAgg,c_genres,c_eventsWithGenre,c_eventsWithFam,ptotal;
+    c_familyAgg=c_genres=c_eventsWithGenre=c_eventsWithFam=ptotal = 0;
 
-    var toSplice = []
+    var genreNoFam = [];
+    var eventsLen = JSON.parse(JSON.stringify(events))
+    var pruned = [];
+    var noSpotify = [];
+    //var toSplice = []
+
     events.forEach((e,i,arr) =>{
+
         var ec = 0;
-
         //note: only here b/c I'm lazy and won't update cached events fetch example!
-        new Date(e.start.datetime) <= new Date() ? arr.splice(i, 1):{}
+       // new Date(e.start.datetime) <= new Date() ? arr.splice(i, 1):{}
 
+        var flag = null;
         e.performance.forEach(p =>{
-            //todo: handle events w/ no family (artist could still be related?)
-            //todo: handle events w/ no family but has genres (which don't have any families :/)
-           p.artist.familyAgg? c_familyAgg++ :(flag === 'hasFamily' ? arr.splice(i, 1):{});
-            // else{flag === 'hasFamily' ? toSplice.push(e):{}}
-
-            p.artist.familyAgg ? ec++ :{};
+           if(p.artist.familyAgg){
+               ec++;
+               //flag === null? flag = 'hasFamily':{}
+           }
+           if(!(p.artist.id)){
+               noSpotify.push(p.artist)
+           }
             p.artist.genres.length > 0 ? c_genres++ :{};
             !( p.artist.familyAgg) && p.artist.genres.length > 0 ? genreNoFam.push(p):{}
             ptotal++
-
         })
+        //flag === 'hasFamily'? c_eventsWithFam++:{};
+        ec > 0 ? c_eventsWithGenre++:{};
+        c_familyAgg = c_familyAgg + ec
+        if(ec === 0 ){
+            pruned.push(arr[i])
+            arr.splice(i, 1);
+        }
 
-        ec > 0 ? c_eventsWithOne++:{};
     })
     // toSplice = _.uniqBy(toSplice,'id')
     // // console.log("toSplice",toSplice);
     // events = _.difference(events, toSplice);
+    //todo: what is this?
+    //flag === 'hasFamily' ? console.log("pruned",eventsLen - events.length):{};
 
-    flag === 'hasFamily' ? console.log("pruned",eventsLen - events.length):{};
     //console.log("$genreNoFam",genreNoFam);
    return {perfArtistWithFamilyAgg:c_familyAgg + "/" + ptotal, perfArtistWithGenre:c_genres+ "/" + ptotal,
-        eventWithAtLeastOneGenre: c_eventsWithOne + "/" + events.length}
+       perfArtistNoSpotify:noSpotify,
+        eventWithAtLeastOneGenre: c_eventsWithGenre + "/" + eventsLen.length,pruned:pruned}
 
 }
 
@@ -350,7 +364,7 @@ var fetchEvents =  function(req){
             .then(function(res){
                 //console.log("retrieved: ",res);
 
-                console.log("getCoverage (events init):",getEventsCoverage(res));
+                console.log("getCoverage (events init):",coverageFilterEvents(res));
 
                 done(res)
             })
@@ -593,7 +607,7 @@ export default {
     fetchPlaylists,
     fetchPlaylistsResolved,
     fetchEvents,
-    getEventsCoverage,
+    getEventsCoverage: coverageFilterEvents,
     getSavedTracks,
     getMySavedTracksLast,
     getMyFollowedArtists,

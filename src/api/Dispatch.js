@@ -71,8 +71,6 @@ function Dispatch(props) {
 			// userProms.push(api.getMySavedAlbums(req))
 			// var r = await Promise.all(userProms)
 
-			//todo:
-			//control.setDataLoaded(true)
 
 			//todo: we're fetching this twice
 			//testing: tracks as a separate step from fetchuser
@@ -103,6 +101,8 @@ function Dispatch(props) {
 			//testing:
 			//fer = fer.slice(0,50)
 			globalDispatch({type: 'update_events', payload: fer,context:'events', control:control});
+			//testing:
+			control.setDataLoaded(true)
 
 			// var NEVER =  function(){
 			// 	return new Promise(function(done, fail) {
