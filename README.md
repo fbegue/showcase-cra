@@ -1,7 +1,24 @@
-# notes
+# Soundfound.io developer notes
 
-- use `npm run commit <msg>` to commit w/ version update
+- use `npm run commit <msg>` then `git push` to commit w/ version update and push
 - change api/redirect addresses in `src/components/Profile.js`
+
+## deploy order
+
+After testing local/local:
+
+- copy sql DB changes
+- point local POC towards RDS
+    - run insertStatic / fetch_metro_events locally
+- test local soundfound w/ local POC RDS
+- deploy live POC 
+- point local soundfound to live POC and test
+- deploy live soundfound
+- test live soundfound
+
+## resources:
+https://soundfound.io/
+https://master.d267e964bph18g.amplifyapp.com/dashboard
 
 ## todo:
 

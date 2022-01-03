@@ -21,7 +21,11 @@ function EventImageFader(props){
 		var testTransparent = "https://images.sk-static.com/images/media/profile_images/artists/10179632/huge_avatar"
 		// if(id){urls.push("https://images.sk-static.com/images/media/profile_images/artists/" + id  + "/huge_avatar")}
 		if(id){urls.push(x === 1 ? testTransparent:"https://images.sk-static.com/images/media/profile_images/artists/" + id  + "/huge_avatar")}
-		if(spotifyId){artistUrls.push(props.item.performance[x].artist.images[0].url)}
+		if(spotifyId &&
+			//todo: remove after deploy
+			props.item.performance[x].artist.images
+			&& props.item.performance[x].artist.images.length >0)
+		{artistUrls.push(props.item.performance[x].artist.images[0].url)}
 	}
 
 	// if(urls.length === 0){urls.push("https://via.placeholder.com/150")}
