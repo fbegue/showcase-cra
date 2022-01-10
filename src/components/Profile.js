@@ -12,13 +12,13 @@ import Player from "./Player";
 import {Control} from "../index";
 
 
-console.log("$profile",navigator.platform);
+console.log("$profile",window.location.host);
 
 let api_address = null;
-if(navigator.platform === "Win32" ){
-	api_address = "http://localhost:8888"
-}else{
+if(window.location.host === "soundfound.io" ){
 	api_address = "https://api.soundfound.io"
+}else{
+	api_address = "http://localhost:8888"
 }
 //let api_address = "https://api.soundfound.io"
 // let api_address = "http://localhost:8888"
