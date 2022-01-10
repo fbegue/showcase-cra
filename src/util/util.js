@@ -149,7 +149,7 @@ function chooseData(statcontrol,friendscontrol,tabcontrol,globalState,globalUI){
 
 
 	console.log("chooseData",statcontrol.stats.name);
-	debugger
+
 	//console.log("guest:",friendscontrol.guest.id);
 
 	var contextFilter = function(key,rec) {

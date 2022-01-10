@@ -58,4 +58,5 @@
   background-size: cover;
   background-position: center;
   will-change: opacity;
+  border:2px solid #6c6161d1;
 }

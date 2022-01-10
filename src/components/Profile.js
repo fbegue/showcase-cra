@@ -12,8 +12,7 @@ import Player from "./Player";
 import {Control} from "../index";
 
 
-console.log("$profile",window.location.host);
-
+// console.log("$profile",window.location.host);
 let api_address = null;
 if(window.location.host === "soundfound.io" ){
 	api_address = "https://api.soundfound.io"

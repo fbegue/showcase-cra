@@ -1,3 +1,10 @@
+
+/*testing: fix left side cutoff on downsize*/
+.app{
+  min-width:22em;
+}
+
+/*todo: move 'global' stuff somewhere else inside app.js*/
 .controls {
   display: flex;
   justify-content: center;
