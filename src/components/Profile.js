@@ -11,8 +11,17 @@ import logo_icon from "../assets/sound_found_logo_icon.png";
 import Player from "./Player";
 import {Control} from "../index";
 
-// let api_address = "https://api.soundfound.io"
-let api_address = "http://localhost:8888"
+
+console.log("$profile",navigator.platform);
+
+let api_address = null;
+if(navigator.platform === "Win32" ){
+	api_address = "http://localhost:8888"
+}else{
+	api_address = "https://api.soundfound.io"
+}
+//let api_address = "https://api.soundfound.io"
+// let api_address = "http://localhost:8888"
 let redirect_address = 'https://soundfound.io'
 //const redirect_address = "https://master.d267e964bph18g.amplifyapp.com"
 
