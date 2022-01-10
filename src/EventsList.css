@@ -6,6 +6,27 @@
   padding-left:0em !important;
 }
 
+/*testing: secondary action auto-floats to right*/
+.MuiListItemSecondaryAction-root{
+  /*top: 50%;*/
+  right: 16px !important;
+  position: relative !important;
+  transform: none !important;
+}
+
+
+/*.MuiListItemText-multiline{*/
+/*  min-height:5em !important;*/
+/*}*/
+/*.MuiCollapse-container .MuiListItemSecondaryAction-root{*/
+/*  !*top: 50%;*!*/
+/*  right: -4px !important;*/
+/*  position: relative !important;*/
+/*  transform: none !important;*/
+/*}*/
+
+
+
 /*.nestedCustom {*/
   /*margin-left:5em !important;*/
 /*}*/

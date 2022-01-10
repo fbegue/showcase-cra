@@ -6,10 +6,12 @@ import HighchartsReact from 'highcharts-react-official'
 import HC_more from 'highcharts/highcharts-more'
 import highcharts3d from 'highcharts/highcharts-3d'
 import drilldown from 'highcharts/modules/drilldown.js';
-import {series as exSeries,drilldowns as exDrilldowns,drilldowns2 as exDrilldowns2} from "./StackedBarDrill/exampleStackedBarData";
+import './StackedBarDrill.css'
+import {series as exSeries,drilldowns as exDrilldowns,drilldowns2 as exDrilldowns2} from "./exampleStackedBarData";
 import {useReactiveVar} from "@apollo/react-hooks";
 // import {BARDATA,BARDRILLDOWNMAP} from "../../storage/withApolloProvider";
-import {exBarData, exBarDataUpdate, exDrillMap} from "./StackedBarDrill/exampleGenreStackedBarData";
+import {exBarData, exBarDataUpdate, exDrillMap} from "./exampleGenreStackedBarData";
+import {FriendsControl} from "../../../index";
 HC_more(Highcharts)
 highcharts3d(Highcharts)
 drilldown(Highcharts)
@@ -62,8 +64,58 @@ function StackedBarDrill(props) {
 		}
 	},[props.barData])
 
+
+	let friendscontrol = FriendsControl.useContainer()
+	useEffect(() =>{
+
+		var isDrilled = elementRef.current.chart.drilldownLevels && elementRef.current.chart.drilldownLevels.length >0
+		if(elementRef.current && !(isDrilled) && friendscontrol.families.length > 0 ){
+			//elementRef.current.chart
+			//var target = e.point.series.name;
+			//debugger
+			// var target = {point:{series:{name:"rock"}}}
+			manualDrilldown(friendscontrol.families[0])
+
+		}else if(elementRef.current && friendscontrol.families.length === 0){
+			//todo: so this doesn't seeeeem to cause any actual issues
+			//see: manualDrilldown
+
+			try{
+				elementRef.current.chart.drillUp()
+			}catch(e){
+				//console.log(e);
+			}
+
+		}
+	}, [friendscontrol.families])
+
 	//testing:
 	//var drilldownFunc = (e,chart) =>{console.log("drilldownFunc",e);console.log(chart);}
+
+	var manualDrilldown = function (target) {
+		var chart = elementRef.current.chart
+
+		//determine selected point
+		var point = null
+		//var target = friendscontrol.families[0];
+		elementRef.current.chart.series.forEach(s =>{
+
+			// eslint-disable-next-line no-unused-expressions
+			s.name ===  target ? point = s.points[0]:{}
+		})
+
+		//var target = e.point.series.name;
+		console.log('drilldown',target);
+
+		temp[target].forEach(gSeries =>{
+			chart.addSingleSeriesAsDrilldown(point, gSeries);
+		})
+		//testing: this causes drilldown data to double
+		//but without this, applyDrilldown throws a length error on ANY drillup (including hidden button)
+		//point.doDrilldown();
+		chart.applyDrilldown();
+
+	}
 
 	const config = {
 		chart: {
@@ -79,9 +131,10 @@ function StackedBarDrill(props) {
 				drilldown: function (e) {
 					var chart = this;
 					if (!e.seriesOptions) {
+
 						var target = e.point.series.name;
 						console.log('drilldown',target);
-
+						friendscontrol.setFamilies([target])
 						//note: the data has to be split b/c I need to add two series
 						//add as many series as there are genres within the target
 
@@ -115,7 +168,11 @@ function StackedBarDrill(props) {
 
 					}
 
-				}
+				},
+				//testing: just got rid of default button w/ css
+				// drillUp: function (e){
+				// 	friendscontrol.setFamilies([])
+				// }
 			}
 		},
 		credits: {enabled: false},
@@ -212,13 +269,13 @@ function StackedBarDrill(props) {
 		}
 	}
 	return(
-		<div>
+		<div id={'StackedBarDrill'}>
 			<div >
 				{/*<button onClick={() =>{addTest()}}>Add User {allowUpdate.toString()}</button>*/}
 				<HighchartsReact  ref={elementRef} highcharts={Highcharts}
 								  allowChartUpdate={false}
 								  containerProps={{ style: { height: getHeight() } }}
-								  // options={{...config,series:[],chart:{...config.chart,height:getHeight()}}} />
+					// options={{...config,series:[],chart:{...config.chart,height:getHeight()}}} />
 								  options={{...config,series:[]}} />
 			</div>
 

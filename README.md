@@ -11,10 +11,10 @@ After testing local/local:
 - point local POC towards RDS
     - run insertStatic / fetch_metro_events locally
 - test local soundfound w/ local POC RDS
-- deploy live POC 
-- point local soundfound to live POC and test
+- deploy live POC RDS
+- point local soundfound to live POC RDS and test
 - deploy live soundfound
-- test live soundfound
+- test live soundfound w/ live POC RDS
 
 ## resources:
 https://soundfound.io/

@@ -6,7 +6,7 @@ import List from '@material-ui/core/List'
 import ListItem from '@material-ui/core/ListItem'
 import ListItemText from '@material-ui/core/ListItemText'
 import Tooltip from '@material-ui/core/Tooltip'
-
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import Collapse from '@material-ui/core/Collapse'
 import ExpandLess from '@material-ui/icons/ExpandLess'
 import ExpandMore from '@material-ui/icons/ExpandMore'
@@ -23,7 +23,6 @@ import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
 import PauseCircleOutlineIcon from '@material-ui/icons/PauseCircleOutline';
 import PlaylistAddIcon from "@material-ui/icons/PlaylistAdd";
 import Button from '@material-ui/core/Button';
-import { useTransition, animated, config } from 'react-spring'
 import SliderEvents from './components/Sliders/Slider-Events'
 import SliderEvents2 from './components/Sliders/Slider-Events2'
 import {Context} from "./storage/Store";
@@ -35,10 +34,12 @@ import {useReactiveVar} from "@apollo/react-hooks";
 import {GLOBAL_UI_VAR, EVENTS_VAR, CHIPGENRES, TILES} from "./storage/withApolloProvider";
 import { StatControl,Control} from "./index";
 import Map from './components/Map';
+import { useSpring, animated } from '@react-spring/web'
 import EventImageFader from "./components/EventImageFader";
 import OpenInNewIcon from '@material-ui/icons/OpenInNew';
 // import ListItemIcon from '@material-ui/core/ListItemIcon';
 import BubbleFamilyGenreChips from "./components/chips/BubbleFamilyGenreChips";
+import Avatar from "./components/Social/Avatar";
 import {useImage} from 'react-image'
 
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
@@ -52,6 +53,7 @@ import Pagination from "./components/utility/Pagination";
 import SimplePopover from "./components/utility/Popover";
 import CreatePlaylist from "./CreatePlaylist";
 import util from "./util/util";
+import SpringMultiDrop from "./components/springs/SpringMultiDrop";
 //import GenreChipsDumb from './components/chips/GenreChipsDumb.js'
 // import './components/utility/CustomScroll/contextStats.scss'
 // import "./components/utility/CustomScroll/FirstComp/customScroll.css";
@@ -103,10 +105,7 @@ function EventsList(props) {
 	util.useProduceEvents()
 	//const classesPlay = useStyles();
 
-	// this method sets the current state of a menu item i.e whether
-	// it is in expanded or collapsed or a collapsed state
 
-	const [state, setState] = useState({});
 	const [friendsFilterOn, setFriendsFilterOn] = useState(false);
 	//const [globalState, globalDispatch] = useContext(Context);
 	const globalUI = useReactiveVar(GLOBAL_UI_VAR);
@@ -180,9 +179,12 @@ function EventsList(props) {
 			})
 	}
 
-	function handleClick(item) {
-		setState(prevState => ({ [item]: !prevState[item] }));
-	}
+
+	//note: abstracted all rows clicks into map
+	//if not defined or defined as false, it's unselected
+	const [state, setState] = useState({});
+
+
 
 	function unHolyDrill(item){
 		//console.log("$unHolyDrill",item);
@@ -212,25 +214,25 @@ function EventsList(props) {
 			<div className={'play-events'}>
 				{/*todo: assuming no genres = tried to locate in spotify but couldn't find it, so can't play*/}
 				<div style={{marginTop:"-.4em"}}>
-				{(sub.artist.genres.length >0 ?
-					<div style={{display:"flex"}}>
-						<div>
-							<img onClick={() => openInNewTab("spotify:artist:" + sub.artist.id)} src={spotifyLogo}
-								 style={{"position":"absolute",left:"-2em",zIndex:"10",height:"1.5em",width:"1.5em"}}
-							/>
-						</div>
-						<div>
-						{control.play && control.playArtist === sub.artist.id ?
-							<ApplyPulse target={
-								<PauseCircleOutlineIcon fontSize={'inherit'} style={{fontSize:"30px"}} color={'secondary'} onClick={() => handlePlay(sub.artist)}></PauseCircleOutlineIcon>
-							}/>
- 						:
-							<ApplyPulse target={
-								<PlayCircleOutlineIcon fontSize={'inherit'} style={{fontSize:"30px"}} color={'secondary'} onClick={() => handlePlay(sub.artist)}></PlayCircleOutlineIcon>
-							}/>
-						}
-						</div>
-					</div>:<div></div>
+					{(sub.artist.genres.length >0 ?
+							<div style={{display:"flex"}}>
+								<div>
+									<img onClick={() => openInNewTab("spotify:artist:" + sub.artist.id)} src={spotifyLogo}
+										 style={{"position":"absolute",left:"-2em",zIndex:"10",height:"1.5em",width:"1.5em"}}
+									/>
+								</div>
+								<div>
+									{control.play && control.playArtist === sub.artist.id ?
+										<ApplyPulse target={
+											<PauseCircleOutlineIcon fontSize={'inherit'} style={{fontSize:"30px"}} color={'secondary'} onClick={() => handlePlay(sub.artist)}></PauseCircleOutlineIcon>
+										}/>
+										:
+										<ApplyPulse target={
+											<PlayCircleOutlineIcon fontSize={'inherit'} style={{fontSize:"30px"}} color={'secondary'} onClick={() => handlePlay(sub.artist)}></PlayCircleOutlineIcon>
+										}/>
+									}
+								</div>
+							</div>:<div></div>
 					)}
 				</div>
 				<div>{sub.displayName}</div>
@@ -330,6 +332,98 @@ function EventsList(props) {
 	const [openNew, setOpenNew] = useState({});
 
 
+	//=====================================================================
+
+	const useStyles = makeStyles({
+		root: {
+			right: "-4px !important",
+			position: "relative !important",
+			transform: "none !important"
+		},
+		multiline:{
+			minHeight:"5em !important"
+		}
+	});
+
+	const classes2 = useStyles();
+
+	// const fader = useSpring({
+	// 	to: {opacity: 1,x:100}, from: {opacity: 0,x:0},
+	// 	config: {duration: 200},
+	// 	delay:1000
+	// })
+	// const fader2 = useSpring({
+	// 	to: {opacity: 0,}, from: {opacity: 1},
+	// 	config: {duration: 500},
+	// 	delay:2000
+	// })
+	// const fader3 = useSpring({
+	// 	to: {opacity: 0,}, from: {opacity: 1},
+	// 	config: {duration: 500},
+	// 	delay:3000
+	// })
+
+	const [drop, setDrop] = useState(false)
+
+	//testing: the output here has to be a real property name
+	// const {opacity} = useSpring({
+	// 	from: { opacity: 0 },
+	// 	opacity: drop ? 1 : 0,
+	// 	config: { duration: 100 },
+	// 	delay:500
+	// })
+
+	//todo: POC of image fadein's with staggered delays
+	//bit ugly right now as hooks (useSpring) can't be called w/in a function,
+	//so don't see any way of parameterizing (just need to setup ahead of time)
+
+	const opacityProps = useSpring({
+		to: { opacity: .5 },
+		from: { opacity: 1 },
+		reset: true,
+		reverse: drop,
+		delay: 300,
+	})
+	const opacityProps2 = useSpring({
+		to: { opacity: .5 },
+		from: { opacity: 1 },
+		reset: true,
+		reverse: drop,
+		delay: 400,
+	})
+	const opacityProps3 = useSpring({
+		to: { opacity: .5 },
+		from: { opacity: 1 },
+		reset: true,
+		reverse: drop,
+		delay: 500,
+	})
+
+	var opacityArr = [opacityProps,opacityProps2,opacityProps3,opacityProps,opacityProps2,opacityProps3,opacityProps,opacityProps2,opacityProps3]
+	const getSpring = (i) =>{
+		return opacityArr[i]
+	}
+
+	//testing: works, just not suuupper smooth
+	const shrinkSecondaryActionStyle = useSpring({
+		width: drop ?0: 90,
+		 height: "5em"
+	});
+
+	function handleClick(item) {
+
+		// var _open = {!(state[subOption.id]) || state[subOption.id] === false}
+		// // setState(prevState => ({ [item]: !prevState[item] }));
+		// if(){}
+		//setDrop(true)
+		setDrop(prevState => !prevState);
+		setState(prevState => {
+			console.log("prevState",prevState);
+			return { [item]: !prevState[item] }});
+	}
+
+	//=======================================================================
+
 	function handler(children,key) {
 
 		// var moment = function(dt,format){
@@ -351,41 +445,56 @@ function EventsList(props) {
 		//doesn't seem like we would generate them ourselves - maybe apply some css w/ user.display_name?
 		//https://github.com/mbrevda/react-image
 
-		function MyImageComponent(props) {
-			let fallback = 'https://via.placeholder.com/150';
-			// const {src} = useImage({
-			// 	srcList: props.rec.user.images[0].url ? [props.rec.user.images[0].url,fallback]:fallback
-			// })
 
-			return props.rec.user.images[0].url
-			? <Tooltip title={props.rec.reason}>
-					<img style={{width: "50px",height:"50px",borderRadius: "50%"}} src={props.rec.user.images[0].url} />
-				</Tooltip>
-			: <Tooltip title={props.rec.reason}>
-					<img style={{width: "50px",height:"50px",borderRadius: "50%"}} src={fallback} />
-				</Tooltip>
-			// return <Suspense fallback={""}>
-			// 	<Tooltip title={props.rec.reason}>
-			// 		<img style={{width: "50px",borderRadius: "50%"}} src={src} />
-			// 	</Tooltip>
-			// </Suspense>
+
+		//testing: would like to replace with animated width (above)
+		//shrinkSecondaryActionStyle
+
+		const getRowDisplay = (subOption) =>{
+
+			if(!(state[subOption.id]) || state[subOption.id] === false){
+				return {width:"5em",height:"5em"}
+			}
+			else{
+				return {width:"",height:""}
+			}
 		}
 
 		return(
 			<div style={{maxHeight:"33em"}}>
-			{/*	testing: disabled custom scroll attempt*/}
-			{/*<div className={'crazy-scroll'} style={{maxHeight:"33em"}}>*/}
-			{/*<CustomScroll>*/}
+				{/*	testing: disabled custom scroll attempt*/}
+				{/*<div className={'crazy-scroll'} style={{maxHeight:"33em"}}>*/}
+				{/*<CustomScroll>*/}
 				{
 					//testing:
-					children.map(subOption => {
+					children.map((subOption,i) => {
 						if (!subOption.childrenKey) {
 							return (
 								// <div key={subOption.id} >{subOption.id}</div>
 								<div key={subOption.id}>
+									{/*todo: move to after ListItemText (but then need to adjust fix css?*/}
+									<ListItemSecondaryAction classes={{root:classes2.root}}>
+										<div style={{position:"relative"}}>
+											{subOption.artist.images && subOption.artist.images.length > 0 &&
+											<animated.div
+												style={opacityArr[i]}
+												// style={{
+												// 	opacity: getSpring(i).to({
+												// 		range: [0, 1],
+												// 		output: [0.5,1],
+												// 	}),
+												// }}
+											>
+												<img style={{height: "5em", width: "5em"}}
+													 src={subOption.artist.images[0].url}></img>
+											</animated.div>
+											}
+										</div>
+									</ListItemSecondaryAction>
 									<ListItemText
 										style={{marginLeft:"2em"}}
 										inset
+										classes={{root:classes2.multiline}}
 										disableTypography
 										primary={ showPlay(subOption)}
 										secondary={
@@ -417,18 +526,45 @@ function EventsList(props) {
 							<div className={getFamilyClass(subOption)}>
 								{/*<div>ListItem  key={subOption.id}  </div>*/}
 								<ListItem  key={subOption.id}  button onClick={() => handleClick(subOption.id)}>
-									<div style={{marginRight:"5em",marginBottom:"4em"}}>
-										{/*testing: what did this every mean tho? that AT LEAST one artist in this perf is linked to spotify (and therefore playable)?*/}
-										{/*just seems a bit weird*/}
-										{/*{unHolyDrill(subOption) &&*/}
-										{/*<img src={spotifyLogo} style={{"position":"absolute","left":"62px","top":"2px",zIndex:"10",height:"1em",width:"1em"}} />*/}
-										{/*}*/}
-										<EventImageFader item={subOption}/>
-									</div>
+
+
+									<ListItemSecondaryAction>
+										<div style={{position:"relative"}}>
+											{/*todo: animate width adjustment?*/}
+
+											<animated.div
+												 style={getRowDisplay(subOption)}
+												//style={shrinkSecondaryActionStyle}
+											>
+												{/*primaryOpen={(!(state[subOption.id]) || state[subOption.id] === false) } */}
+
+												<SpringMultiDrop item={subOption}
+													open={!(state[subOption.id]) || state[subOption.id] === false}
+																/>
+											{/*					 toggle={() =>{handleClick(subOption.id)}} */}
+											</animated.div>
+											{/*<div>*/}
+											{/*	{ (!(state[subOption.id]) || state[subOption.id] === false)  &&*/}
+											{/*	<div style={{marginRight:"5em",marginBottom:"4em"}}>*/}
+											{/*		/!*testing: what did this every mean tho? that AT LEAST one artist in this perf is linked to spotify (and therefore playable)?*!/*/}
+											{/*		/!*just seems a bit weird*!/*/}
+											{/*		/!*{unHolyDrill(subOption) &&*!/*/}
+											{/*		/!*<img src={spotifyLogo} style={{"position":"absolute","left":"62px","top":"2px",zIndex:"10",height:"1em",width:"1em"}} />*!/*/}
+											{/*		/!*}*!/*/}
+											{/*		<EventImageFader item={subOption}/>*/}
+											{/*		/!*<SpringMultiDrop items={subOption.performance}/>*!/*/}
+											{/*	</div>*/}
+											{/*	}*/}
+											{/*</div>*/}
+										</div>
+									</ListItemSecondaryAction>
+
+
 									<ListItemText
 										// inset
 										disableTypography
 										primary={ formatEventName(subOption)}
+										classes={{multiline:classes2.multiline}}
 										secondary={
 											<React.Fragment>
 												<Typography
@@ -456,7 +592,7 @@ function EventsList(props) {
 														<div style={{display:"flex",justifyContent:"flex-start",marginLeft:"2em"}}>
 															{subOption.friends.map((rec,i) =>
 																<div key={i}>
-																	<MyImageComponent rec={rec}/>
+																	<Avatar rec={rec}/>
 																	{/*<Tooltip title="likes this artist">*/}
 																	{/*	<MyImageComponent user={f}/>*/}
 																	{/*	/!*<img src={f.images[0].url}*!/*/}
@@ -469,13 +605,14 @@ function EventsList(props) {
 														}
 
 
-														<div onClick={() =>{openSongkickExt(subOption)}}
-															 onMouseEnter={() =>{setOpenNew({...openNew,[subOption.id]:!openNew[subOption.id]})}}
-															 onMouseOut={() =>{setOpenNew({})}} className={'songkickExt'}>
-															<img src={songkick_badge_pink} style={{height:"3em",width:"3em"}} />
-															{openNew[subOption.id] && <OpenInNewIcon
-																style={{"fontSize":"1rem","position":"absolute","right":"50px","top":"30px","visibility":openNew[subOption.id] ?'visible':"hidden"}} fontSize={'inherit'}/>}
-														</div>
+														{/*testing: disabled for now*/}
+														{/*<div onClick={() =>{openSongkickExt(subOption)}}*/}
+														{/*	 onMouseEnter={() =>{setOpenNew({...openNew,[subOption.id]:!openNew[subOption.id]})}}*/}
+														{/*	 onMouseOut={() =>{setOpenNew({})}} className={'songkickExt'}>*/}
+														{/*	<img src={songkick_badge_pink} style={{height:"3em",width:"3em"}} />*/}
+														{/*	{openNew[subOption.id] && <OpenInNewIcon*/}
+														{/*		style={{"fontSize":"1rem","position":"absolute","right":"50px","top":"30px","visibility":openNew[subOption.id] ?'visible':"hidden"}} fontSize={'inherit'}/>}*/}
+														{/*</div>*/}
 
 														<div style={{width:"1em"}}>{'\u00A0'}</div>
 
@@ -535,8 +672,8 @@ function EventsList(props) {
 						);
 					})
 				}
-			{/*</CustomScroll>*/}
-			{/*</div>*/}
+				{/*</CustomScroll>*/}
+				{/*</div>*/}
 			</div>
 		)
 	}
@@ -574,13 +711,13 @@ function EventsList(props) {
 				{/*testing: idk - gotta be a better way to communicate with w/out using up so much space*/}
 				{/*<div style={{"width":"100%","height":"3em","backgroundColor":"lightblue","display":"flex","alignItems":"center",justifyContent:"flex-start"}}>*/}
 
-					{/*<div style={{"transform":"rotate(180deg)"}}>*/}
-					{/*	<img style={{height:"3em",marginRight:".5em"}} src={SwipeRight}/>*/}
-					{/*</div>*/}
-					{/*<div style={{position: "relative",zIndex:"2"}}>*/}
-					{/*	<img style={{"height":"2.5em","marginTop":"0.3em","marginRight":"0.5em","marginLeft":"-0.3em"}} src={DragHand}/>*/}
-					{/*</div>*/}
-					{/*<div style={{marginLeft:"1em"}}>Matched {tiles.length} Items </div>*/}
+				{/*<div style={{"transform":"rotate(180deg)"}}>*/}
+				{/*	<img style={{height:"3em",marginRight:".5em"}} src={SwipeRight}/>*/}
+				{/*</div>*/}
+				{/*<div style={{position: "relative",zIndex:"2"}}>*/}
+				{/*	<img style={{"height":"2.5em","marginTop":"0.3em","marginRight":"0.5em","marginLeft":"-0.3em"}} src={DragHand}/>*/}
+				{/*</div>*/}
+				{/*<div style={{marginLeft:"1em"}}>Matched {tiles.length} Items </div>*/}
 				{/*</div>*/}
 				<List>
 					<ListItem button divider key={'locdate'} onClick={handleClickConfig}>

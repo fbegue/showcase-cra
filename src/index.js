@@ -147,8 +147,8 @@ function useFriends(initialState = 0) {
     //somehow not a problem when I have a testin value?
     //otherwise friendscontrol isn't even defined?
 
-    //let [guest, setGuest] = useState(null);
-    let [guest, setGuest] = useState({id:123028477,name:"Dan"});
+    let [guest, setGuest] = useState(null);
+    //let [guest, setGuest] = useState({id:123028477,name:"Dan"});
     //user,guest,shared,all
     let [compare, setCompare] = useState('shared');
     let [families, setFamilies] = useState([]);

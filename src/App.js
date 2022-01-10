@@ -42,7 +42,6 @@ import './components/tiles/Tiles.css'
 //import stylesViewPager from'./stylesViewPager.module.css'
 //import ViewPager from "./ViewPager";
 
-import Accordion from "./components/Framer/Accordion";
 import Pager from "./components/Framer/Pager";
 import {motion} from "framer-motion";
 import FloatingActionButton from "./components/utility/FloatingActionButton";
@@ -344,7 +343,7 @@ function App(props) {
 
 
 
-                            <div>
+                            <div style={{background:"#808080"}} >
                                 {/*testing: not exactly what I was expecting but w/e*/}
                                 {/*outline:"1px solid blue"*/}
                                 <div ref={ref} style={{width:"10em",height:".1px"}}></div>
@@ -366,8 +365,9 @@ function App(props) {
 
                             <motion.div
                                 initial={false}
-                                animate={{y: gridControl.collapse ? 0:gridControl.infoBound -80}}
+                                // animate={{y: gridControl.collapse ? 0:gridControl.infoBound -80}}
                                 transition={{ duration: 0.3 }}
+                                style={{outline: "2px solid red"}}
 
                             >
                                 {globalUI.access_token &&

@@ -147,7 +147,9 @@ function chooseData(statcontrol,friendscontrol,tabcontrol,globalState,globalUI){
 	var data_user = [];
 	var data_guest = [];
 
-	//console.log("chooseData",statcontrol.stats.name);
+
+	console.log("chooseData",statcontrol.stats.name);
+	debugger
 	//console.log("guest:",friendscontrol.guest.id);
 
 	var contextFilter = function(key,rec) {
@@ -215,20 +217,26 @@ function chooseData(statcontrol,friendscontrol,tabcontrol,globalState,globalUI){
 			//todo: not applicable to USER b/c these are in seperate categories?
 			//but here in USER v FRIEND, we give the option
 
-			//need to dedupe if we're not filtering by source
-			if(friendscontrol.sourceFilter ===  'both'){
 
-				//console.log("sourceFilter set to both");
-				data_user = globalState[globalUI.user.id + key]
-				data_guest = globalState[friendscontrol.guest.id + key]
-				//todo: uniqBy at this stage makes sense, right?
-				data_user = _.uniqBy(data_user,'id')
-				data_guest  = _.uniqBy(data_guest,'id')
+			if(!(friendscontrol.guest)){
+				console.warn("no guest selected - skipped stat re-render for: " + statcontrol.stats.name)
 			}else{
-				//console.log("sourceFilter on:",friendscontrol.sourceFilter);
-				data_user = globalState[globalUI.user.id + key].filter(contextFilter.bind(null,friendscontrol.sourceFilter))
-				data_guest = globalState[friendscontrol.guest.id + key].filter(contextFilter.bind(null,friendscontrol.sourceFilter))
+				//need to dedupe if we're not filtering by source
+				if(friendscontrol.sourceFilter ===  'both'){
+
+					//console.log("sourceFilter set to both");
+					data_user = globalState[globalUI.user.id + key]
+					data_guest = globalState[friendscontrol.guest.id + key]
+					//todo: uniqBy at this stage makes sense, right?
+					data_user = _.uniqBy(data_user,'id')
+					data_guest  = _.uniqBy(data_guest,'id')
+				}else{
+					//console.log("sourceFilter on:",friendscontrol.sourceFilter);
+					data_user = globalState[globalUI.user.id + key].filter(contextFilter.bind(null,friendscontrol.sourceFilter))
+					data_guest = globalState[friendscontrol.guest.id + key].filter(contextFilter.bind(null,friendscontrol.sourceFilter))
+				}
 			}
+
 			break;
 
 		default:
@@ -1407,13 +1415,16 @@ function useProduceEvents(){
 				//regardless, we would like to only be recalculating what we HAVE to
 				//which really means
 
+				var tempColorMap = {}
 				//todo: change packages from tinycolor to color (tinycolor didn't have alpha adjustments)
 				var getDrilldownData = (fmap,gmap) =>{
 					var drilldown = {series:[]};
 					Object.keys(fmap).forEach((fname,i) =>{
+
+						//todo: this is from masterlist of genres
 						var gs = genres.filter(gOb =>{return gOb.family_name === fname});
 						var d = []
-						var colorMap = {};
+						//var tempColorMap = {};
 						var mult = 3;
 						var offset = 20;
 
@@ -1425,21 +1436,22 @@ function useProduceEvents(){
 						gs.forEach((g,i) =>{
 							adjust = (i*mult)+offset
 							if(i <= gs.length/2){
-								colorMap[g.name] = tinycolor(familyColors[fname]).lighten(lightest - adjust).toString()
+								tempColorMap[g.name] = tinycolor(familyColors[fname]).lighten(lightest - adjust).toString()
 							}
 							else{
 								//could have just broke this into 2 loops
 								//instead we'll just set (i) to inc like it did in lighten clause
 								var asi = i-gs.length/2
 								adjust = (asi*mult)+offset
-								colorMap[g.name] = tinycolor(familyColors[fname]).darken(adjust).toString()
+								tempColorMap[g.name] = tinycolor(familyColors[fname]).darken(adjust).toString()
 							}
-							// console.log(colorMap[g.name] );
+							// console.log(tempColorMap[g.name] );
 						})
-						CHIPGENRESCOLORMAP(colorMap)
+						CHIPGENRESCOLORMAP(tempColorMap)
 
 						//todo: don't feel like this needs to be done for EACH Object.keys(fmap) ?
-						//console.log("$colorMap",colorMap);
+						//console.log("$tempColorMap",tempColorMap);
+
 
 						gs.forEach((gOb,gi) =>{
 							//because genres is the entire list for both users, it's possible
@@ -1450,7 +1462,7 @@ function useProduceEvents(){
 							//todo: set real colors on families, then use tinyColor to set genres based on family color
 							//https://github.com/bgrins/TinyColor
 
-							gmap[gOb.name] ? d.push({name:gOb.name,y:Object.keys(gmap[gOb.name]).length,color:colorMap[gOb.name]}):{}
+							gmap[gOb.name] ? d.push({name:gOb.name,y:Object.keys(gmap[gOb.name]).length,color:tempColorMap[gOb.name]}):{}
 
 						})
 						d.sort((a,b) =>{return  b[1] - a[1]})
@@ -1480,13 +1492,77 @@ function useProduceEvents(){
 				//todo: going to have to keep repeating this loop for each user
 				//b/c all the graph data is dependent on the last :/
 
+				//testing:
+				var genreFamilyMap = {};
+
+				genres.forEach(gOb =>{
+					genreFamilyMap[gOb.name] = gOb.family_name
+				})
 				Object.keys(userMapStore).forEach(k =>{
 					var u = userMapStore[k];
+
+					/** Clean up graph displays by removing low-impact genres from overpopulated family sets
+					 * @method abbreviateGenres
+					 * */
+					function abbreviateGenres(){
+
+						//if the # of genres for a family is over a minimum limit,
+						//remove from bottom until n = 10
+						var max = 10;
+
+						//determine cardinality of genres per family
+						//for every genre key, increase count for fam on famGenreMap
+						var famGenreMap = {}
+						//also init famGenreHitMap
+						var famGenreHitMap= {}
+						Object.keys(u.genreArtist).forEach(k =>{
+							//var localFam = u.genreArtist[k][0].familyAgg
+							var localFam = genreFamilyMap[k]
+							if(!(famGenreMap[localFam])){famGenreMap[localFam] = 0}
+							if(!(famGenreHitMap[localFam])){famGenreHitMap[localFam] = []}
+							famGenreMap[localFam]++
+						})
+
+						//determine which families need adjusted
+						Object.keys(u.genreArtist).forEach(k =>{
+							var localFam = genreFamilyMap[k]
+							if(famGenreMap[localFam] > max){
+								//record all lengths
+								famGenreHitMap[localFam].push({genre:k,family:localFam,hits:u.genreArtist[k].length});
+							}
+						})
+						//turn famGenreHitMap into sorted arrays w/ max length
+						//debugger
+						Object.keys(famGenreHitMap).forEach(fam =>{
+							if(famGenreHitMap[fam].length > 0){
+								famGenreHitMap[fam] = famGenreHitMap[fam].sort((a,b) =>{return b.hits - a.hits }).slice(10,famGenreHitMap[fam].length)
+							}else{
+								//debugger
+							}
+
+						})
+						var unwound = []
+						Object.keys(famGenreHitMap).forEach(fam =>{
+							unwound = unwound.concat(famGenreHitMap[fam])
+						})
+						//console.log(unwound);
+
+						genres = genres.filter(gOb =>{
+							//note: DO NOT SIMPLIFY ASSHOLE
+							return  _.find(unwound, {genre: gOb.name}) ? false:true
+						})
+					}
+
+					abbreviateGenres()
+
 					var drilldown = getDrilldownData(u.familyArtist,u.genreArtist)
 					var pieData = producePieData(u.familyArtist)
 					userMapStore[k]['drilldown'] = drilldown;
 					userMapStore[k]['pieData'] = pieData;
 				})
+
+
+
 
 				// var tempPieDataDrilldown = {series: []}
 				// var tempPieDataDrilldownGuest = {series: []}
@@ -1575,6 +1651,7 @@ function useProduceEvents(){
 
 				//====================================================================
 
+
 				const produceBarDrillData = (drilldatas,barDrillMap) =>{
 					//testing: like families above, we'll define for both users any existing genre
 					systemFamilies.forEach(fam =>{
@@ -1583,7 +1660,7 @@ function useProduceEvents(){
 						var gSet = genres.filter(r =>{return r.family_name === fam})
 						gSet.forEach(g =>{
 							//todo: don't know shit about colors yet
-							var gPoint = {name:g.name,color:null,dataLabels:
+							var gPoint = {name:g.name,color:tempColorMap[g.name],dataLabels:
 									{formatter: function() {return g.name}},data:[]}
 							var ugPoint = null;
 							drilldatas.forEach(userDrillOb =>{

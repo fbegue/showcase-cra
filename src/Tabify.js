@@ -413,9 +413,26 @@ export default function Tabify() {
 	// const [section, setActiveSection] = useState(2);
 
 
+	//click
 	function handleSectionSelect(event,sectionkey){
 		console.log("handleSectionSelect",sectionkey);
 		tabcontrol.setActiveSection(sectionkey)
+
+		switch (sectionkey) {
+			case 1:
+				statcontrol.setStats({name:"artists_saved"})
+				break;
+			case 2:
+				statcontrol.setStats({name:"artists_friends"})
+				break;
+			default:
+		}
+
+		// console.log("handleTabChange",tabMap[tabcontrol.section][tabindex]);
+		// console.log(tabcontrol.tab);
+
+		//tabcontrol.setActiveTab(tabindex);
+		//statcontrol.setStats({name:Object.keys(tabMap[tabcontrol.section][tabindex])[0]})
 
 		//testing: went away from grid control
 		// if(sectionkey === 2){
@@ -428,18 +445,19 @@ export default function Tabify() {
 		// 	// paner.setPane(paner.paneSettings['default'])
 		// }
 
+		//testing: went away from tabs
 		//if the section changed, also trigger tab set (0 as default)
-		if(sectionkey !== tabcontrol.section){
-			handleTabChange(null,0,sectionkey)
-		}
-
-
-
+		// if(sectionkey !== tabcontrol.section){
+		// 	handleTabChange(null,0,sectionkey)
+		// }
 	}
 
+	//click
 	const handleTabChange = (event, tabindex) => {
+
 		console.log("handleTabChange",tabMap[tabcontrol.section][tabindex]);
 		console.log(tabcontrol.tab);
+		debugger
 		tabcontrol.setActiveTab(tabindex);
 		statcontrol.setStats({name:Object.keys(tabMap[tabcontrol.section][tabindex])[0]})
 
@@ -544,8 +562,8 @@ export default function Tabify() {
 				<Tabs
 					// value={friendscontrol.selectedTabIndex}
 					value={tabcontrol.tab}
-					//todo:
-					onChange={(e,v) =>{handleTabChange(e,v)}}
+					//testing: disabled
+					// onChange={(e,v) =>{handleTabChange(e,v)}}
 					className={classes.root}
 					aria-label="simple tabs example"
 					id={'generated-tabs'}
@@ -627,47 +645,52 @@ export default function Tabify() {
 				</Tabs>
 			</AppBar>
 			{/*<a.div style={{...drawerExpandProps}}>*/}
-				<div >
+			<div >
 
-					{/*todo: disabled for now*/}
-					{/*<InfoPanel setInfoBound={gridControl.setInfoBound} setInfoCollapse={setInfoCollapse}/>*/}
+				{/*todo: disabled for now*/}
+				{/*<InfoPanel setInfoBound={gridControl.setInfoBound} setInfoCollapse={setInfoCollapse}/>*/}
 
-					{/*todo: further parameterize to allow for "My Profile" content*/}
-					{mapNum.map((index) =>
-						<TabPanel key={index}   className={'tabs' + index} value={tabcontrol.section} index={index}>
-							{/*testing:*/}
-							{/*{getTabs()}*/}
-							{/*ref={ref}*/}
-							{index === 2 ?
-								<Accordion infoBound={gridControl.infoBound} i={0} setCollapse={gridControl.setCollapse}
-										   collapse={gridControl.collapse}
-										   content={
-											   <div style={{background: 'pink', width: width}}>
-												   <Social />
-											   </div>
-										   }
-								/> : <div style={{marginTop:"4em"}}>
-									&nbsp;
-								</div>
-							}
-						</TabPanel>
-					)}
+				{/*todo: further parameterize to allow for "My Profile" content*/}
+				{mapNum.map((index) =>
+					<TabPanel key={index}   className={'tabs' + index} value={tabcontrol.section} index={index}>
+						{/*testing:*/}
+						{/*{getTabs()}*/}
+						{/*ref={ref}*/}
+						{/*{gridControl.collapse &&*/}
+						{/*<div style={{marginTop:"4em"}}>content</div>*/}
+						{/*}*/}
+						{index === 2 ?
+							<Accordion infoBound={gridControl.infoBound} i={0} setCollapse={gridControl.setCollapse}
+									   collapse={gridControl.collapse}
+									   content={
+										   <div style={{background: 'pink', width: width}}>
+											   <Social />
+										   </div>
+									   }
+							/> : <div>
+								{/*style={{marginTop:"4em"}}*/}
+								{/*&nbsp;*/}
+								{/*	todo: this is where profile content would go when not on social tab OR put next to social above*/}
+							</div>
+						}
+					</TabPanel>
+				)}
 
 
-					{/*<TabPanel   className={'tabs1'} value={tabcontrol.section} index={1}>*/}
-					{/*	{getTabs()}*/}
-					{/*	{*/}
-					{/*		infoCollapse &&*/}
-					{/*		<div id={'handle'} style={{background:'#f53177',height:30,zIndex:500,position:"relative",width:"100%"}}>*/}
-					{/*			<button onClick={() =>{setInfoCollapse(prev => !(prev))}}>expand summary</button>*/}
-					{/*		</div>*/}
-					{/*	}*/}
-					{/*	<InfoPanel setInfoBound={setInfoBound} setInfoCollapse={setInfoCollapse}/>*/}
-					{/*</TabPanel>*/}
-					{/*<TabPanel value={tabcontrol.section} index={2}>*/}
-					{/*	<Social/>*/}
-					{/*</TabPanel>*/}
-				</div>
+				{/*<TabPanel   className={'tabs1'} value={tabcontrol.section} index={1}>*/}
+				{/*	{getTabs()}*/}
+				{/*	{*/}
+				{/*		infoCollapse &&*/}
+				{/*		<div id={'handle'} style={{background:'#f53177',height:30,zIndex:500,position:"relative",width:"100%"}}>*/}
+				{/*			<button onClick={() =>{setInfoCollapse(prev => !(prev))}}>expand summary</button>*/}
+				{/*		</div>*/}
+				{/*	}*/}
+				{/*	<InfoPanel setInfoBound={setInfoBound} setInfoCollapse={setInfoCollapse}/>*/}
+				{/*</TabPanel>*/}
+				{/*<TabPanel value={tabcontrol.section} index={2}>*/}
+				{/*	<Social/>*/}
+				{/*</TabPanel>*/}
+			</div>
 			{/*</a.div>*/}
 		</div>
 	)

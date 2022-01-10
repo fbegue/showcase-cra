@@ -226,11 +226,9 @@ var getTopArtists =  function(req){
 
 //static user methods
 
-var fetchStaticUser =  function(req){
+var myFetch =  function(route,req){
     return new Promise(function(done, fail) {
-
-        //console.log("$user",req);
-        fetch(api_address + '/fetchStaticUser', {
+        fetch(api_address + route, {
             method: 'POST', // *GET, POST, PUT, DELETE, etc.
             mode: 'cors', // no-cors, *cors, same-origin
             headers: {
@@ -243,8 +241,36 @@ var fetchStaticUser =  function(req){
                 //console.log("retrieved: ",res);
                 done(res)
             })
+            .catch(e =>{
+                debugger
+                console.error("myFetch: " + route,e);
+                fail(e)
+            })
     })
 }
+var fetchStaticUser =  function(req){
+    return new Promise(function(done, fail) {
+
+        myFetch('/fetchStaticUser',req)
+            .then(r =>done(r))
+            .catch(e => fail(e))
+
+        //console.log("$user",req);
+    //     fetch(api_address + '/fetchStaticUser', {
+    //         method: 'POST', // *GET, POST, PUT, DELETE, etc.
+    //         mode: 'cors', // no-cors, *cors, same-origin
+    //         headers: {
+    //             'Content-Type': 'application/json'
+    //         },
+    //         body: JSON.stringify(req)
+    //
+    //     }).then(res => res.json())
+    //         .then(function(res){
+    //             //console.log("retrieved: ",res);
+    //             done(res)
+    //         })
+
+})}
 
 var getUserPlaylistFriends =  function(req){
     return new Promise(function(done, fail) {

@@ -40,7 +40,7 @@ import BubbleFamilyGenreChips from "../chips/BubbleFamilyGenreChips";
 import Paper from "@material-ui/core/Paper";
 import {tabMap} from "../../Tabify";
 import FilterListIcon from "@material-ui/icons/FilterList";
-import StackedBarDrill from "../Charts/StackedBarDrill";
+import StackedBarDrill from "../Charts/StackedBarDrill/StackedBarDrill";
 import {BARDATA,BARDRILLDOWNMAP} from "../../storage/withApolloProvider";
 import GenreChipsCompact from "../chips/GenreChipsCompact";
 const useStyles = makeStyles((theme) => ({
@@ -362,12 +362,12 @@ function Social(props) {
 	const [tstate, toggle] = useState(true);
 	return(
 		<div>
-			<div
+			<div id={'social'}
 				style={{
 					//todo: have to set explcit height here?
 					//not undertstanding why it just doesn't adjust to content
 					height: "18.5em",
-					outline: "1px solid orange",
+					outline: "2px solid orange",
 					position: "relative"
 				}}
 			>
@@ -489,7 +489,7 @@ function Social(props) {
 				}
 			</div>
 
-			<div id={'stats'}>
+			<div id={'stats'} style={{outline: "2px solid purple"}} >
 
 				<div style={{"display":"flex",flexDirection:"column"}}>
 					{/*,marginTop:"2em"*/}
