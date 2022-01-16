@@ -14,13 +14,13 @@ tables["spotifyusers"] = [];
 tables["users"] = {};
 
 //todo: cheat init user
-tables["users"]["dacandyman01"] = {
-	artists: [],
-	//artists from albums
-	albums:  [],
-	tracks:[],
-	node:[]
-}
+// tables["users"]["dacandyman01"] = {
+// 	artists: [],
+// 	//artists from albums
+// 	albums:  [],
+// 	tracks:[],
+// 	node:[]
+// }
 
 //testing: a user which is just the system that holds all non-user sourced selections?
 //these will be specifically named collections which we need to maintain (not just filter on b/c they are tables)

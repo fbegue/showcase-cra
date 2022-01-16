@@ -185,9 +185,11 @@ function Social(props) {
 	//idea is: take all MY related_users and filter out ones that are already friends
 	//then append to the end of that list the rest of the users, so my suggestions appear before the rest of the user catalog
 	useEffect(() => {
-		var relatedNotFriends = globalUI.user.related_users.filter(testQuery).filter(r =>{return !(r.friend)})
-		var withAllUsers = _.uniqBy(relatedNotFriends.concat(globalState.spotifyusers),'id')
-		set(withAllUsers)
+		var relatedNotFriends = globalUI.user?.related_users?.filter(testQuery).filter(r =>{return !(r.friend)}) || []
+		// var relatedNotFriends = globalUI.user.related_users.filter(testQuery).filter(r =>{return !(r.friend)})
+		//todo:
+		//var withAllUsers = _.uniqBy(relatedNotFriends.concat(globalState.spotifyusers),'id')
+		set(relatedNotFriends)
 	}, [query,globalUI.user])
 
 
@@ -359,6 +361,17 @@ function Social(props) {
 	const chipFamilies = useReactiveVar(CHIPFAMILIES);
 	const chipGenres = useReactiveVar(CHIPGENRES);
 
+	//see todo: alright fuck this bullshit in StackedBarDrill.js
+	var getMargin = () =>{
+		var numbars = barData[0] ? barData[0].data.length:1
+		//console.log("numbars",numbars);
+		switch (numbars) {
+			case 1:return '0em'//120
+			case 2:return '-5em'//440
+			//default:return 120
+		}
+	}
+
 	const [tstate, toggle] = useState(true);
 	return(
 		<div>
@@ -412,11 +425,12 @@ function Social(props) {
 										<div style={{display:"flex",flexDirection:"row"}}>
 											{/*	//	todo: why was this 480px? it covers stats panel beside it*/}
 											<div style={{display:"flex", flexWrap:"wrap",width:"13em"}}>
-												<FriendsDisplay onClick={selectUser} users={globalUI.user.related_users.filter(r =>{return r.friend})}/>
+												<FriendsDisplay onClick={selectUser} users={globalUI.user?.related_users?.filter(r =>{return r.friend}) || []}/>
 											</div>
 										</div>
 									</div>
 
+									{/*{globalState['spotifyusers'].length > 0 &&*/}
 									{globalState['spotifyusers'].length > 0 &&
 									//style={{marginTop:"1em"}}
 									<div>
@@ -493,13 +507,15 @@ function Social(props) {
 
 				<div style={{"display":"flex",flexDirection:"column"}}>
 					{/*,marginTop:"2em"*/}
-					<div style={{"padding":"5px","zIndex":"5","flexGrow":"1","overflowY":"auto","overflowX":"hidden",height:"7.3em","minWidth":"7em"}}>
-						<GenreChipsCompact families={chipFamilies}  genres={chipGenres} pieData={barData || []}  genresDisabled={false} occurred={false} clearable={false} flexDirection={'row'}/>
-					</div>
+
 					<div>
 						{barData.length > 0  &&
 						<StackedBarDrill barData={barData} barDrillMap={barDrillMap}/>
 						}
+					</div>
+					<div style={{"padding":"5px","zIndex":"5","flexGrow":"1","overflowY":"auto","overflowX":"hidden",
+						height:"7.3em","minWidth":"7em",marginTop:getMargin()}}>
+						<GenreChipsCompact families={chipFamilies}  genres={chipGenres} pieData={barData || []}  genresDisabled={false} occurred={false} clearable={false} flexDirection={'row'}/>
 					</div>
 					</div>
 

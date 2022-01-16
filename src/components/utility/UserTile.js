@@ -1,5 +1,6 @@
 import React, {} from 'react';
 import {Button} from "@material-ui/core"
+import {getAvatarSRC} from '../../components/Social/AvatarGenreator'
 function UserTile(props) {
 
 	const getInvite = (item) =>{
@@ -28,7 +29,8 @@ function UserTile(props) {
 				{/* width="150px" height="150px"*/}
 				{/*114px | 80px*/}
 				{/*testing: had this as img attrs but why?*/}
-				<img   style={{width:props.size[0], height:props.size[1]}} src={props.item.images[0] && props.item.images[0].url ? props.item.images[0].url:'https://via.placeholder.com/150?text=?'}
+				<img   style={{width:props.size[0], height:props.size[1]}}
+					   src={getAvatarSRC(props.item)}
 					  onError={(e)=>{e.target.onerror = null; e.target.src="https://via.placeholder.com/150?text=?"}}/>
 			</div>
 			<div style={{background:"rgb(128 128 128 / .7)",color:"white",position:"absolute",width:"100%"}}>

@@ -17,6 +17,8 @@ import { createContainer } from "unstated-next"
 function useControl(initialState = 0) {
     let [id, _setId] = useState(null);
     let [play, _togglePlay] = useState(false);
+    let [playerVisible, _setPlayerVisible] = useState(false);
+    let setPlayerVisible = (playerVisible) => _setPlayerVisible(playerVisible)
 
     //testing: just ohio for now
     var states = {"OH":[
@@ -37,8 +39,9 @@ function useControl(initialState = 0) {
     // let [startDate, setStartDate] = useState(new Date());
     let [startDate, setStartDate] = useState(DateTime.now());
     //testing:
-    let [endDate, setEndDate] = useState(null);
-    // let [endDate, setEndDate] = useState(new Date().addDays(30));
+    //let [endDate, setEndDate] = useState(null);
+    var thirty = DateTime.fromJSDate( new Date().addDays(30))
+    let [endDate, setEndDate] = useState(thirty);
 
     let togglePlay = (play) => _togglePlay(play)
     let setId = (id) => _setId(id);
@@ -70,7 +73,7 @@ function useControl(initialState = 0) {
     let mapArtist = {0:"exact",1:"off",2:"related"}
     let rmapArtist = {"exact":0,"off":1,"related":2}
     return { play,id, togglePlay, setId,metro,selectMetro,playArtist,setPlayArtist,
-        startDate,endDate,setStartDate,setEndDate,
+        startDate,endDate,setStartDate,setEndDate,setPlayerVisible,playerVisible,
         genreSens,setGenreSens, artistSens, setArtistSens,map,rmap,mapArtist,rmapArtist,
         dataLoaded,setDataLoaded}
 }

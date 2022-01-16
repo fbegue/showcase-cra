@@ -259,10 +259,16 @@ function StackedBarDrill(props) {
 		})
 	}
 
+	//todo: alright fuck this bullshit (reduce unneeded space taken up for 1,2 bars)
+	//when (2) is 15em, charts just fit together, but there's still extra space
+	//so make it shorter right? but then it scrunches them together UNLESS I force a height
+	//on the div that this is all contained in, which is non-helpful.
+	//tried to POC adjusting outer height w/ this one, but that scrunched too for seemingly no reason
 	var getHeight = () =>{
 		var numbars = props.barData[0].data.length;
 		//console.log("numbars",numbars);
 		switch (numbars) {
+			//change this to 5em? sorry that'll fuck up the 15em????
 			case 1:return '10em'//120
 			case 2:return '15em'//440
 			//default:return 120
@@ -275,7 +281,8 @@ function StackedBarDrill(props) {
 				<HighchartsReact  ref={elementRef} highcharts={Highcharts}
 								  allowChartUpdate={false}
 								  containerProps={{ style: { height: getHeight() } }}
-					// options={{...config,series:[],chart:{...config.chart,height:getHeight()}}} />
+								// same issue
+								// containerProps={{ style: { height: props.barData[0].data.length === 1 ? "5em":"15em"} }}
 								  options={{...config,series:[]}} />
 			</div>
 

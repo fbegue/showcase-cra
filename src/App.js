@@ -6,7 +6,6 @@ import RedirectPage from './RedirectPage';
 // import 'brace/mode/json';
 // import 'brace/theme/monokai';
 import Dispatch from './api/Dispatch'
-import Player,{} from './components/Player'
 import Profile from './components/Profile'
 import Tabify from './Tabify'
 // import Stats from "./components/Stats";
@@ -308,7 +307,9 @@ function App(props) {
                         <div style={{zIndex:20}}>
                             <FloatingActionButton icon={
                                 //src: https://v4.mui.com/components/badges/
-                                <Badge color="secondary" max={999} badgeContent={events.length}
+                                <Badge color="secondary" max={999}
+                                        badgeContent={events.length}
+                                       // badgeContent={globalUI.user.display_name}
                                        anchorOrigin={{
                                            vertical: 'bottom',
                                            horizontal: 'right',

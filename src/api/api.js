@@ -226,27 +226,33 @@ var getTopArtists =  function(req){
 
 //static user methods
 
-var myFetch =  function(route,req){
-    return new Promise(function(done, fail) {
-        fetch(api_address + route, {
+var myFetch =  async function(route,req){
+   let res = null;
+    try{
+        res = await fetch(api_address + route, {
             method: 'POST', // *GET, POST, PUT, DELETE, etc.
             mode: 'cors', // no-cors, *cors, same-origin
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(req)
-
-        }).then(res => res.json())
-            .then(function(res){
-                //console.log("retrieved: ",res);
-                done(res)
-            })
-            .catch(e =>{
-                debugger
-                console.error("myFetch: " + route,e);
-                fail(e)
-            })
-    })
+        })
+        //testing: think I was forgetting to do proper error handling in back
+        // like: res.status(500).send(err) - without which, on errors the res.json() will always fail
+        if(res.status === 200){
+            let result = await res.json()
+            return result
+        }else{
+            let error = await res.json()
+            throw error
+        }
+    }
+    catch(e){
+        console.error("myFetch: " + route,e);
+        console.log(res);
+        debugger;
+        throw e
+    }
 }
 var fetchStaticUser =  function(req){
     return new Promise(function(done, fail) {

@@ -127,7 +127,9 @@ Object.keys(familyColors).forEach((k,i,arr) =>{
 			//color of chip
 			backgroundColor:familyColors[k],
 			// backgroundColor:'orange',
-			borderColor:'black'}
+			borderRadius: "10px",
+			border:" 1px solid #dbd0d0",
+		}
 	}
 		//todo: this just isn't the way to go about this
 		//the values are right, but only fucking clicking on the element fixes the render,

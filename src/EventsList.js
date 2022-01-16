@@ -110,7 +110,7 @@ function EventsList(props) {
 	//const [globalState, globalDispatch] = useContext(Context);
 	const globalUI = useReactiveVar(GLOBAL_UI_VAR);
 	const events= useReactiveVar(EVENTS_VAR);
-	console.log(comp + " events",events);
+	//console.log(comp + " events",events);
 	//testing: after applying this filter, the events that were left couldn't be expanded?
 	//no error, just not there. didn't really investigate...
 
@@ -780,9 +780,10 @@ function EventsList(props) {
 										{/*<div style={{color:"#0055ff"}}>{events.filter(EventControlsFilter).length} events </div>*/}
 										<div style={{alignSelf:"flex-end" }}> found in:</div>
 									</div>
-									<div style={{background:'#80808026',display:"flex",flexDirection:"column",maxWidth:"10em"}}>
-										<div>{getTitle()}</div>
-										<div>{getDate()}</div>
+									<div style={{display:"flex",flexDirection:"column",maxWidth:"10em"}}>
+										<div style={{background:'#80808026'}}>{getTitle()}</div>
+										<div style={{background:'#80808026'}}>{getDate()}</div>
+
 									</div>
 								</div>
 

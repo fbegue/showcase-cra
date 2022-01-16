@@ -396,7 +396,7 @@ function ContextStats(props) {
 
 	return(
 		<div>
-			<div id={'test1'}>
+			<div id={'context-stats'}>
 				{/*note: floating filter buttons*/}
 				<div>
 					{/*<button*/}
@@ -614,7 +614,7 @@ function ContextStats(props) {
 
 			</div>
 
-			{/*note: drawer content*/}
+			<div  id={'artist-detail-drawer'}>
 			<Drawer
 				open={gridControl.tileFilterOpen}
 				onClose={() => {}}
@@ -685,7 +685,9 @@ function ContextStats(props) {
 
 			</Drawer>
 
+
 			<AnimatedHeightDrawer/>
+			</div>
 
 			{/*}*/}
 

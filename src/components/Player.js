@@ -9,7 +9,7 @@ import RotateSpring from "./springs/RotateSpring";
 import InputIcon from "@material-ui/icons/Input";
 import './Player.css'
 import CustomizedInputBase from "./utility/CustomizedInputBase";
-import FriendsDisplay from "./Social/FriendsDisplay";
+
 import Popper from "@material-ui/core/Popper";
 import styles from "./Social/Social.tiles.module.css";
 import UserTile from "./utility/UserTile";
@@ -24,9 +24,26 @@ function Main(props) {
 	// var token = null;
 	//var token = "BQBOHZzUm9289ptWT1vq3Lz7xn5c1V2mW7jpF2XiI0ULLm1viCwnhZD5eAHX4Xr4U5Y1I4lJGXAe6eDFoep-2P63q293KXlfppL8q0QiRuqsXSp2fKTb0mVLKCjrzYneH0pmm2uhluhNQWH3MW0SqVjBxAHq0T7ut8nkJ_7BXPWI96wXpq0cCP6b1ZOvQVR-6pqAzw2-xJN7BSPdHfp9avt1rncpQdMAd0rNc1ypP62qFmvTDNCCjKHiltFZG71wygRbLxf7XjZiyCOTHcZEihebLcI"
 
-	//reconcile external togglePlay trigger
+
+
 	function callback(u){
 		console.log("player update callback",u);
+
+		//todo: prevent player from showing if user doesn't have premium
+		//for now just hide the player if ANYTHING goes wrong
+
+		//todo: UPDATE: there's an undocumented/only provided by my lib field called 'product'
+		//https://github.com/thelinmichael/spotify-web-api-node
+		//either set to open or premium
+
+		//note: no error = '', not a falsely value
+		// if(u.error === 'This functionality is restricted to premium users only'){
+		if(u.error !== ''){
+			control.setPlayerVisible(false)
+		}else{
+			control.setPlayerVisible(true)
+		}
+		//reconcile external togglePlay trigger
 
 		//if the player isn't playing, but it has a track loaded, toggle play to match
 		if(!(u.isPlaying) ){
@@ -116,6 +133,17 @@ function Main(props) {
 		}
 
 	}, [pstate])
+
+	//todo: prevent player from showing if user doesn't have premium
+	//testing: hide player on load if it outputs error (no premium = creates comp w/ class _ErrorRSWP)
+	// const [visible, setVisible] = useState(true)
+	// useEffect(() => {
+	//
+	// 	console.log("_ErrorRSWP");
+	// 	if(document.getElementsByClassName('_ErrorRSWP').length === 1){
+	// 		setVisible(false)
+	// 	}
+	// }, [])
 
 
 	return(params ?

@@ -151,10 +151,10 @@ function AnimatedHeightDrawer(props) {
 
 	const drawerProps = useSpring({
 		// top: show ? 200 : 0,
-		position: "absolute",
+		position: "relative",
 		left: 0,
 		right:0,
-		bottom: 10,
+		// bottom: 10,
 		backgroundColor: "#808080",
 		//note: spring doesn't do auto, so you need to calculate it
 		//note: mixing bounds.height (integer) w/ string measures (em) throws:
@@ -178,7 +178,7 @@ function AnimatedHeightDrawer(props) {
 
 	return(
 		<div>
-			<div id={'drawer'}>
+			<div>
 						<a.div  style={{...drawerProps}}>
 							<div ref={ref}>{
 								tileSelectControl.tile?

@@ -816,7 +816,7 @@ function useProduceData(){
 
 		console.log("useProduceData",statcontrol.stats.name);
 		//console.log("guest",friendscontrol.guest);
-		friendscontrol.guest.id ? console.log("guest:",friendscontrol.guest.id):{};
+		friendscontrol.guest ? console.log("guest:",friendscontrol.guest.id):{};
 		//console.log("tables",tables);
 
 		//set data pointer based on current tab

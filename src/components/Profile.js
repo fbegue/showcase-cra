@@ -10,6 +10,7 @@ import logo from "../assets/sound_found.png";
 import logo_icon from "../assets/sound_found_logo_icon.png";
 import Player from "./Player";
 import {Control} from "../index";
+import {getAvatarSRC} from "./Social/AvatarGenreator";
 
 
 // console.log("$profile",window.location.host);
@@ -19,7 +20,10 @@ if(window.location.host === "soundfound.io" ){
 }else{
 	api_address = "http://localhost:8888"
 }
-//let api_address = "https://api.soundfound.io"
+
+// console.log("FORCING api_address = https://api.soundfound.io");
+// api_address = "https://api.soundfound.io"
+
 // let api_address = "http://localhost:8888"
 let redirect_address = 'https://soundfound.io'
 //const redirect_address = "https://master.d267e964bph18g.amplifyapp.com"
@@ -149,10 +153,10 @@ function Profile(props) {
 						<div style={{width:"4em"}}><img style={{width: "inherit"}} src={logo}/> </div>
 					}
 
-
-					{shrink ?
+					{/*todo: disabled for now*/}
+					{shrink && false ?
 						<div style={{marginLeft:"1em",height:"2em",position:"relative",top:"-5px"}}>
-							<img src={globalUI.user.images[0].url} style={{width: 50, borderRadius: '50%'}}/>
+							<img src={getAvatarSRC(globalUI.user)} style={{width: 50, borderRadius: '50%'}}/>
 						</div>
 						:
 						<div style={{display:"flex"}}>
@@ -163,14 +167,13 @@ function Profile(props) {
 								</Typography>
 							</div>
 							<div style={{marginLeft:"1em",height:"2em"}}>
-								<img src={globalUI.user.images[0].url} style={{width: 50, borderRadius: '50%'}}/>
+								<img src={getAvatarSRC(globalUI.user)} style={{width: 50, borderRadius: '50%'}}/>
 							</div>
 						</div>
 					}
 
-					<div>
-
-								<Player token={globalUI.access_token} id={control.id} play={control.play}/>
+					<div style={{visibility:control.playerVisible ? 'visible':'hidden'}}>
+						<Player token={globalUI.access_token} id={control.id} play={control.play}/>
 
 					</div>
 

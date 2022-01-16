@@ -7,7 +7,7 @@ export default function Pagination(props){
 //source: https://v4.mui.com/components/pagination/#basic-pagination
 
 	var comp = "Pagination |"
-	console.log(comp,props);
+	//console.log(comp,props);
 
 	return(
 		<div style={{display:'flex',flexDirection:"row",marginTop:"-1em",marginLeft:"-1em",width:"7em"}}>

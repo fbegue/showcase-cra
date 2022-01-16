@@ -457,6 +457,7 @@ const Reducer = (state, action) => {
 				// console.log("$",tables);
 				// console.log("$",action.user.id);
 				// console.log("$",tables["users"][action.user.id]);
+
 				tables["users"][action.user.id][action.context] = tables["users"][action.user.id][action.context].concat(action.payload.artists)
 
 				var key = action.user.id + '_' + action.context;

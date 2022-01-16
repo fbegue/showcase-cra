@@ -44,11 +44,11 @@ let initialState = {
 		}
 	],
 	//testing:
-	dacandyman01_artists:[],
-	dacandyman01_playlists:[],
-	dacandyman01_tracks:[],
-	dacandyman01_albums:[],
-	dacandyman01_playlists_stats:null,
+	// dacandyman01_artists:[],
+	// dacandyman01_playlists:[],
+	// dacandyman01_tracks:[],
+	// dacandyman01_albums:[],
+	// dacandyman01_playlists_stats:null,
 	users:[],
 	spotifyusers:[],
 	error: null
@@ -56,6 +56,7 @@ let initialState = {
 
 var types = ["artists","playlists","tracks","albums"]
 export function initUser(user){
+	// debugger
 	tables['users'][user.id] = {artists:[],playlists:[],tracks:[],albums:[]};
 	types.forEach(t =>{
 		initialState[user.id + "_" + t] = []

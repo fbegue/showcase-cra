@@ -28,13 +28,16 @@ function Dispatch(props) {
 			//figure out if we've seen this user before - if so this'll do a quick fetch, if not we're going to resolve and then store
 			//note: param name = friend, b/c mostly used to fetch them
 			var me = await api.fetchStaticUser({auth:globalUI,friend: globalUI.user})
+			globalUI.user.related_users = me.related_users
 
-			//testing: if this is a new user, our globalUI.user will currently only be spotify data
-			//so need to init it here
-			!(globalUI.user.related_users) ? globalUI.user.related_users = me.related_users:{};
+			//todo go thru init user process (debug in Reducer.js to see other bits laying about)
+			//mainUser,tables.users?,guest
+			initUser(globalUI.user);
 
 			// var artistsPay = [];
 			// artistsPay = artistsPay.concat(r[0]).concat(r[1].artists);
+
+			globalDispatch({type: 'init', payload:me.tracks,user: globalUI.user,context:'tracks'});
 
 			globalDispatch({type: 'init', payload:{artists:me.artists.artists,stats:null},user: globalUI.user,context:'artists'});
 
@@ -72,18 +75,16 @@ function Dispatch(props) {
 			// var r = await Promise.all(userProms)
 
 
-			//todo: we're fetching this twice
-			//testing: tracks as a separate step from fetchuser
+			//testing: getSavedTracks - but  not recentlyPlayed - as a separate step from fetchuser
 			var userProms2 = [];
-			userProms2.push(api.getRecentlyPlayedTracks(req))
+			//userProms2.push(api.getRecentlyPlayedTracks(req))
 			userProms2.push(api.getSavedTracks(req))
 			let r2 = await Promise.all(userProms2)
 
 			var tracksPay = {tracks:[]};
-
-			//todo: what is this getRecentlyPlayedTracks = {tracks:[],artists:[]} ARTISTS here?
-			tracksPay.tracks = tracksPay.tracks.concat(r2[0].tracks);tracksPay.tracks = tracksPay.tracks.concat(r2[1].tracks);
-			tracksPay.stats = r2[1].stats
+			tracksPay.tracks = tracksPay.tracks.concat(r2[0].tracks);
+			//tracksPay.tracks = tracksPay.tracks.concat(r2[1].tracks);
+			tracksPay.stats = r2[0].stats
 
 			globalDispatch({type: 'init', payload:tracksPay,user: globalUI.user,context:'tracks'});
 
@@ -131,7 +132,7 @@ function Dispatch(props) {
 				//testing: Dan only
 				 //.filter(r =>{return r.id === "123028477"})
 				//.filter(r =>{return r.id !== "123028477"})
-				.filter(r =>{return r.id === "123028477#2"})
+				// .filter(r =>{return r.id === "123028477#2"})
 			 // .filter(r =>{return r.display_name !== "Dustin Reinhart"})
 				.forEach(f =>{
 					//testing: using example response on fetchStaticUser
@@ -182,9 +183,8 @@ function Dispatch(props) {
 	}
 
 	useEffect(() => {
-		//todo: somehow still don't understand how to call functional code w/out linkage to fucking render state
 
-		if(globalState[globalUI.user.id + "_artists"].length === 0) {
+		if( !(globalState[globalUI.user.id + "_artists"]) || globalState[globalUI.user.id + "_artists"].length === 0) {
 			//setCount(1)
 			asyncDispatch()
 				.then(r => {
