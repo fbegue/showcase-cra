@@ -45,6 +45,8 @@ function Main(props) {
 		}
 		//reconcile external togglePlay trigger
 
+		//testing: force track
+
 		//if the player isn't playing, but it has a track loaded, toggle play to match
 		if(!(u.isPlaying) ){
 			if(control.play && props.id){
@@ -164,7 +166,7 @@ function Main(props) {
 			</animated.div>
 			<animated.div style={drawerSpringStyle}>
 				<div className="drawer">
-					<SpotifyPlayer token={params.access_token} uris={props.id ? ['spotify:track:' + props.id]:[]} callback={callback} play={props.play}
+					<SpotifyPlayer token={params.access_token} uris={props.id ? ['spotify:track:' + props.id]:['spotify:track:16jipzPjf6QePjMHaL4mzF']} callback={callback} play={props.play}
 								   //testing: not working?
 								   magnifySliderOnHover={true}/>
 				</div>

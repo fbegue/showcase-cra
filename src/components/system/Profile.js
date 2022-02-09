@@ -21,8 +21,8 @@ if(window.location.host === "soundfound.io" ){
 	api_address = "http://localhost:8888"
 }
 
-// console.log("FORCING api_address = https://api.soundfound.io");
-// api_address = "https://api.soundfound.io"
+//console.log("FORCING api_address = https://api.soundfound.io");
+//api_address = "https://api.soundfound.io"
 
 // let api_address = "http://localhost:8888"
 let redirect_address = 'https://soundfound.io'
@@ -104,31 +104,16 @@ function Profile(props) {
 	const [shrink, setShrink] = useState(false);
 
 
-
-	useEffect(() => {
-		//console.log("resizeHeaderOnScroll",props.scrollTop);
-
-		// const distanceY =  props.scrollTop,
-		// 	shrinkOn = 1,
-		// 	headerEl = document.getElementById("profile-header");
-		//console.log("resizeHeaderOnScroll",distanceY);
-		//  if(distanceY < 400) {
-		// 	//console.log("shrinkOff");
-		// 	headerEl.classList.remove("smaller");
-		// 	setShrink(false)
-		// }else{
-		// 	// console.log("shrinkOn");
-		// 	 headerEl.classList.add("smaller");
-		// 	 setShrink(true)
-		//  }
-		if(props.scrollTop) {
-			//console.log("shrinkOff");
-			setShrink(false)
-		}else{
-			setShrink(true)
-		}
-
-	}, [props.scrollTop])
+	//todo: disabled (POC that doens't work on mobile)
+	// useEffect(() => {
+	// 	if(props.scrollTop) {
+	// 		//console.log("shrinkOff");
+	// 		setShrink(false)
+	// 	}else{
+	// 		setShrink(true)
+	// 	}
+	//
+	// }, [props.scrollTop])
 
 	return(
 		<div id={'profile-header'}>
@@ -154,7 +139,7 @@ function Profile(props) {
 					}
 
 					{/*todo: disabled for now*/}
-					{shrink && false ?
+					{shrink ?
 						<div style={{marginLeft:"1em",height:"2em",position:"relative",top:"-5px"}}>
 							<img src={getAvatarSRC(globalUI.user)} style={{width: 50, borderRadius: '50%'}}/>
 						</div>

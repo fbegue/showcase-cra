@@ -1,6 +1,6 @@
 import React, {} from 'react';
 import { VictoryStack,VictoryArea } from 'victory';
-import {families,familyColors} from "../families"
+import {families,familyColors} from "../util/families"
 
 //testing: (Tabify)
 //<Home data={state[user.id + "_artists"].filter(i =>{return i.term})} />

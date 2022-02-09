@@ -1,7 +1,7 @@
 //testing:
 //todo: something about the content of ContextStats (but not EventsList?) causes the gesture space to be wacky
 import ContextStats from "./components/ContextStats";
-import EventsList from "./EventsList";
+import EventsList from "./components/Events/EventsList";
 import Stats from "./components/Stats";
 import React, {useRef,useState} from "react";
 import useMeasure from "react-use-measure";
