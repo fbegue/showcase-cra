@@ -1,6 +1,6 @@
 import React from 'react';
-import api from './api/api'
-import { GLOBAL_UI_VAR } from './storage/withApolloProvider';
+import api from '../../api/api'
+import { GLOBAL_UI_VAR } from '../../storage/withApolloProvider';
 //source:
 //https://dev.to/myogeshchavan97/how-to-create-a-spotify-music-search-app-in-react-328m
 //repo:

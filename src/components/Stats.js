@@ -17,7 +17,7 @@ import CloudIcon from "@material-ui/icons/Cloud";
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Divider from '@material-ui/core/Divider';
-import {families as systemFamilies,familyColors} from '../families'
+import {families as systemFamilies,familyColors} from '../util/families'
 //FriendsControl
 
 import {Control, TabControl, StatControl, GridControl, TileSelectControl} from "../index";
@@ -36,7 +36,7 @@ import DisplayDetailRow from './tiles/DisplayDetailRow'
 
 //todo: update spring list implementation
 // import GenresDisplayVertical from "./GenresDisplayVertical";
-import BubbleChart from "./BubbleChart";
+import BubbleChart from "./Charts/BubbleChart";
 import './Stats.css'
 import {FormControl, FormControlLabel, Radio, RadioGroup, Select} from "@material-ui/core";
 //testing:

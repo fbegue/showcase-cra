@@ -6,7 +6,7 @@ import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import PropTypes from 'prop-types';
 import _ from 'lodash'
 //import {PieControl} from "../../index";
-import {familyColors,families as systemFamilies} from '../../families'
+import {familyColors,families as systemFamilies} from '../../util/families'
 import {FriendsControl,Control} from "../../index";
 import makeChipStyle from "./makeChipStyle";
 //import OVERFLOW_VAR from '../../storage/withApolloProvider'

@@ -1,16 +1,16 @@
 import React, {useContext, useEffect,useState} from 'react';
-import { GLOBAL_UI_VAR } from '../storage/withApolloProvider';
+import { GLOBAL_UI_VAR } from '../../storage/withApolloProvider';
 import {useReactiveVar} from "@apollo/react-hooks";
 import Button from '@material-ui/core/Button';
 import Typography from "@material-ui/core/Typography";
-import api from "../api/api";
-import CustomizedInputBase from "./utility/CustomizedInputBase";
-import {Context} from "../storage/Store";
-import logo from "../assets/sound_found.png";
-import logo_icon from "../assets/sound_found_logo_icon.png";
+// import api from "../../api/api";
+// import CustomizedInputBase from "../utility/CustomizedInputBase";
+import {Context} from "../../storage/Store";
+import logo from "../../assets/sound_found.png";
+import logo_icon from "../../assets/sound_found_logo_icon.png";
 import Player from "./Player";
-import {Control} from "../index";
-import {getAvatarSRC} from "./Social/AvatarGenreator";
+import {Control} from "../../index";
+import {getAvatarSRC} from "../Social/AvatarGenreator";
 
 
 // console.log("$profile",window.location.host);

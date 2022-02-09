@@ -2,7 +2,7 @@ import React from 'react';
 import Badge from '@material-ui/core/Badge';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
-import {familyColors} from '../../families'
+import {familyColors} from '../../util/families'
 export default function Dot(props) {
 	//todo: fudging dynamic matUI rules...
 	//reason this is outside usually...?

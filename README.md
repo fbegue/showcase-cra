@@ -7,6 +7,10 @@
 
 After testing local/local:
 
+UPDATE: the RDS tables won't have populated artist genres and such unless
+it's forced to run thru the users that need said artist/genres, so have to 
+completely remove and rebuild users from scratch I think
+
 - copy sql DB changes
 - point local POC towards RDS
     - run insertStatic / fetch_metro_events locally

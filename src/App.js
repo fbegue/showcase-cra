@@ -1,13 +1,14 @@
 
 import React, {useState, useEffect, useRef, useContext} from 'react';
-import RedirectPage from './RedirectPage';
+import RedirectPage from './components/system/RedirectPage';
 
 //todo: wtf is this shit?
 // import 'brace/mode/json';
 // import 'brace/theme/monokai';
 import Dispatch from './api/Dispatch'
-import Profile from './components/Profile'
+import Profile from './components/system/Profile'
 import Tabify from './Tabify'
+import ErrorBoundary from "./util/ErrorBoundary";
 // import Stats from "./components/Stats";
 
 import Store, {Context} from './storage/Store'
@@ -277,6 +278,7 @@ function App(props) {
     const ref = useRef()
     const isVisible = useOnScreen(ref)
     return (
+        <ErrorBoundary>
         <MuiThemeProvider theme={muiTheme}>
             <Store>
                 {globalUI.user && <Dispatch/>}
@@ -326,7 +328,8 @@ function App(props) {
                     <div  style={{position: "sticky",top: "0px", "paddingTop":"0.5em","paddingBottom":"0.5em",
                         borderBottom: "1px solid black", zIndex: "20",display:'flex',background:"#f0f0f0"}}>
                         <div>
-                            <Profile version={pjson.version} scrollTop={isVisible}/>
+                            {/* scrollTop={isVisible}*/}
+                            <Profile version={pjson.version}/>
                         </div>
                         {/*<div><ControlTest/></div>*/}
                         {/*<input value={code} onChange={(event) =>{setCode(event.target.value)}}  />*/}
@@ -394,6 +397,7 @@ function App(props) {
                 </animated.div>
             </Store>
         </MuiThemeProvider>
+            </ErrorBoundary>
     );
 }
 

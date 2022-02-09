@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {GridControl} from "../index";
+import {GridControl} from "../../index";
 
 function ControlTest(props) {
 

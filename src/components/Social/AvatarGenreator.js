@@ -22,12 +22,12 @@ var generator = function(name){
 }
 
 exports.getAvatarSRC = function(user) {
-	var src = null;
-
-	if (user.images[0] && user.images[0].url) {
+	var src = 'https://via.placeholder.com/150?text=+'
+	if (user?.images?.[0]?.url) {
 		src = user.images[0].url
-	} else {
+	} else if(user){
 		src = 'https://via.placeholder.com/150?text=' + generator(user.display_name)
 	}
-	return src
+
+return src
 }

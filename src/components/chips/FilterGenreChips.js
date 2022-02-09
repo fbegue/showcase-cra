@@ -3,7 +3,7 @@ import React, {useState,useEffect} from 'react';
 import { makeStyles } from "@material-ui/core/styles";
 import Chip from "@material-ui/core/Chip";
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
-import {familyColors,families as systemFamilies} from '../../families'
+import {familyColors,families as systemFamilies} from '../../util/families'
 import {FriendsControl,Control} from "../../index";
 const useStyles = makeStyles({
 	chip: {

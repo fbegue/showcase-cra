@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-expressions */
 import React, {useState,useEffect,useRef} from 'react';
 //import React from "react";
 import ReactDOM from "react-dom";
@@ -12,6 +13,8 @@ import {useReactiveVar} from "@apollo/react-hooks";
 // import {BARDATA,BARDRILLDOWNMAP} from "../../storage/withApolloProvider";
 import {exBarData, exBarDataUpdate, exDrillMap} from "./exampleGenreStackedBarData";
 import {FriendsControl} from "../../../index";
+import {GLOBAL_UI_VAR} from "../../../storage/withApolloProvider";
+import {getAvatarSRC} from "../../Social/AvatarGenreator";
 HC_more(Highcharts)
 highcharts3d(Highcharts)
 drilldown(Highcharts)
@@ -28,7 +31,7 @@ var temp = null;
 function StackedBarDrill(props) {
 	var comp = "StackedBarDrill |"
 	//console.log(comp,props.barDrillMap);
-
+	const globalUI = useReactiveVar(GLOBAL_UI_VAR);
 	const elementRef = useRef();
 	if(props.barDrillMap !== {}){temp = props.barDrillMap}
 
@@ -117,11 +120,24 @@ function StackedBarDrill(props) {
 
 	}
 
+	const getUser = (chartInd) =>{
+
+		var userDataEx = props.barData[0].data[chartInd]
+		//if I can't find the user in my fiends, its me.
+		var u = globalUI.user.related_users.filter(r =>{return r.id === userDataEx.id})[0]
+		!(u) ? u = globalUI.user:{};
+		var img = document.createElement('img');
+		img.setAttribute('src',getAvatarSRC(u))
+		img.style.width = "50px";img.style['border-radius'] ="50%"
+		return img.outerHTML
+		//return`<img src="${src}" style={{width: 50, borderRadius: "50%"}}/>`
+	}
 	const config = {
 		chart: {
 			//todo: needs to adjust w/ # of barData users?
 			//height:100,
 			type: 'bar',
+			backgroundColor:'transparent',
 			spacingTop: 0,
 			spacingRight: 0,
 			spacingBottom: 0,
@@ -193,9 +209,10 @@ function StackedBarDrill(props) {
 				formatter:(_this)=>{
 					//testing: _this.value is the index of the bar?
 					//so I could look them up somewhere...
-					var users = ["dacandyman0","123028477#2","TODOTODOTODO"]
+					//var users = ["dacandyman0","123028477#2","TODOTODOTODO"]
 					//console.log("_this",_this.value);
-					return '<span>' + users[_this.value] + '</span>'
+					 //return '<span>' + users[_this.value] + '</span>'
+					return getUser(_this.value)
 				}
 			},
 
@@ -222,19 +239,30 @@ function StackedBarDrill(props) {
 		},
 		plotOptions: {
 			bar: {
-				//reduce space between bars
-				grouping: true,
-				groupPadding:0.5,
+				borderColor:'transparent',
+				borderWidth:1,
+				//todo: trying to understand how this works, but never got far
+				//note: When pointWidth is null, the width is calculated from the pointPadding and groupPadding.
+				//i.e. if it has a value, next two are useless
 				// height of one bar
 				pointWidth:80,
+
+				//reduce space between bars
+				// grouping: true,
+				// groupPadding:0.5,
+
 				//forces full width as percentages,
 				//but this means obviously that 2 subsections w/ same value will have different bar lengths
 				stacking: 'percent',
 				// stacking: 'normal',
+				//NOTE: I'm setting the formatter for the drilldown data when I set the data (util.js)
 				dataLabels: {
 					// value of subsection of bar
 					enabled: true,
-					format: '<b>{point.percentage:.1f}%</b>'
+					// format: '<b>{point.percentage:.1f}%</b>'
+					formatter: function() {
+						return this.series.name
+					}
 				},
 			}
 		},

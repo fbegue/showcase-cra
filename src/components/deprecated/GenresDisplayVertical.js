@@ -2,7 +2,7 @@ import React, {useContext, useEffect, useState} from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
 import { useTransition, animated } from "react-spring";
- import {Context} from "../storage/Store";
+ import {Context} from "../../storage/Store";
 const drawerWidth = "15em";
 
 const styles = theme => ( {

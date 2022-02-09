@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import { useTransition,a} from "react-spring";
-import styles from './ContextStats.tiles.module.css'
+import styles from '../ContextStats.tiles.module.css'
 
 function EventImageFader(props){
 

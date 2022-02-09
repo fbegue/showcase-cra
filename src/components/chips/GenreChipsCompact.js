@@ -6,11 +6,11 @@ import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import PropTypes from 'prop-types';
 import _ from 'lodash'
 //import {PieControl} from "../../index";
-import {familyColors,families as systemFamilies} from '../../families'
+import {familyColors,families as systemFamilies} from '../../util/families'
 import {FriendsControl,Control} from "../../index";
 import makeChipStyle from "./makeChipStyle";
 //import OVERFLOW_VAR from '../../storage/withApolloProvider'
-import {CHIPGENRESCOLORMAP,CHIPGENRESCOMBINEDMAP} from '../../storage/withApolloProvider'
+import {CHIPGENRESCOLORMAP,CHIPGENRESCOMBINEDMAP,CHIPFAMILIESRANKEDMAP,CHIPGENRESRANKEDMAP} from '../../storage/withApolloProvider'
 import {useReactiveVar} from "@apollo/react-hooks";
 //import MoreChips from "../utility/Menu/MoreChips";
 const useStyles = makeStyles({
@@ -51,13 +51,15 @@ function GenreChipsCompact(props) {
 	let control = Control.useContainer();
 	const chipGenresColorMap = useReactiveVar(CHIPGENRESCOLORMAP)
 	const chipGenresSharedMap= useReactiveVar(CHIPGENRESCOMBINEDMAP)
+	const chipGenresRankedMap = useReactiveVar(CHIPGENRESRANKEDMAP)
+	const chipFamiliesRankedMap= useReactiveVar(CHIPFAMILIESRANKEDMAP)
 	//console.log("$PieChips | props",props);
 	//testing:
 
 	//let pieDataSum = props.pieData.reduce((prev,curr) =>{return {y:prev.y + curr.y}}).y
 	// let pieDataMap = {}; props.pieData.forEach(f =>{pieDataMap[f.name] = f.y;})
 
-	//note: reduce throws error on an empty array
+	//todo: yeah this is broken and abandoned
 	let pieDataMap = {};
 	let pieDataSum = 0;
 
@@ -94,6 +96,8 @@ function GenreChipsCompact(props) {
 
 	var toMap = systemFamilies;
 	toMap = toMap.filter(f =>{return props.families.indexOf(f) !== -1})
+
+
 
 	//console.log("$toMap",toMap);
 	var _genres = [];
@@ -320,6 +324,20 @@ function GenreChipsCompact(props) {
 	function filterOut(fam){
 		return friendscontrol.families.length > 0 ? friendscontrol.families.indexOf(fam) !== -1:true;
 	}
+
+	function sortItems(a1,a2){
+
+		//console.log(this);
+		// console.log(chipFamiliesRankedMap);
+
+		if(this === 'family'){
+			return chipFamiliesRankedMap[a2] -chipFamiliesRankedMap[a1]
+		}else{
+
+			return chipGenresRankedMap[a2.name] - chipGenresRankedMap[a1.name]
+		}
+	}
+
 	return(<div>
 
 		{/*note: not sure how to get flex to respect any sort of height unless you specify it here */}
@@ -328,7 +346,7 @@ function GenreChipsCompact(props) {
 
 		{/*<div ref={visRef}>{isVisible && `Yep, I'm on screen`}</div>*/}
 		<div  style={{display:"flex",flexDirection:props.flexDirection,flexWrap:"wrap"}}>
-			{toMap.filter(filterOut).sort((a1,a2) =>{return  pieDataMap[a2] - pieDataMap[a1]}).map((fam,i) =>
+			{toMap.filter(filterOut).sort(sortItems.bind('family')).map((fam,i) =>
 				<div  key={i} style={{display:"flex"}} onClick={() =>{handleClick(fam)}}>
 					<Chip
 						// className={classes.chip}
@@ -343,7 +361,8 @@ function GenreChipsCompact(props) {
 				</div>
 			)}
 			{/*testing: */}
-			{_genres.sort((a,b) =>{return b.y - a.y}).map((gOb,i) =>
+			{/*{_genres.sort((a,b) =>{return b.y - a.y}).map((gOb,i) =>*/}
+			{_genres.sort(sortItems.bind('genre')).map((gOb,i) =>
 				{
 					return (
 						<div key={i}  ref={refs.current[i]} onClick={() =>{handleGClick(gOb)}}>

@@ -4,7 +4,7 @@ import {Context} from "../../storage/Store";
 import {FriendsControl, StatControl, TabControl} from "../../index";
 import {useReactiveVar} from "@apollo/react-hooks";
 import {GLOBAL_UI_VAR, STATS, TILES} from "../../storage/withApolloProvider";
-import {families as systemFamilies, familyColors, familyIdMap} from "../../families";
+import {families as systemFamilies, familyColors, familyIdMap} from "../families";
 import _ from "lodash";
 import tables from "../../storage/tables";
 const uuid = require('react-uuid')

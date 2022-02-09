@@ -515,7 +515,8 @@ function Social(props) {
 					</div>
 					<div style={{"padding":"5px","zIndex":"5","flexGrow":"1","overflowY":"auto","overflowX":"hidden",
 						height:"7.3em","minWidth":"7em",marginTop:getMargin()}}>
-						<GenreChipsCompact families={chipFamilies}  genres={chipGenres} pieData={barData || []}  genresDisabled={false} occurred={false} clearable={false} flexDirection={'row'}/>
+						<GenreChipsCompact families={chipFamilies}  genres={chipGenres} pieData={barData || []}
+										   genresDisabled={false} occurred={false} clearable={false} flexDirection={'row'}/>
 					</div>
 					</div>
 

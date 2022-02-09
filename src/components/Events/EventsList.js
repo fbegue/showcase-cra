@@ -1,5 +1,10 @@
 /* eslint-disable no-unused-expressions */
 import React, {Component, useContext, useEffect, useState, Suspense} from 'react'
+import api from "../../api/api";
+import {GLOBAL_UI_VAR, EVENTS_VAR, CHIPGENRES, TILES} from "../../storage/withApolloProvider";
+import { StatControl,Control} from "../../index";
+import {familyStyles } from '../../util/families';
+
 import './EventsList.css'
 import { DateTime } from "luxon";
 import List from '@material-ui/core/List'
@@ -11,52 +16,49 @@ import Collapse from '@material-ui/core/Collapse'
 import ExpandLess from '@material-ui/icons/ExpandLess'
 import ExpandMore from '@material-ui/icons/ExpandMore'
 import Typography from '@material-ui/core/Typography';
+import Chip from '@material-ui/core/Chip';
+
+import {useReactiveVar} from "@apollo/react-hooks";
+import { makeStyles } from '@material-ui/core/styles';
+
+import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
+import PauseCircleOutlineIcon from '@material-ui/icons/PauseCircleOutline';
+import spotifyLogo from '../../assets/spotify_logo_large.png'
+
+
+import Map from '../misc/Map';
+import { useSpring, animated } from '@react-spring/web'
+import EventImageFader from "./EventImageFader";
 import TextField from "@material-ui/core/TextField";
 import Snackbar from '@material-ui/core/Snackbar';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
-import Chip from '@material-ui/core/Chip';
+import FilterListIcon from "@material-ui/icons/FilterList";
+
 import Paper from '@material-ui/core/Paper';
 import MusicNoteIcon from '@material-ui/icons/MusicNote';
-import { makeStyles } from '@material-ui/core/styles';
-import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
-import PauseCircleOutlineIcon from '@material-ui/icons/PauseCircleOutline';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
+import ListItemAvatar from '@material-ui/core/ListItemAvatar';
+// import SwipeRight from "./assets/swipe-right.png";
+// import DragHand from "./assets/noun_Drag Hand_230196.png";
+import BubbleFamilyGenreChips from "../chips/BubbleFamilyGenreChips";
+import Avatar from "../Social/Avatar";
+import ApplyPulse from "../springs/ApplyPulse";
+import Switch from '@material-ui/core/Switch';
+import Pagination from "../utility/Pagination";
+import SimplePopover from "../utility/Popover";
+import CreatePlaylist from "./CreatePlaylist";
+import util from "../../util/util";
+import SpringMultiDrop from "../springs/SpringMultiDrop";
+import {useImage} from 'react-image'
 import PlaylistAddIcon from "@material-ui/icons/PlaylistAdd";
 import Button from '@material-ui/core/Button';
-import SliderEvents from './components/Sliders/Slider-Events'
-import SliderEvents2 from './components/Sliders/Slider-Events2'
-import {Context} from "./storage/Store";
-import {familyStyles } from './families';
-import spotifyLogo from './assets/spotify_logo_large.png'
-import songkick_badge_pink from './assets/songkick_badge_pink.png'
-import api from "./api/api";
-import {useReactiveVar} from "@apollo/react-hooks";
-import {GLOBAL_UI_VAR, EVENTS_VAR, CHIPGENRES, TILES} from "./storage/withApolloProvider";
-import { StatControl,Control} from "./index";
-import Map from './components/Map';
-import { useSpring, animated } from '@react-spring/web'
-import EventImageFader from "./components/EventImageFader";
-import OpenInNewIcon from '@material-ui/icons/OpenInNew';
-// import ListItemIcon from '@material-ui/core/ListItemIcon';
-import BubbleFamilyGenreChips from "./components/chips/BubbleFamilyGenreChips";
-import Avatar from "./components/Social/Avatar";
-import {useImage} from 'react-image'
+import SliderEvents from '../Sliders/Slider-Events'
+import SliderEvents2 from '../Sliders/Slider-Events2'
 
-import ListItemAvatar from '@material-ui/core/ListItemAvatar';
-import SwipeRight from "./assets/swipe-right.png";
-import DragHand from "./assets/noun_Drag Hand_230196.png";
-import ApplyPulse from "./components/springs/ApplyPulse";
-import MoreVertIcon from '@material-ui/icons/MoreVert';
-import Switch from '@material-ui/core/Switch';
-import FilterListIcon from "@material-ui/icons/FilterList";
-import Pagination from "./components/utility/Pagination";
-import SimplePopover from "./components/utility/Popover";
-import CreatePlaylist from "./CreatePlaylist";
-import util from "./util/util";
-import SpringMultiDrop from "./components/springs/SpringMultiDrop";
-//import GenreChipsDumb from './components/chips/GenreChipsDumb.js'
-// import './components/utility/CustomScroll/contextStats.scss'
-// import "./components/utility/CustomScroll/FirstComp/customScroll.css";
+//import GenreChipsDumb from '../chips/GenreChipsDumb.js'
+// import '../utility/CustomScroll/contextStats.scss'
+// import "../utility/CustomScroll/FirstComp/customScroll.css";
 // import CustomScroll from "react-custom-scroll";
 
 function ChipsArray_dep(props) {
@@ -337,6 +339,7 @@ function EventsList(props) {
 	const useStyles = makeStyles({
 		root: {
 			right: "-4px !important",
+			top:"-118px !important",
 			position: "relative !important",
 			transform: "none !important"
 		},
@@ -472,25 +475,6 @@ function EventsList(props) {
 							return (
 								// <div key={subOption.id} >{subOption.id}</div>
 								<div key={subOption.id}>
-									{/*todo: move to after ListItemText (but then need to adjust fix css?*/}
-									<ListItemSecondaryAction classes={{root:classes2.root}}>
-										<div style={{position:"relative"}}>
-											{subOption.artist.images && subOption.artist.images.length > 0 &&
-											<animated.div
-												style={opacityArr[i]}
-												// style={{
-												// 	opacity: getSpring(i).to({
-												// 		range: [0, 1],
-												// 		output: [0.5,1],
-												// 	}),
-												// }}
-											>
-												<img style={{height: "5em", width: "5em"}}
-													 src={subOption.artist.images[0].url}></img>
-											</animated.div>
-											}
-										</div>
-									</ListItemSecondaryAction>
 									<ListItemText
 										style={{marginLeft:"2em"}}
 										inset
@@ -518,6 +502,26 @@ function EventsList(props) {
 											</React.Fragment>
 										}
 									/>
+									<ListItemSecondaryAction classes={{root:classes2.root}}>
+										<div style={{position:"relative"}}>
+											{subOption.artist.images && subOption.artist.images.length > 0 &&
+											<animated.div
+												style={opacityArr[i]}
+												// style={{
+												// 	opacity: getSpring(i).to({
+												// 		range: [0, 1],
+												// 		output: [0.5,1],
+												// 	}),
+												// }}
+											>
+												<img style={{height: "5em", width: "5em"}}
+													 src={subOption.artist.images[0].url}></img>
+											</animated.div>
+											}
+										</div>
+									</ListItemSecondaryAction>
+
+
 								</div>
 							);
 						}

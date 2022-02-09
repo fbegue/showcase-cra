@@ -26,14 +26,14 @@ import util from "./util/util";
 import tables from "./storage/tables";
 import _ from "lodash";
 import {Control, FriendsControl, GridControl, StatControl,TabControl} from "./index";
-import DiscreteSlider from "./Slider";
+import DiscreteSlider from "./components/utility/Slider";
 import { GLOBAL_UI_VAR } from './storage/withApolloProvider';
 import {useQuery,useReactiveVar} from "@apollo/react-hooks";
 //testing:
 import Home from './components/Home';
 import TabPanel from './components/utility/CustomTabPanel'
 import Social from "./components/Social/Social";
-import MatTableTreeTest from './components/MatTableTreeTest'
+import MatTableTreeTest from './components/deprecated/MatTableTreeTest'
 import Box from "@material-ui/core/Box";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
@@ -663,7 +663,9 @@ export default function Tabify() {
 							<Accordion infoBound={gridControl.infoBound} i={0} setCollapse={gridControl.setCollapse}
 									   collapse={gridControl.collapse}
 									   content={
-										   <div style={{background: 'pink', width: width}}>
+										   <div style={{
+										     	// background: 'pink',
+											   width: width}}>
 											   <Social />
 										   </div>
 									   }

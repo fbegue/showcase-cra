@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {VictoryLabel, VictoryPie,VictoryContainer} from "victory";
-import {familyColors} from "../../families";
+import {familyColors} from "../../util/families";
 import { Highlighter} from "../../index";
 
 function VictoryPieChart(props) {

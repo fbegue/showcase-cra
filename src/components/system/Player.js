@@ -1,18 +1,19 @@
 /* eslint-disable no-unused-expressions */
 import React, {useEffect,useState} from 'react';
 import SpotifyPlayer from 'react-spotify-web-playback';
-import Drawer from "@material-ui/core/Drawer";
-import {Control} from "../index";
+
+import {Control} from "../../index";
 import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
+import Drawer from "@material-ui/core/Drawer";
 import {a, animated, useSpring} from "react-spring";
-import RotateSpring from "./springs/RotateSpring";
+import RotateSpring from "../springs/RotateSpring";
 import InputIcon from "@material-ui/icons/Input";
 import './Player.css'
-import CustomizedInputBase from "./utility/CustomizedInputBase";
+//import CustomizedInputBase from "./utility/CustomizedInputBase";
 
 import Popper from "@material-ui/core/Popper";
-import styles from "./Social/Social.tiles.module.css";
-import UserTile from "./utility/UserTile";
+//import styles from "./Social/Social.tiles.module.css";
+//import UserTile from "./utility/UserTile";
 
 //src library
 //https://github.com/gilbarbara/react-spotify-web-playback

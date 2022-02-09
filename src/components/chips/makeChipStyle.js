@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-expressions */
-import {familyColors} from "../../families";
+import {familyColors} from "../../util/families";
 import CHIPGENRESCOLORMAP from "../../storage/withApolloProvider"
 import {useReactiveVar} from "@apollo/react-hooks";
 

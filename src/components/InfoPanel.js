@@ -5,7 +5,7 @@ import {Context} from "../storage/Store";
 import {FriendsControl, StatControl, TabControl, TileSelectControl} from "../index";
 import {useReactiveVar} from "@apollo/react-hooks";
 import Paper from '@material-ui/core/Paper';
-import ItemCarousel from './ItemCarousel'
+import ItemCarousel from './libraries/ItemCarousel/ItemCarousel'
 import useMeasure from "react-use-measure";
 import {a, useSpring} from "react-spring";
 import ExpandLessIcon from "@material-ui/icons/ExpandLess";

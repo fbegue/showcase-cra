@@ -2,7 +2,7 @@
 import React, {useEffect, useState,useLayoutEffect,useRef} from 'react'
 import useMeasure from 'react-use-measure'
 import { useSpring, animated } from '@react-spring/web'
-import EventImageFader from "../EventImageFader";
+import EventImageFader from "../Events/EventImageFader";
 // import styles from './styles.module.css'
 
 export default function SpringMultiDrop(props) {

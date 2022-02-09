@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-expressions */
 import React, {useContext, useEffect, useState} from "react";
-import api from "./api/api";
+import api from "../../api/api";
 import Snackbar from "@material-ui/core/Snackbar";
 import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
@@ -9,9 +9,9 @@ import PlaylistAddIcon from "@material-ui/icons/PlaylistAdd";
 import TextField from "@material-ui/core/TextField";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
-import {Context} from "./storage/Store";
+import {Context} from "../../storage/Store";
 import {useReactiveVar} from "@apollo/react-hooks";
-import {GLOBAL_UI_VAR} from "./storage/withApolloProvider";
+import {GLOBAL_UI_VAR} from "../../storage/withApolloProvider";
 
 function CreatePlaylist(props){
 

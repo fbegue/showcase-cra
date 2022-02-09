@@ -4,7 +4,7 @@ import {useReactiveVar} from "@apollo/react-hooks";
 import {GLOBAL_UI_VAR} from "../storage/withApolloProvider";
 import _ from 'lodash'
 import React from "react";
-import {api_address }from '../components/Profile'
+import {api_address }from '../components/system/Profile'
 //testing:
 //let api_address = "http://localhost:8888"
 // let api_address = "https://api.soundfound.io/api"

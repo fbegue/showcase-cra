@@ -12,7 +12,7 @@ import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import Box from "@material-ui/core/Box";
 import styles from './ContextStats.tiles.module.css'
-import {families as systemFamilies} from "../families";
+import {families as systemFamilies} from "../util/families";
 import uuid from 'react-uuid'
 import CustomizedInputBase from "./utility/CustomizedInputBase";
 import Slider from '@material-ui/core/Slider';

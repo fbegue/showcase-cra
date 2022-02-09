@@ -1,8 +1,8 @@
 import React from "react";
-import Ohio from '../data/maps/Ohio'
+import Ohio from '../../data/maps/Ohio'
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
-import {Control} from "../index";
+import {Control} from "../../index";
 import { withStyles,makeStyles } from '@material-ui/core/styles';
 
 //note: had to downgrade version here due to issue

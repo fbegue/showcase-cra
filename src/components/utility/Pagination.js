@@ -12,10 +12,10 @@ export default function Pagination(props){
 	return(
 		<div style={{display:'flex',flexDirection:"row",marginTop:"-1em",marginLeft:"-1em",width:"7em"}}>
 			<div>
-				<IconButton aria-label="nav-prev">
-					<NavigateBeforeIcon style={{ fontSize: 50 }} onClick={() =>{props.setPage((prevState => {
-						return prevState !== 1 ? prevState - 1:prevState
-					}))}}/>
+				<IconButton aria-label="nav-prev"  onClick={() =>{props.setPage((prevState => {
+					return prevState !== 1 ? prevState - 1:prevState
+				}))}}>
+					<NavigateBeforeIcon style={{ fontSize: 50 }}/>
 				</IconButton>
 			</div>
 			<div style={{"marginLeft":"-1em","marginTop":"1.5em",minWidth:"1.4em"}}>
@@ -29,10 +29,10 @@ export default function Pagination(props){
 
 			</div>
 			<div style={{marginLeft:"-1em"}}>
-				<IconButton aria-label="nav-next">
-					<NavigateNextIcon style={{ fontSize: 50 }} onClick={() =>{props.setPage((prevState => {
-						return prevState <= props.records.length/props.pageSize ? prevState + 1:prevState
-					}))}}/>
+				<IconButton aria-label="nav-next" onClick={() =>{props.setPage((prevState => {
+					return prevState <= props.records.length/props.pageSize ? prevState + 1:prevState
+				}))}}>
+					<NavigateNextIcon style={{ fontSize: 50 }} />
 				</IconButton>
 			</div>
 		</div>

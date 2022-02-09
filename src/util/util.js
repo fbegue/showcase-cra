@@ -3,13 +3,14 @@ import _ from "lodash";
 // import ChipsArray from "../components/utility/ChipsArray";
 import React, {useContext,useState,useEffect,useRef} from "react";
 import tables from "../storage/tables";
-import {families as systemFamilies, familyColors,familyIdMap} from "../families";
+import {families as systemFamilies, familyColors,familyIdMap} from "./families";
 import {Highlighter, StatControl,FriendsControl,Control,TabControl,PieControl} from "../index";
 import {Context} from "../storage/Store";
 import {useReactiveVar} from "@apollo/react-hooks";
 import {
 	GLOBAL_UI_VAR, TILES, EVENTS_VAR, STATS, CHIPFAMILIES, CHIPGENRES,
-	CHIPGENRESRANKED, CHIPFAMILIESRANKED, CHIPGENRESCOLORMAP, CHIPGENRESCOMBINEDMAP, BARDATA,BARDRILLDOWNMAP
+	CHIPGENRESRANKED, CHIPFAMILIESRANKED, CHIPGENRESCOLORMAP, CHIPGENRESCOMBINEDMAP, BARDATA,BARDRILLDOWNMAP,
+	CHIPGENRESRANKEDMAP,CHIPFAMILIESRANKEDMAP
 } from "../storage/withApolloProvider";
 
 import {data1} from './testData'
@@ -1255,8 +1256,11 @@ function useProduceEvents(){
 
 
 				//note:REF5: produce various UI abstractions
+
+				//todo: unwind and create rankmap,
 				function makeGenreRank(genres){
-					//note: think I overmapped this guy but its fine!
+
+					var _rankGenresMap = {};
 					var rankGenresMap = {};
 					var rankFamiliyMap = {};
 					genres.forEach(gob =>{
@@ -1265,13 +1269,13 @@ function useProduceEvents(){
 
 							// var f = friendscontrol.families.find(f =>{return f.id === gob.family_id})
 							if(friendscontrol.families.indexOf(gob.family_name) !== -1){
-								!(rankGenresMap[gob.id]) ? rankGenresMap[gob.id] = [1,gob] :rankGenresMap[gob.id][0]++
+								!(_rankGenresMap[gob.id]) ? _rankGenresMap[gob.id] = [1,gob] :_rankGenresMap[gob.id][0]++
 							}else{
 								//skip this genre which is not in the selected family
 							}
 
 						}else{
-							!(rankGenresMap[gob.id]) ? rankGenresMap[gob.id] = [1,gob] :rankGenresMap[gob.id][0]++
+							!(_rankGenresMap[gob.id]) ? _rankGenresMap[gob.id] = [1,gob] :_rankGenresMap[gob.id][0]++
 						}
 						!(rankFamiliyMap[gob.family_name]) ? rankFamiliyMap[gob.family_name] = 1 :rankFamiliyMap[gob.family_name]++
 						//!(rankGenresMap[gob.id]) ? rankGenresMap[gob.id] = [1,gob] :rankGenresMap[gob.id][0]++
@@ -1279,11 +1283,12 @@ function useProduceEvents(){
 
 					var arrGenresSorted = []
 					var arrFamiliesSorted = []
-					if (!(_.isEmpty(rankGenresMap))) {
+					if (!(_.isEmpty(_rankGenresMap))) {
 						//convert map to array and find the max
 						var arr = [];
-						Object.entries(rankGenresMap).forEach(tup => {
+						Object.entries(_rankGenresMap).forEach(tup => {
 							var r = { occurred:tup[1][0],genre: tup[1][1]};
+							//var r = { occurred:tup[1][0],...tup[1][1]};
 							arr.push(r);
 						});
 						arrGenresSorted = _.sortBy(arr, function (r) {
@@ -1299,14 +1304,26 @@ function useProduceEvents(){
 						arrFamiliesSorted = _.sortBy(arr, function (r) {return r.occurred}).reverse()
 					}
 
-					return {arrGenresSorted,arrFamiliesSorted}
+					arrGenresSorted.forEach(tuple =>{
+						rankGenresMap[tuple.genre.name] = tuple.occurred
+					})
+					return {arrGenresSorted,arrFamiliesSorted,rankGenresMap,rankFamiliyMap}
 				};
 
-				let {arrGenresSorted:newRank,arrFamiliesSorted:newFamRank} = makeGenreRank(genres)
+				let {arrGenresSorted:newRank,arrFamiliesSorted:newFamRank,
+					rankGenresMap:newRankMap,rankFamiliyMap:newFamRankMap} = makeGenreRank(genres)
+
 				//console.log("makeGenreRank",newRank);
-				CHIPGENRESRANKED(newRank)
+				//CHIPGENRESRANKED(newRank)
 				//console.log("makeFamRank",newFamRank);
-				CHIPFAMILIESRANKED(newFamRank)
+				//CHIPFAMILIESRANKED(newFamRank)
+
+				console.log("makeRankGenresMap",newRankMap);
+				CHIPGENRESRANKEDMAP(newRankMap)
+				console.log("makeRankFamiliyMap",newFamRankMap);
+				CHIPFAMILIESRANKEDMAP(newFamRankMap)
+
+
 
 				genres = _.uniqBy(genres,'id')
 				console.log("CHIPGENRES",genres);
@@ -1661,7 +1678,7 @@ function useProduceEvents(){
 						gSet.forEach(g =>{
 							//todo: don't know shit about colors yet
 							var gPoint = {name:g.name,color:tempColorMap[g.name],dataLabels:
-									{formatter: function() {return g.name}},data:[]}
+									{formatter: function() {return g.name.slice(0,5)}},data:[]}
 							var ugPoint = null;
 							drilldatas.forEach(userDrillOb =>{
 

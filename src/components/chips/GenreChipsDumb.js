@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import { makeStyles } from "@material-ui/core/styles";
 import Chip from "@material-ui/core/Chip";
-import {familyColors,families as systemFamilies} from '../../families'
+import {familyColors,families as systemFamilies} from '../../util/families'
 import {FriendsControl} from "../../index";
 const useStyles = makeStyles({
 	chip: {

@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import './Pager.css'
 import Stats from "../Stats";
 import ContextStats from "../ContextStats";
-import EventsList from "../../EventsList";
+import EventsList from "../Events/EventsList";
 import {TabControl} from '../../index'
 // import { images } from "./image-data";
 

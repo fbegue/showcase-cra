@@ -2,7 +2,7 @@
 import React, {useState} from "react";
 import Chip from "@material-ui/core/Chip";
 import { makeStyles } from '@material-ui/core/styles';
-import {familyColors, familyNormal, familyStyles, genreFam_map} from '../../families';
+import {familyColors, familyNormal, familyStyles, genreFam_map} from '../../util/families';
 import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
 
 //help understanding the override system

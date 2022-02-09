@@ -6,7 +6,7 @@ import Home from "../components/Home";
 import MaterialTable from "material-table";
 import PlayCircleOutlineIcon from "@material-ui/icons/PlayCircleOutline";
 import util from "../util/util";
-import DiscreteSlider from "../Slider";
+import DiscreteSlider from "../components/utility/Slider";
 import GenreChipsSmart from "../components/chips/ChipsArray";
 import React from "react";
 

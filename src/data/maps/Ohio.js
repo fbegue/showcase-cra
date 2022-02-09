@@ -1,5 +1,5 @@
 import React from "react";
-import '../../components/Map.css'
+import '../../components/misc/Map.css'
 
 //todo: thought about highlighting selected?
 //didn't look like 'ellipse' had a property I could set with like css
