@@ -31,6 +31,7 @@ https://eslint.org/docs/rules/no-unused-expressions
 
 ## idiosyncrasies (dumb shit to remember)
 
+
 - For material-ui-pickers v3 use v1.x version of @date-io adapters.
 
 - Framer v5 (and other libraries) has an issue with the react-scripts (CRA) version I'm on
