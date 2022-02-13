@@ -43,6 +43,7 @@ import './Tabify.css'
 import PulseSpinnerSpring from './components/springs/PulseSpinnerSpring'
 import useMeasure from "react-use-measure";
 import {useSpring,a} from "react-spring";
+import { useMediaQuery } from 'react-responsive'
 import Accordion from "./components/Framer/Accordion";
 
 
@@ -121,6 +122,8 @@ const tabMap = {
 	}}
 export {tabMap}
 export default function Tabify() {
+
+	const isTabletOrMobile = useMediaQuery({ query: '(max-width: 768px)' })
 
 	const classes = useStyles();
 
@@ -622,78 +625,136 @@ export default function Tabify() {
 	return(
 		// style={styles}
 		<div>
-			<AppBar position="static">
-				<Tabs className={classes.root} value={tabcontrol.section} onChange={handleSectionSelect} >
-					{/*todo: disabled for now (broke in multiple places)*/}
-					{/*<Tab label="Search">*/}
-					{/*	<Search></Search>*/}
-					{/*</Tab>*/}
-					<Tab label="My Profile"/>
-					<Tab label="My Library"/>
-					<Tab label="My Friends"/>
+			{!isTabletOrMobile && <div>
+				<AppBar position="static">
+					<Tabs className={classes.root} value={tabcontrol.section} onChange={handleSectionSelect} >
+						{/*todo: disabled for now (broke in multiple places)*/}
+						{/*<Tab label="Search">*/}
+						{/*	<Search></Search>*/}
+						{/*</Tab>*/}
+						<Tab label="My Profile"/>
+						<Tab label="My Library"/>
+						<Tab label="My Friends"/>
+						{/*todo:*/}
+						{/*<Tab label="Billboards">*/}
+						{/*	<Tabs>*/}
+						{/*		<Tab label="Subtab 2.1">*/}
+						{/*			Tab 2 Content 1*/}
+						{/*		</Tab>*/}
+						{/*		<Tab label="Subtab 2.2">Tab 2 Content 2</Tab>*/}
+						{/*		<Tab label="Subtab 2.3">Tab 2 Content 3</Tab>*/}
+						{/*	</Tabs>*/}
+						{/*</Tab>*/}
+					</Tabs>
+				</AppBar>
+				<div>
+					{/*todo: disabled for now*/}
+					{/*<InfoPanel setInfoBound={gridControl.setInfoBound} setInfoCollapse={setInfoCollapse}/>*/}
 
-					{/*todo:*/}
-					{/*<Tab label="Billboards">*/}
-					{/*	<Tabs>*/}
-					{/*		<Tab label="Subtab 2.1">*/}
-					{/*			Tab 2 Content 1*/}
-					{/*		</Tab>*/}
-					{/*		<Tab label="Subtab 2.2">Tab 2 Content 2</Tab>*/}
-					{/*		<Tab label="Subtab 2.3">Tab 2 Content 3</Tab>*/}
-					{/*	</Tabs>*/}
-					{/*</Tab>*/}
-				</Tabs>
-			</AppBar>
-			{/*<a.div style={{...drawerExpandProps}}>*/}
-			<div >
+					{/*todo: further parameterize to allow for "My Profile" content*/}
+					{mapNum.map((index) =>
+						<TabPanel key={index}   className={'tabs' + index} value={tabcontrol.section} index={index}>
+							{/*testing:*/}
+							{/*{getTabs()}*/}
 
-				{/*todo: disabled for now*/}
-				{/*<InfoPanel setInfoBound={gridControl.setInfoBound} setInfoCollapse={setInfoCollapse}/>*/}
+							<Social />
+							{/*ref={ref}*/}
+							{/*{gridControl.collapse &&*/}
+							{/*<div style={{marginTop:"4em"}}>content</div>*/}
+							{/*}*/}
 
-				{/*todo: further parameterize to allow for "My Profile" content*/}
-				{mapNum.map((index) =>
-					<TabPanel key={index}   className={'tabs' + index} value={tabcontrol.section} index={index}>
-						{/*testing:*/}
-						{/*{getTabs()}*/}
-						{/*ref={ref}*/}
-						{/*{gridControl.collapse &&*/}
-						{/*<div style={{marginTop:"4em"}}>content</div>*/}
-						{/*}*/}
-						{index === 2 ?
-							<Accordion infoBound={gridControl.infoBound} i={0} setCollapse={gridControl.setCollapse}
-									   collapse={gridControl.collapse}
-									   content={
-										   <div style={{
-										     	// background: 'pink',
-											   width: width}}>
-											   <Social />
-										   </div>
-									   }
-							/> : <div>
-								{/*style={{marginTop:"4em"}}*/}
-								{/*&nbsp;*/}
-								{/*	todo: this is where profile content would go when not on social tab OR put next to social above*/}
-							</div>
-						}
-					</TabPanel>
-				)}
+						</TabPanel>
+					)}
 
 
-				{/*<TabPanel   className={'tabs1'} value={tabcontrol.section} index={1}>*/}
-				{/*	{getTabs()}*/}
-				{/*	{*/}
-				{/*		infoCollapse &&*/}
-				{/*		<div id={'handle'} style={{background:'#f53177',height:30,zIndex:500,position:"relative",width:"100%"}}>*/}
-				{/*			<button onClick={() =>{setInfoCollapse(prev => !(prev))}}>expand summary</button>*/}
-				{/*		</div>*/}
-				{/*	}*/}
-				{/*	<InfoPanel setInfoBound={setInfoBound} setInfoCollapse={setInfoCollapse}/>*/}
-				{/*</TabPanel>*/}
-				{/*<TabPanel value={tabcontrol.section} index={2}>*/}
-				{/*	<Social/>*/}
-				{/*</TabPanel>*/}
-			</div>
-			{/*</a.div>*/}
+					{/*<TabPanel   className={'tabs1'} value={tabcontrol.section} index={1}>*/}
+					{/*	{getTabs()}*/}
+					{/*	{*/}
+					{/*		infoCollapse &&*/}
+					{/*		<div id={'handle'} style={{background:'#f53177',height:30,zIndex:500,position:"relative",width:"100%"}}>*/}
+					{/*			<button onClick={() =>{setInfoCollapse(prev => !(prev))}}>expand summary</button>*/}
+					{/*		</div>*/}
+					{/*	}*/}
+					{/*	<InfoPanel setInfoBound={setInfoBound} setInfoCollapse={setInfoCollapse}/>*/}
+					{/*</TabPanel>*/}
+					{/*<TabPanel value={tabcontrol.section} index={2}>*/}
+					{/*	<Social/>*/}
+					{/*</TabPanel>*/}
+				</div>
+			</div>}
+			{isTabletOrMobile &&
+			<div>
+				<AppBar position="static">
+					<Tabs className={classes.root} value={tabcontrol.section} onChange={handleSectionSelect} >
+						{/*todo: disabled for now (broke in multiple places)*/}
+						{/*<Tab label="Search">*/}
+						{/*	<Search></Search>*/}
+						{/*</Tab>*/}
+						<Tab label="My Profile"/>
+						<Tab label="My Library"/>
+						<Tab label="My Friends"/>
+						{/*todo:*/}
+						{/*<Tab label="Billboards">*/}
+						{/*	<Tabs>*/}
+						{/*		<Tab label="Subtab 2.1">*/}
+						{/*			Tab 2 Content 1*/}
+						{/*		</Tab>*/}
+						{/*		<Tab label="Subtab 2.2">Tab 2 Content 2</Tab>*/}
+						{/*		<Tab label="Subtab 2.3">Tab 2 Content 3</Tab>*/}
+						{/*	</Tabs>*/}
+						{/*</Tab>*/}
+					</Tabs>
+				</AppBar>
+				{/*<a.div style={{...drawerExpandProps}}>*/}
+				<div>
+					{/*todo: disabled for now*/}
+					{/*<InfoPanel setInfoBound={gridControl.setInfoBound} setInfoCollapse={setInfoCollapse}/>*/}
+
+					{/*todo: further parameterize to allow for "My Profile" content*/}
+					{mapNum.map((index) =>
+						<TabPanel key={index}   className={'tabs' + index} value={tabcontrol.section} index={index}>
+							{/*testing:*/}
+							{/*{getTabs()}*/}
+							{/*ref={ref}*/}
+							{/*{gridControl.collapse &&*/}
+							{/*<div style={{marginTop:"4em"}}>content</div>*/}
+							{/*}*/}
+							{index === 2 ?
+								<Accordion infoBound={gridControl.infoBound} i={0} setCollapse={gridControl.setCollapse}
+										   collapse={gridControl.collapse}
+										   content={
+											   <div style={{
+												   // background: 'pink',
+												   width: width}}>
+												   <Social />
+											   </div>
+										   }
+								/> : <div>
+									{/*style={{marginTop:"4em"}}*/}
+									{/*&nbsp;*/}
+									{/*	todo: this is where profile content would go when not on social tab OR put next to social above*/}
+								</div>
+							}
+						</TabPanel>
+					)}
+
+
+					{/*<TabPanel   className={'tabs1'} value={tabcontrol.section} index={1}>*/}
+					{/*	{getTabs()}*/}
+					{/*	{*/}
+					{/*		infoCollapse &&*/}
+					{/*		<div id={'handle'} style={{background:'#f53177',height:30,zIndex:500,position:"relative",width:"100%"}}>*/}
+					{/*			<button onClick={() =>{setInfoCollapse(prev => !(prev))}}>expand summary</button>*/}
+					{/*		</div>*/}
+					{/*	}*/}
+					{/*	<InfoPanel setInfoBound={setInfoBound} setInfoCollapse={setInfoCollapse}/>*/}
+					{/*</TabPanel>*/}
+					{/*<TabPanel value={tabcontrol.section} index={2}>*/}
+					{/*	<Social/>*/}
+					{/*</TabPanel>*/}
+				</div>
+				{/*</a.div>*/}
+			</div>}
 		</div>
 	)
 }

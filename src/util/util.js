@@ -1208,6 +1208,7 @@ function useProduceEvents(){
 
 								// if(g.id===88){
 								// }
+
 								genres.push(g)
 							})
 							//allArtist[r] ? allArtist[r] = r:allArtist[r]
@@ -1313,10 +1314,13 @@ function useProduceEvents(){
 				let {arrGenresSorted:newRank,arrFamiliesSorted:newFamRank,
 					rankGenresMap:newRankMap,rankFamiliyMap:newFamRankMap} = makeGenreRank(genres)
 
-				//console.log("makeGenreRank",newRank);
-				//CHIPGENRESRANKED(newRank)
-				//console.log("makeFamRank",newFamRank);
-				//CHIPFAMILIESRANKED(newFamRank)
+
+				//testing: could make CHIPGENRESRANKEDMAP resolve at an object instead of just the #
+				//and then could just unwind that anytime I needed the array ... do I care tho?
+				console.log("makeGenreRank",newRank);
+				CHIPGENRESRANKED(newRank)
+				console.log("makeFamRank",newFamRank);
+				CHIPFAMILIESRANKED(newFamRank)
 
 				console.log("makeRankGenresMap",newRankMap);
 				CHIPGENRESRANKEDMAP(newRankMap)
@@ -1434,6 +1438,8 @@ function useProduceEvents(){
 
 				var tempColorMap = {}
 				//todo: change packages from tinycolor to color (tinycolor didn't have alpha adjustments)
+				//todo: what am I talking about lol? I don't see any other color library around anywhere....?
+
 				var getDrilldownData = (fmap,gmap) =>{
 					var drilldown = {series:[]};
 					Object.keys(fmap).forEach((fname,i) =>{

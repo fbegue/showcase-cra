@@ -77,15 +77,26 @@ const Accordion = ({infoBound,collapse, setCollapse,content }) => {
                 <div style={{display:"flex"}}>
                     <div style={{marginLeft:".5em"}}><RotateSpring vert={true} toggle={setCollapse} state={collapse} target={<InputIcon fontSize={'inherit'} style={{fontSize:"32px"}} color={'secondary'} />}/>
                     </div>
-                    <div>
+                    <div style={{marginRight:".5em"}}>
                         {collapse ? 'expand':'collapse'} {tabcontrol.section === 2 ? 'friends':'summary'}
                     </div>
-                    <div style={{display:"flex"}}>
-                        {collapse ? '':
+                    {/*todo: fade in opacity*/}
+                    {/*testing: more than 1 avatar = overlap (flex not working)
+                       something to do with this entire bar being a little strange maybe?*/}
+
+                    <div style={{display:"flex",flexDirection:"row",opacity:collapse ? 1:.5}}>
                             <div>
-                                {friendscontrol.guest ? <Avatar rec={{user:friendscontrol.guest}}/> :<div/>}
+                                {friendscontrol.guest ? <Avatar dim="40px" rec={{user:friendscontrol.guest}}/> :<div/>}
                             </div>
-                        }
+                        {/*<div>*/}
+                        {/*    {friendscontrol.guest ? <Avatar dim="40px" rec={{user:friendscontrol.guest}}/> :<div/>}*/}
+                        {/*</div>*/}
+
+                        {/*{collapse ? '':*/}
+                        {/*    <div>*/}
+                        {/*        {friendscontrol.guest ? <Avatar rec={{user:friendscontrol.guest}}/> :<div/>}*/}
+                        {/*    </div>*/}
+                        {/*}*/}
                     </div>
                 </div>
             </motion.header>

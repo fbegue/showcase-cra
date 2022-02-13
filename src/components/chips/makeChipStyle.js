@@ -15,6 +15,9 @@ const makeChipStyle = (fam,which,genreColor) =>{
 	// }
 	fam === null? fam='unknown' :{};
 	//use fam to set colors
+
+	//note: very confusing "2 is default, 1 is clicked"
+
 	var defaultSt = {
 		"--background-color-hover":familyColors[fam + "2"],
 		"--background-color": genreColor ?genreColor:familyColors[fam + "2"],

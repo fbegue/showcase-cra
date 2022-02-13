@@ -1,6 +1,6 @@
 // eslint-disable-next-line no-unused-expressions
 import {FriendsControl, GridControl, StatControl, TabControl,TileSelectControl} from "../index";
-import React, {useContext, useMemo,useEffect,useState} from "react";
+import React, {useContext, useMemo,useEffect,useState,useRef} from "react";
 import {Context} from "../storage/Store";
 import {useReactiveVar} from "@apollo/react-hooks";
 import {CHIPFAMILIES, CHIPGENRES, EVENTS_VAR, TILES} from "../storage/withApolloProvider";
@@ -33,6 +33,12 @@ import { GLOBAL_UI_VAR } from '../storage/withApolloProvider';
 import util from '../util/util'
 import OpacityPulse from "./springs/OpacityPulse";
 import TouchAppIcon from '@material-ui/icons/TouchApp';
+import PersonIcon from '@material-ui/icons/Person';
+import PeopleAltIcon from '@material-ui/icons/PeopleAlt';
+import StackedBarDrill from "../components/Charts/StackedBarDrill/StackedBarDrill";
+import GenreChipsCompact from "../components/chips/GenreChipsCompact";
+import {BARDATA,BARDRILLDOWNMAP} from "../storage/withApolloProvider";
+
 //import FloatingActionButton from "./utility/FloatingActionButton";
 import Paper from "@material-ui/core/Paper";
 import InputIcon from "@material-ui/icons/Input";
@@ -44,6 +50,7 @@ import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 import {makeStyles} from "@material-ui/core/styles";
 import Dot from './chips/Dot'
+import Switch from "@material-ui/core/Switch";
 //todo: for some wild reason, after c/p customScroll.css",firstComp.scss  out to above FirstComp for gen use
 //that don't work - but importing them from another comp that uses them...works?
 //import {FirstComp} from './utility/CustomScroll/FirstComp/FirstComp'
@@ -103,13 +110,11 @@ function ContextStats(props) {
 	let tabcontrol = TabControl.useContainer()
 	let gridControl = GridControl.useContainer();
 	let tileSelectControl = TileSelectControl.useContainer();
-
+	const barData = useReactiveVar(BARDATA);
+	const barDrillMap = useReactiveVar(BARDRILLDOWNMAP);
 
 	// const [globalState, globalDispatch] = useContext(Context);
 	const globalUI = useReactiveVar(GLOBAL_UI_VAR);
-
-
-
 
 
 
@@ -376,7 +381,7 @@ function ContextStats(props) {
 
 	const chipFamilies = useReactiveVar(CHIPFAMILIES);
 	const chipGenres = useReactiveVar(CHIPGENRES);
-	const events = useReactiveVar(EVENTS_VAR);
+	//const events = useReactiveVar(EVENTS_VAR);
 
 	const getFilterLabel = () => {
 
@@ -393,6 +398,23 @@ function ContextStats(props) {
 	}
 
 	const classes= useStyles()
+	const [friendsFilterOn, setFriendsFilterOn] = useState(false);
+
+	//see todo: alright fuck this bullshit in StackedBarDrill.js
+	var getMargin = () =>{
+		var numbars = barData[0] ? barData[0].data.length:1
+		//console.log("numbars",numbars);
+		switch (numbars) {
+			case 1:return '0em'//120
+			case 2:return '-5em'//440
+			//default:return 120
+		}
+	}
+
+	const appref = useRef();
+	const refCallBack = (chartRef, appRef) => {
+		appRef.current = chartRef;
+	};
 
 	return(
 		<div>
@@ -411,6 +433,7 @@ function ContextStats(props) {
 					{/*todo: thought Paper would give me some free box shadowing?*/}
 					{/*<Paper elevation={3}>*/}
 					<div style={{position: "absolute", zIndex: "10000",marginTop:"30em"}}>
+
 						<button
 							//note: zindex - huh
 							style={{ border: "1px solid red",transform:"rotate(90deg)",
@@ -434,14 +457,15 @@ function ContextStats(props) {
 					{/*</Paper>*/}
 				</div>
 
-				{/*note: drawer instantiation*/}
+				{/*note: drawer instantiation (look for drawer-container below, it points here) */}
 				<div style={{position:"absolute"}}>
 					<div
 						id="drawer-container"
 						style={{
 							position: "relative",
 							// backgroundColor: "orange",
-							height: "28em",
+							// height: "28em",
+							height: "36em",
 							width:"22em"
 						}}
 					>
@@ -588,106 +612,153 @@ function ContextStats(props) {
 					{/*testing: disabled cusotm scroll attempt*/}
 					{/*<div className={'crazy-scroll'}>*/}
 					{/*	<CustomScroll>*/}
-							<div className={styles.list} >
-								{transitions((style, item) => (
-									<a.div style={style} onClick={() =>{handleTileSelect(item)}}>
-										{item.type === "track" &&
-										<div className={tileSelectControl.tile && tileSelectControl.tile.id === item.id ? 'tile-selected':'tile-unselected' }>
-											<img height={120} src={item.album.images[0] && item.album.images[0].url}/>
-											{/*<div style={{padding:"2px",background:"rgb(128 128 128 / .7)",position:"relative",top:"-43px",color:"white",height:"20px"}}>{item.name}</div>*/}
-											<div className={'tile-text'}>{item.name}</div>
-										</div>
-										}
-										{item.type !== "track" &&
-										<div className={tileSelectControl.tile && tileSelectControl.tile.id === item.id ? 'tile-selected':'tile-unselected' }>
-											<img height={120} src={item.images[0] && item.images[0].url}/>
-											<div className={'tile-text'}>{item.name}</div>
-										</div>
-										}
+					<div className={styles.list} >
+						{transitions((style, item) => (
+							<a.div style={style} onClick={() =>{handleTileSelect(item)}}>
+								{item.type === "track" &&
+								<div className={tileSelectControl.tile && tileSelectControl.tile.id === item.id ? 'tile-selected':'tile-unselected' }>
+									<img height={120} src={item.album.images[0] && item.album.images[0].url}/>
+									{/*<div style={{padding:"2px",background:"rgb(128 128 128 / .7)",position:"relative",top:"-43px",color:"white",height:"20px"}}>{item.name}</div>*/}
+									<div className={'tile-text'}>{item.name}</div>
+								</div>
+								}
+								{item.type !== "track" &&
+								<div className={tileSelectControl.tile && tileSelectControl.tile.id === item.id ? 'tile-selected':'tile-unselected' }>
+									<img height={120} src={item.images[0] && item.images[0].url}/>
+									<div className={'tile-text'}>{item.name}</div>
+								</div>
+								}
 
-									</a.div>
-								))}
-							</div>
+							</a.div>
+						))}
+					</div>
 					{/*	</CustomScroll>*/}
 					{/*</div>*/}
 				</div>
 
 			</div>
 
-			<div  id={'artist-detail-drawer'}>
-			<Drawer
-				open={gridControl.tileFilterOpen}
-				onClose={() => {}}
-				onOpen={() => {}}
-				PaperProps={{ style: { position: "absolute",background:"rgb(255 255 255 / 75%)"} }}
-				BackdropProps={{ style: { position: "absolute"} }}
-				ModalProps={{
-					container: document.getElementById("drawer-container"),
-					style: { position: "absolute" }
-				}}
-				variant="temporary"
-			>
+			<div  id={'filter-drawer'}>
+				<Drawer
+					open={gridControl.tileFilterOpen}
+					onClose={() => {}}
+					// onOpen={() => {}}
+					PaperProps={{ style: { position: "absolute",background:"rgb(255 255 255 / 75%)"} }}
+					BackdropProps={{ style: { position: "absolute"} }}
+					ModalProps={{
+						container: document.getElementById("drawer-container"),
+						style: { position: "absolute" }
+					}}
+					variant="temporary"
+				>
 
-				{/*<button*/}
-				{/*	style={{"border":"1px solid red","position":"absolute","zIndex":"2","marginTop":"50%","right":"0px","transform":"rotate(90deg)"}}*/}
-				{/*	onClick={() => {*/}
-				{/*		toggleDrawer();*/}
-				{/*	}}*/}
-				{/*>*/}
-				{/*	<FilterListIcon/>*/}
-				{/*</button>*/}
-				<div className={'filterItems'} style={{display:"flex",flexDirection:"column"}}>
-					<div style={{display:'flex',flexDirection:"column"}}>
-						<div>
-							<CustomizedInputBase value={searchTerm} placeholder={getFilterLabel()} onChange={(e) =>{setSearchTerm(e.target.value)}} clearForm={() =>{clearForm()}}/>
+					{/*<button*/}
+					{/*	style={{"border":"1px solid red","position":"absolute","zIndex":"2","marginTop":"50%","right":"0px","transform":"rotate(90deg)"}}*/}
+					{/*	onClick={() => {*/}
+					{/*		toggleDrawer();*/}
+					{/*	}}*/}
+					{/*>*/}
+					{/*	<FilterListIcon/>*/}
+					{/*</button>*/}
+					<div className={'filterItems'} style={{display:"flex",flexDirection:"column",marginTop:".5em"}}>
+						<div style={{display:"flex",flexDirection:"row"}}>
+
+							{/*testing: bit to much space left here*/}
+							<div style={{marginLeft:"-.2em"}}>
+								<CustomizedInputBase width={'16em'} value={searchTerm} placeholder={getFilterLabel()} onChange={(e) =>{setSearchTerm(e.target.value)}} clearForm={() =>{clearForm()}}/>
+							</div>
+							<div style={{display:"flex",flexDirection:"column"}}>
+								<Switch
+									checked={friendsFilterOn}
+									// onChange={() =>{setFriendsFilterOn(prev => !(prev))}}
+									color="secondary"
+									onClick={(e) => {
+										setFriendsFilterOn(prev => !(prev));
+										//setDisabledRipple(true);
+									}}
+								/>
+
+								<div style={{width:"4em",marginTop:"-.5em"}}>
+									<PersonIcon style={{marginRight:".6em"}}/>
+									<PeopleAltIcon/>
+								</div>
+
+							</div>
 						</div>
 
-					</div>
-					<div style={{display:"flex",flexDirection:"column",width:"20em",background:"darkgrey"}}>
-						{(tabcontrol.section === 1 && tabcontrol.tab === 1) &&
-						<div>
-							<PlaylistCheckboxes setState={friendscontrol.setCheckboxes} state={friendscontrol.checkboxes} handleChange={handleCheck}/>
-						</div>
-						}
-						{/*todo: disabled (not implemented yet)*/}
-						{/*<div>Release Range*/}
-						{/*	<Slider*/}
-						{/*		value={100}*/}
-						{/*		marks={[*/}
-						{/*			{*/}
-						{/*				value: 0,*/}
-						{/*				label: '1970',*/}
-						{/*			},*/}
-						{/*			{*/}
-						{/*				value: 100,*/}
-						{/*				label: '2021',*/}
-						{/*			}]}*/}
-						{/*		// onChange={handleChange}*/}
-						{/*		valueLabelDisplay="auto"*/}
-						{/*		aria-labelledby="range-slider"*/}
-						{/*	/>*/}
-						{/*</div>*/}
-					</div>
-					<div style={{width:"1em"}}>
 
-						<div style={{"padding":"5px","zIndex":"5","flexGrow":"1","overflowY":"auto","overflowX":"hidden","maxHeight":"23.5em",width:"21em"}}>
-							<BubbleFamilyGenreChips families={chipFamilies} genres={chipGenres} flexDirection={'row'} clearable={true} seperator={true}/>
-							{/*<div>{getPointSum(bubbleData)}</div>*/}
+						<div style={{display:"flex",flexDirection:"column",width:"20em",background:"darkgrey"}}>
+							{(tabcontrol.section === 1 && tabcontrol.tab === 1) &&
+							<div>
+								<PlaylistCheckboxes setState={friendscontrol.setCheckboxes} state={friendscontrol.checkboxes} handleChange={handleCheck}/>
+							</div>
+							}
+							{/*todo: disabled (not implemented yet)*/}
+							{/*<div>Release Range*/}
+							{/*	<Slider*/}
+							{/*		value={100}*/}
+							{/*		marks={[*/}
+							{/*			{*/}
+							{/*				value: 0,*/}
+							{/*				label: '1970',*/}
+							{/*			},*/}
+							{/*			{*/}
+							{/*				value: 100,*/}
+							{/*				label: '2021',*/}
+							{/*			}]}*/}
+							{/*		// onChange={handleChange}*/}
+							{/*		valueLabelDisplay="auto"*/}
+							{/*		aria-labelledby="range-slider"*/}
+							{/*	/>*/}
+							{/*</div>*/}
 						</div>
 
-						{/*testing: old 'reactive' companion to rest of chip selection in app*/}
-						{/*note: see BubbleFamilyGenreChips @ handleGClick
+						<div style={{width:"1em",display: !friendsFilterOn ? 'initial':'none'}}>
+
+							<div style={{"padding":"5px","zIndex":"5","flexGrow":"1","overflowY":"auto","overflowX":"hidden","maxHeight":"23.5em",width:"21em"}}>
+								<BubbleFamilyGenreChips families={chipFamilies} genres={chipGenres} flexDirection={'row'} clearable={true} seperator={true}/>
+								{/*<div>{getPointSum(bubbleData)}</div>*/}
+							</div>
+
+							{/*testing: old 'reactive' companion to rest of chip selection in app*/}
+							{/*note: see BubbleFamilyGenreChips @ handleGClick
 						   can't delimit by families here if auto-add-family is disabled */}
-						{/*<BubbleFamilyGenreChips removable={true} clearable={true} familyDisabled={true} families={friendscontrol.families} genres={friendscontrol.genres} flexDirection={'column'}/>*/}
+							{/*<BubbleFamilyGenreChips removable={true} clearable={true} familyDisabled={true} families={friendscontrol.families} genres={friendscontrol.genres} flexDirection={'column'}/>*/}
+
+						</div>
+
+						<div id={'stats'} style={{outline: "2px solid purple",display: friendsFilterOn ? 'initial':'none'}} >
+
+							<div style={{"display":"flex",flexDirection:"column"}}>
+
+								<div>
+									{/*{barData.length > 0  &&*/}
+									<StackedBarDrill barData={barData} barDrillMap={barDrillMap}
+													// callback={(ref) => {refCallBack(ref, appref);}}
+										//ref={appref}
+									/>
+									{/*}*/}
+								</div>
+								{/*marginTop:getMargin()*/}
+								<div style={{"padding":"5px","zIndex":"5","flexGrow":"1","overflowY":"auto","overflowX":"hidden",
+									maxHeight:"19em","minWidth":"7em"}}>
+									<GenreChipsCompact families={chipFamilies}  genres={chipGenres} pieData={barData || []}
+													   genresDisabled={false} occurred={false} clearable={false} flexDirection={'row'}/>
+								</div>
+							</div>
+
+						</div>
+
+
 
 					</div>
-				</div>
 
-			</Drawer>
-
-
-			<AnimatedHeightDrawer/>
+				</Drawer>
 			</div>
+			<div id={'artist-detail-drawer'}>
+				<AnimatedHeightDrawer/>
+			</div>
+
 
 			{/*}*/}
 

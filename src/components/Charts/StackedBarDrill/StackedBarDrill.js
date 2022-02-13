@@ -27,12 +27,15 @@ drilldown(Highcharts)
 //so comp only stores it locally (outside comp scope) when it's be initialized
 
 var temp = null;
+var prevLen = null;
+var prevBarData = null;
 
 function StackedBarDrill(props) {
 	var comp = "StackedBarDrill |"
 	//console.log(comp,props.barDrillMap);
 	const globalUI = useReactiveVar(GLOBAL_UI_VAR);
 	const elementRef = useRef();
+
 	if(props.barDrillMap !== {}){temp = props.barDrillMap}
 
 	// const barData = useReactiveVar(BARDATA);
@@ -43,8 +46,39 @@ function StackedBarDrill(props) {
 	// const props.barDrillMap =  props.barDrillMap;
 
 	useEffect(() =>{
-		//console.log("$check",props.barData[0]?.data.length !== 1);
-		if(elementRef.current  && props.barData[0]?.data.length !== 1){
+
+		//todo: all this fucking did was stop me from ever calling update
+		//but when I do, shit still doesn't work.
+		// the chart ref WILL BE LOST if we close the drawer.
+
+		//testing: so figured out? that it's really just the fact that we keep re-rendering this
+		//b/c the barData changes - so for now I'm just doing a deep compare by
+		//var checkLength = prevLen !==  props.barData.length
+		// var checkLength = false;
+		//
+		// if(!prevBarData){
+		// 	//
+		// }else{
+		// 	props.barData.forEach((datum,i) =>{
+		// 		if(prevBarData[i].data.length !== datum.data.length){
+		// 			debugger
+		// 			checkLength = true
+		// 		}
+		// 	})
+		// }
+
+		//testing: alright so leaving this broken and inconsistent
+		//fuck not redrawing unless we can see the ref
+		//- if I can't find the ref when it's hidden than fuck it - just going to init barData
+		//  everytime UNLESS it's open, b/c then I'll have a valid ref to update
+		//- bars not grouping like they do when they update versus render anew
+
+		var checkValidRef = elementRef.current.chart.series.length !== 0
+		if(!(checkValidRef)){
+			console.warn("StackedBarDrill denied extra render");
+		}
+
+		if(checkValidRef && elementRef.current  && props.barData[0]?.data.length !== 1){
 			console.log(comp + " update barData",props.barData);
 			//console.log("props.barData",props.barData);
 			elementRef.current.chart.series.forEach(s =>{
@@ -55,6 +89,8 @@ function StackedBarDrill(props) {
 				var t = bs.data[bs.data.length -1]
 				s.addPoint(t)
 			})
+			elementRef.current.chart.redraw()
+			debugger
 		}else{
 			console.log(comp + " init barData",props.barData);
 			if(elementRef.current.chart.series.length === 0){
@@ -65,6 +101,10 @@ function StackedBarDrill(props) {
 				})
 			}
 		}
+		// prevLen === null ? prevLen = props.barData.length:{}
+		prevLen = parseInt(props.barData.length + "")
+		prevBarData = JSON.parse(JSON.stringify(props.barData));
+
 	},[props.barData])
 
 
@@ -111,6 +151,7 @@ function StackedBarDrill(props) {
 		console.log('drilldown',target);
 
 		temp[target].forEach(gSeries =>{
+
 			chart.addSingleSeriesAsDrilldown(point, gSeries);
 		})
 		//testing: this causes drilldown data to double
@@ -295,6 +336,7 @@ function StackedBarDrill(props) {
 	var getHeight = () =>{
 		var numbars = props.barData[0].data.length;
 		//console.log("numbars",numbars);
+
 		switch (numbars) {
 			//change this to 5em? sorry that'll fuck up the 15em????
 			case 1:return '10em'//120
@@ -302,16 +344,21 @@ function StackedBarDrill(props) {
 			//default:return 120
 		}
 	}
+
 	return(
 		<div id={'StackedBarDrill'}>
 			<div >
+				{/*<button onClick={() =>{test(true)}}>setTest</button>*/}
 				{/*<button onClick={() =>{addTest()}}>Add User {allowUpdate.toString()}</button>*/}
-				<HighchartsReact  ref={elementRef} highcharts={Highcharts}
+				<HighchartsReact   highcharts={Highcharts}
 								  allowChartUpdate={false}
-								  containerProps={{ style: { height: getHeight() } }}
+								   containerProps={{ style: { height: getHeight(),width:"20em" } }}
 								// same issue
-								// containerProps={{ style: { height: props.barData[0].data.length === 1 ? "5em":"15em"} }}
-								  options={{...config,series:[]}} />
+								// containerProps={{ style: { height: props.barData[0].data.length === 1 ? "5em":"15em"} }}b
+								  options={{...config,series:[]}}
+								  ref={elementRef}
+									//callback={props.callback}
+				/>
 			</div>
 
 		</div>)

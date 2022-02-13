@@ -16,6 +16,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import styles from './Social.tiles.module.css'
 import './Social.css'
 import CustomizedInputBase from "../utility/CustomizedInputBase";
+import MasonrySimple from  '../Masonry/MasonrySimple'
 import UserTile from "../utility/UserTile";
 import FriendsDisplay from "./FriendsDisplay";
 import InputIcon from '@material-ui/icons/Input';
@@ -43,6 +44,7 @@ import FilterListIcon from "@material-ui/icons/FilterList";
 import StackedBarDrill from "../Charts/StackedBarDrill/StackedBarDrill";
 import {BARDATA,BARDRILLDOWNMAP} from "../../storage/withApolloProvider";
 import GenreChipsCompact from "../chips/GenreChipsCompact";
+import Avatar from "./Avatar";
 const useStyles = makeStyles((theme) => ({
 	root: {
 		width: '100%',
@@ -85,15 +87,18 @@ const Fade = React.forwardRef(function Fade(props, ref) {
 });
 
 function Social(props) {
+	var comp = "Social |"
 
 	const [globalState, globalDispatch] = useContext(Context);
 	const globalUI = useReactiveVar(GLOBAL_UI_VAR);
 	let control = Control.useContainer();
 	let friendscontrol = FriendsControl.useContainer();
 	const chipGenresRanked = useReactiveVar(CHIPGENRESRANKED);
-	const chipFamiliesRanked = useReactiveVar(CHIPFAMILIESRANKED);
+	//const chipFamiliesRanked = useReactiveVar(CHIPFAMILIESRANKED);
 	const barData = useReactiveVar(BARDATA);
-	const barDrillMap = useReactiveVar(BARDRILLDOWNMAP);
+	//const barDrillMap = useReactiveVar(BARDRILLDOWNMAP);
+
+	console.log(comp + "chipGenresRanked",chipGenresRanked);
 
 	let statcontrol = StatControl.useContainer();
 	let tabcontrol = TabControl.useContainer()
@@ -104,48 +109,6 @@ function Social(props) {
 
 	//todo:
 	const [term, setTerm] = useState('medium');
-
-	//testing: moved to dispatch
-	// function setStatic(){
-	//
-	// 	var friendsProms = [];
-	// 	friendsProms.push(api.fetchSpotifyUsers({auth:globalUI}))
-	//
-	// 	globalUI.user.related_users.filter(r =>{return r.friend})
-	// 		//testing: Dan only
-	// 		.filter(r =>{return r.id === "123028477"})
-	// 		.forEach(f =>{
-	// 		friendsProms.push(api.fetchStaticUser( {auth:globalUI,friend:f}))
-	// 	})
-	// 	console.log("setStatic...",friendsProms.length - 1);
-	// 	Promise.all(friendsProms)
-	// 		.then(results =>{
-	// 			//console.log("setStatic users fetched",results.length);
-	// 			globalDispatch({type: 'init', payload:results[0],user: globalUI.user,context:'spotifyusers'});
-	//
-	// 			// console.log(results.length);
-
-	// 			var users = results.slice(1,results.length)
-	// 			//var users =[]
-	// 				users.forEach(r =>{
-	//
-	// 				 initUser(r);
-	// 				//note:  have to read the type key off the tuple, which itself is a tuple w/ {typekey:[obs],stats:{stats}}
-	// 				//note: artists follows this pattern even though it has no stats
-	// 				globalDispatch({type: 'init', user:{id:r.id},payload:r.artists,context:'artists'});
-	// 				globalDispatch({type: 'init', user:{id:r.id},payload:r.tracks,context:'tracks'});
-	// 				globalDispatch({type: 'init', user:{id:r.id},payload:r.albums,context:'albums'});
-	// 			})
-	//
-	// 		},err =>{
-	// 			console.log(err);
-	// 		})
-	// }
-	// useEffect(()=>{
-	// 	//testing:
-	// 	setStatic();
-	// },[])
-
 
 	var handleSelectGuest = function(rows){
 		//here I'm just accessing the 'checked' rows directly later, so null payload here
@@ -318,7 +281,7 @@ function Social(props) {
 		// left: 0,
 		right:0,
 		backgroundColor: "#f0f0f0",
-		 height: "100%",
+		height: "100%",
 		//height: "2.2em",
 		margin:"0px",
 		// to: [
@@ -326,9 +289,9 @@ function Social(props) {
 		// 	// { opacity: 0, color: 'rgb(14,26,19)' },
 		// ],
 		// from: { opacity: 0, color: 'red' },
-		opacity:  isDrawerShowing ? 1 : .5,
+		opacity:  isDrawerShowing ? 1 : 1,
 		// "filter": isDrawerShowing ? "brightness(.5)" : "brightness(1)",
-		 width: isDrawerShowing ? "22.5em" : "2.2em"
+		width: isDrawerShowing ? "22.5em" : "2.2em"
 		// width: isDrawerShowing ? "2.2em":"22.5em"
 	});
 
@@ -336,7 +299,7 @@ function Social(props) {
 		position:"absolute",
 		right:isDrawerShowing ? 0 :-15,
 		top:2,zIndex:"3",margin:".2em",
-		 opacity:  isDrawerShowing ? 1 : .8,
+		opacity:  isDrawerShowing ? 1 : .8,
 		// "filter": isDrawerShowing ? "brightness(.5)" : "brightness(1)",
 		// width: isDrawerShowing ? "22.5em" : "2.2em"
 		// width: isDrawerShowing ? "2.2em":"22.5em"
@@ -373,16 +336,33 @@ function Social(props) {
 	}
 
 	const [tstate, toggle] = useState(true);
+
+
+	//todo: this will be replaced by pre-loading all queries (refactor of util.js)
+	//testing: this really should be some kind of aggregate determined by multiple factors:
+	//- obvs both users's top artists
+	//- further sort by
+	// 	- # of saved songs/albums by that artist
+
+	function getTopSharedArtists(){
+
+		var a =globalState[friendscontrol.guest.id + "_artists"].filter(i =>{return i.source === 'top'})
+		var b =globalState[globalUI.user.id+ "_artists"].filter(i =>{return i.source === 'top'})
+		var shared = _.intersectionBy(a,b,'id') //.slice(0,6)
+		return shared
+
+	}
+
 	return(
 		<div>
 			<div id={'social'}
-				style={{
-					//todo: have to set explcit height here?
-					//not undertstanding why it just doesn't adjust to content
-					height: "18.5em",
-					outline: "2px solid orange",
-					position: "relative"
-				}}
+				 style={{
+					 //todo: have to set explcit height here?
+					 //not undertstanding why it just doesn't adjust to content
+					 height: "18.5em",
+					 outline: "2px solid orange",
+					 position: "relative"
+				 }}
 			>
 				<animated.div style={drawerToggleStyle} onClick={handleToggleDrawer}>
 					{/*<IconStyle reverse={true}/>*/}
@@ -469,58 +449,72 @@ function Social(props) {
 
 				//	todo: not sure why I can't get this UserTile and guestStats to flex correctly
 
-				<div style={{display:"flex",flexDirection:"row"}}>
+				<div style={{display:"flex",flexDirection:"column"}}>
 					{/*<div><UserTile item={selectedUser} single={true} size={["200px","200px"]} /> </div>*/}
 					{/* style={{"position":"absolute","zIndex":"1"}}*/}
-					<div><UserTile item={selectedUser} single={true} size={["auto","16em"]} /> </div>
-						<div style={{"zIndex":"2",marginLeft:"11.5em"}} id={'guestStats'}>
-							{/*testing: meh*/}
-							{/*<div style={{padding:"2px",color:"white",height:"20px",width:friendscontrol.families.length > 0? "9.2em":"5.3em",marginBottom:"1em"}}>*/}
-							{/*	<Paper elevation={3}>*/}
-							{/*		<Typography variant="subtitle1">*/}
-							{/*			{friendscontrol.families.length > 0 ? 'Selected Family':"Top Family"}*/}
-							{/*		</Typography>*/}
-							{/*	</Paper>*/}
-							{/*</div>*/}
-							{/*<div>*/}
-							{/*	<BubbleFamilyGenreChips families={ chipFamiliesRanked[0] ? [chipFamiliesRanked[0].family_name]:[]} familyDisabled={true} occurred={true} clearable={false} genres={[]} flexDirection={'column'}/>*/}
-							{/*</div>*/}
-							{/*todo: not sure why BubbleFamilyGenreChips is creeping up here*/}
-							<div style={{padding:"2px",color:"white",height:"20px",width:"9.2em",marginBottom:"1em"}}>
-								<Paper elevation={3}>
-									<Typography variant="subtitle1">
-										Top Shared Genres
-									</Typography>
-								</Paper>
-							</div>
-							<div>
-								<BubbleFamilyGenreChips families={[]} familyDisabled={true} occurred={true} clearable={false} genres={chipGenresRanked} flexDirection={'column'}/>
-							</div>
+
+					{/*testing: trying to just take up as little space as possible*/}
+					{/*<div><UserTile item={selectedUser} single={true} size={["auto","16em"]} /> </div>*/}
+					<div style={{display:"flex",flexDirection:"row"}}>
+						<Avatar rec={{user:globalUI.user}}/>
+						<div style={{"fontSize":"2.5em","color":"white","WebkitTextStrokeWidth":"1px","WebkitTextStrokeColor":"black",
+							"marginLeft":"-0.2em","marginRight":"-0.2em","zIndex":"1"}}>X</div>
+						<Avatar rec={{user:friendscontrol.guest}}/>
+					</div>
+
+					{/*,marginLeft:"11.5em"*/}
+					<div style={{"zIndex":"2",display:"flex"}} id={'guestStats'}>
+
+						{/*todo: not sure why BubbleFamilyGenreChips is creeping up here*/}
+						<div style={{color:"white",height:"20px",marginBottom:"1em",width:"fit-content"}}>
+							<Paper elevation={3}>
+								<Typography style={{padding:"1px 4px"}} variant="subtitle1">
+									Genres
+								</Typography>
+							</Paper>
+						</div>
+						<div>
+							<BubbleFamilyGenreChips families={[]} familyDisabled={true} occurred={true}
+													clearable={false} genres={chipGenresRanked} flexDirection={'row'}/>
 						</div>
 
+					</div>
+					<div style={{display:"flex"}}>
+						<div style={{color:"white",height:"20px",marginBottom:"1em",width:"fit-content"}}>
+							<Paper elevation={3}>
+								<Typography style={{padding:"1px 4px"}} variant="subtitle1">
+									Artists
+								</Typography>
+
+							</Paper>
+						</div>
+						<MasonrySimple data={getTopSharedArtists()}/>
+					</div>
 				</div>
 					// </Paper>
 				}
 			</div>
 
-			<div id={'stats'} style={{outline: "2px solid purple"}} >
+			{/*testing: liked this near social, but gotta move it I think*/}
 
-				<div style={{"display":"flex",flexDirection:"column"}}>
-					{/*,marginTop:"2em"*/}
+			{/*<div id={'stats'} style={{outline: "2px solid purple"}} >*/}
 
-					<div>
-						{barData.length > 0  &&
-						<StackedBarDrill barData={barData} barDrillMap={barDrillMap}/>
-						}
-					</div>
-					<div style={{"padding":"5px","zIndex":"5","flexGrow":"1","overflowY":"auto","overflowX":"hidden",
-						height:"7.3em","minWidth":"7em",marginTop:getMargin()}}>
-						<GenreChipsCompact families={chipFamilies}  genres={chipGenres} pieData={barData || []}
-										   genresDisabled={false} occurred={false} clearable={false} flexDirection={'row'}/>
-					</div>
-					</div>
+			{/*	<div style={{"display":"flex",flexDirection:"column"}}>*/}
+			{/*		/!*,marginTop:"2em"*!/*/}
 
-			</div>
+			{/*		<div>*/}
+			{/*			{barData.length > 0  &&*/}
+			{/*			<StackedBarDrill barData={barData} barDrillMap={barDrillMap}/>*/}
+			{/*			}*/}
+			{/*		</div>*/}
+			{/*		<div style={{"padding":"5px","zIndex":"5","flexGrow":"1","overflowY":"auto","overflowX":"hidden",*/}
+			{/*			height:"7.3em","minWidth":"7em",marginTop:getMargin()}}>*/}
+			{/*			<GenreChipsCompact families={chipFamilies}  genres={chipGenres} pieData={barData || []}*/}
+			{/*							   genresDisabled={false} occurred={false} clearable={false} flexDirection={'row'}/>*/}
+			{/*		</div>*/}
+			{/*		</div>*/}
+
+			{/*</div>*/}
 		</div>
 
 	)

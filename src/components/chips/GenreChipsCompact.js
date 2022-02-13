@@ -46,6 +46,8 @@ const useStyles = makeStyles({
 
 function GenreChipsCompact(props) {
 
+	var comp = "GenreChipsCompact |"
+
 	const classes = useStyles();
 	let friendscontrol = FriendsControl.useContainer()
 	let control = Control.useContainer();
@@ -53,6 +55,8 @@ function GenreChipsCompact(props) {
 	const chipGenresSharedMap= useReactiveVar(CHIPGENRESCOMBINEDMAP)
 	const chipGenresRankedMap = useReactiveVar(CHIPGENRESRANKEDMAP)
 	const chipFamiliesRankedMap= useReactiveVar(CHIPFAMILIESRANKEDMAP)
+	console.log(comp + "chipGenresRankedMap",chipGenresRankedMap);
+
 	//console.log("$PieChips | props",props);
 	//testing:
 

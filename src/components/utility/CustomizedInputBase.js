@@ -32,7 +32,7 @@ const useStyles = makeStyles((theme) => ({
 export default function CustomizedInputBase(props) {
 	const classes = useStyles();
 	return (
-		<Box width={'20em'}>
+		<Box width={props.width || '20em'}>
 			<Paper component="form" className={classes.root}>
 				<IconButton className={classes.iconButton}>
 					<SearchIcon />

@@ -1,7 +1,7 @@
 
 import React, {useState, useEffect, useRef, useContext} from 'react';
 import RedirectPage from './components/system/RedirectPage';
-
+import { useMediaQuery } from 'react-responsive'
 //todo: wtf is this shit?
 // import 'brace/mode/json';
 // import 'brace/theme/monokai';
@@ -23,7 +23,7 @@ import SplitPane from "react-split-pane";
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { withStyles } from '@material-ui/core/styles';
 import { createMuiTheme } from '@material-ui/core/styles';
- import SwipeRight from './assets/swipe-right.png'
+import SwipeRight from './assets/swipe-right.png'
 // import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
 import { ThemeProvider as MuiThemeProvider } from '@material-ui/core/styles';
 import EventIcon from '@material-ui/icons/Event';
@@ -98,11 +98,13 @@ const styles = theme => ({
 
 function App(props) {
 
+    const isTabletOrMobile = useMediaQuery({ query: '(max-width: 768px)' })
+
     const { classes } = props;
     let [filter, setFilter] = useState('active');
     let control = Control.useContainer()
     //let gridControl = GridControl.useContainer()
-  //  let friendscontrol = FriendsControl.useContainer()
+    //  let friendscontrol = FriendsControl.useContainer()
 
     const globalUI = useReactiveVar(GLOBAL_UI_VAR);
     const events = useReactiveVar(EVENTS_VAR);
@@ -214,7 +216,7 @@ function App(props) {
 
     //=============================================================
 
-     const [scrollTop, setScrollTop] = useState(0);
+    const [scrollTop, setScrollTop] = useState(0);
     //
     // const getScrollData = (event) =>{
     //     console.log("getScrollData",event.target.scrollTop);
@@ -279,125 +281,226 @@ function App(props) {
     const isVisible = useOnScreen(ref)
     return (
         <ErrorBoundary>
-        <MuiThemeProvider theme={muiTheme}>
-            <Store>
-                {globalUI.user && <Dispatch/>}
-                {/*<TestComp/>*/}
-                <BrowserRouter>
-                    <div className="main">
-                        <Switch>
-                            {/*<Route path="/" component={Home} exact={true} />*/}
-                            <Route path="/redirect" component={RedirectPage} />
-                            {/*<Route path="/dashboard" component={Dashboard} />*/}
-                            {/*<Route component={NotFoundPage} />*/}
-                        </Switch>
-                    </div>
-                </BrowserRouter>
-                {/* style={{overflow:"scroll"}} onScroll={getScrollData}*/}
-                <animated.div className={'app'} >
-
-                    {/*<div  style={{position: "sticky",bottom: "0px", "paddingTop":"0.5em","paddingBottom":"0.5em",*/}
-                    {/*    borderBottom: "1px solid black", zIndex: "20",display:'flex',background:"#f0f0f0"}}>*/}
-                    {/*    <div>*/}
-                    {/*       Test Content*/}
-                    {/*    </div>*/}
-                    {/*</div>*/}
-
-                    <div  style={{position: "fixed",bottom:0,right:0,paddingRight:"1em",paddingLeft:"1em",zIndex:20}}>
-                        {/*transform: "scaleX(-1)"*/}
-                        <div><img style={{height:"3em",opacity:.5,marginTop:"2em",zIndex:25,marginLeft:"1.5em"}} src={SwipeRight}/></div>
-                        <div style={{zIndex:20}}>
-                            <FloatingActionButton icon={
-                                //src: https://v4.mui.com/components/badges/
-                                <Badge color="secondary" max={999}
-                                        badgeContent={events.length}
-                                       // badgeContent={globalUI.user.display_name}
-                                       anchorOrigin={{
-                                           vertical: 'bottom',
-                                           horizontal: 'right',
-                                       }}>
-                                    <EventIcon />
-                                </Badge>
-                            }/>
+            <MuiThemeProvider theme={muiTheme}>
+                <Store>
+                    {globalUI.user && <Dispatch/>}
+                    {/*<TestComp/>*/}
+                    <BrowserRouter>
+                        <div className="main">
+                            <Switch>
+                                {/*<Route path="/" component={Home} exact={true} />*/}
+                                <Route path="/redirect" component={RedirectPage} />
+                                {/*<Route path="/dashboard" component={Dashboard} />*/}
+                                {/*<Route component={NotFoundPage} />*/}
+                            </Switch>
                         </div>
+                    </BrowserRouter>
+                    {/* style={{overflow:"scroll"}} onScroll={getScrollData}*/}
 
+                    <div>
+                        {!isTabletOrMobile && <div className={'app'} >
 
-                    </div>
-
-
-                    <div  style={{position: "sticky",top: "0px", "paddingTop":"0.5em","paddingBottom":"0.5em",
-                        borderBottom: "1px solid black", zIndex: "20",display:'flex',background:"#f0f0f0"}}>
-                        <div>
-                            {/* scrollTop={isVisible}*/}
-                            <Profile version={pjson.version}/>
-                        </div>
-                        {/*<div><ControlTest/></div>*/}
-                        {/*<input value={code} onChange={(event) =>{setCode(event.target.value)}}  />*/}
-                        {/*<button onClick={() =>{getAuth(code)}}>fake auth </button>*/}
-
-                        {/*<div ref={containerRef} className={classnames(params)}>yeah don't work here either</div>*/}
-
-                    </div>
-                    {/* className={gridControl.gridClass}*/}
-                    {globalUI.access_token ?
-                        <div >
-                            {/*testing: messed up width of tabs and stats, so disabled this transition for now */}
-                            {/*- is this gridClass changing here affecting responsive collapsing?*/}
-                            {/*<div className="tabs" style={{width:gridControl.gridClass === 'defaultGrid' ? "44em":"35em"}} >*/}
-
-
-
-                            <div style={{background:"#808080"}} >
-                                {/*testing: not exactly what I was expecting but w/e*/}
-                                {/*outline:"1px solid blue"*/}
-                                <div ref={ref} style={{width:"10em",height:".1px"}}></div>
-                                {globalUI.access_token &&
-                                  <Tabify/>
-                                // <Accordion setExpanded={setExpanded} expanded={expanded}
-                                //
-                                //            content={
-                                //                <div style={{background:'pink',height:height,width:width}}>
-                                //                    <Tabify/>
-                                //                </div>
-                                //            }
-                                // />
-                                 }
-                            </div>
-
-                            {/*testing: trying framer instead*/}
-                            {/*<ViewPager />*/}
-
-                            <motion.div
-                                initial={false}
-                                // animate={{y: gridControl.collapse ? 0:gridControl.infoBound -80}}
-                                transition={{ duration: 0.3 }}
-                                style={{outline: "2px solid red"}}
-
-                            >
-                                {globalUI.access_token &&
-                                <Pager/>}
-                            </motion.div>
-
-                            {/*<div style={{marginTop:"2em"}}>*/}
-                            {/*    {globalUI.access_token &&*/}
-                            {/*    <>*/}
-                            {/*       */}
-                            {/*        <Pager/>*/}
-                            {/*    </>*/}
-                            {/*    }*/}
+                            {/*<div  style={{position: "sticky",bottom: "0px", "paddingTop":"0.5em","paddingBottom":"0.5em",*/}
+                            {/*    borderBottom: "1px solid black", zIndex: "20",display:'flex',background:"#f0f0f0"}}>*/}
+                            {/*    <div>*/}
+                            {/*       Test Content*/}
+                            {/*    </div>*/}
                             {/*</div>*/}
 
+                            <div  style={{position: "fixed",bottom:0,right:0,paddingRight:"1em",paddingLeft:"1em",zIndex:20}}>
+                                {/*transform: "scaleX(-1)"*/}
+                                <div><img style={{height:"3em",opacity:.5,marginTop:"2em",zIndex:25,marginLeft:"1.5em"}} src={SwipeRight}/></div>
+                                <div style={{zIndex:20}}>
+                                    <FloatingActionButton icon={
+                                        //src: https://v4.mui.com/components/badges/
+                                        <Badge color="secondary" max={999}
+                                               badgeContent={events.length}
+                                            // badgeContent={globalUI.user.display_name}
+                                               anchorOrigin={{
+                                                   vertical: 'bottom',
+                                                   horizontal: 'right',
+                                               }}>
+                                            <EventIcon />
+                                        </Badge>
+                                    }/>
+                                </div>
+                            </div>
+
+                            <div  style={{position: "sticky",top: "0px", "paddingTop":"0.5em","paddingBottom":"0.5em",
+                                borderBottom: "1px solid black", zIndex: "20",display:'flex',background:"#f0f0f0"}}>
+                                <div>
+                                    {/* scrollTop={isVisible}*/}
+                                    <Profile version={pjson.version}/>
+                                </div>
+                                {/*<div><ControlTest/></div>*/}
+                                {/*<input value={code} onChange={(event) =>{setCode(event.target.value)}}  />*/}
+                                {/*<button onClick={() =>{getAuth(code)}}>fake auth </button>*/}
+
+                                {/*<div ref={containerRef} className={classnames(params)}>yeah don't work here either</div>*/}
+
+                            </div>
+                            {/* className={gridControl.gridClass}*/}
+                            {globalUI.access_token ?
+                                <div >
+                                    {/*testing: messed up width of tabs and stats, so disabled this transition for now */}
+                                    {/*- is this gridClass changing here affecting responsive collapsing?*/}
+                                    {/*<div className="tabs" style={{width:gridControl.gridClass === 'defaultGrid' ? "44em":"35em"}} >*/}
 
 
-                        </div>
-                        : <div>splash</div>
 
-                    }
+                                    <div style={{background:"#808080"}} >
+                                        {/*testing: not exactly what I was expecting but w/e*/}
+                                        {/*outline:"1px solid blue"*/}
+                                        <div ref={ref} style={{width:"10em",height:".1px"}}></div>
+                                        {globalUI.access_token &&
+                                        <Tabify/>
+                                            // <Accordion setExpanded={setExpanded} expanded={expanded}
+                                            //
+                                            //            content={
+                                            //                <div style={{background:'pink',height:height,width:width}}>
+                                            //                    <Tabify/>
+                                            //                </div>
+                                            //            }
+                                            // />
+                                        }
+                                    </div>
 
-                </animated.div>
-            </Store>
-        </MuiThemeProvider>
-            </ErrorBoundary>
+                                    {/*testing: trying framer instead*/}
+                                    {/*<ViewPager />*/}
+
+
+                                    <motion.div
+                                        initial={false}
+                                        // animate={{y: gridControl.collapse ? 0:gridControl.infoBound -80}}
+                                        transition={{ duration: 0.3 }}
+                                        style={{outline: "2px solid red"}}
+
+                                    >
+                                        {globalUI.access_token &&
+                                        <Pager/>}
+                                    </motion.div>
+
+                                    {/*<div style={{marginTop:"2em"}}>*/}
+                                    {/*    {globalUI.access_token &&*/}
+                                    {/*    <>*/}
+                                    {/*       */}
+                                    {/*        <Pager/>*/}
+                                    {/*    </>*/}
+                                    {/*    }*/}
+                                    {/*</div>*/}
+
+                                </div>
+                                : <div>splash</div>
+
+                            }
+                        </div>}
+                        {isTabletOrMobile && <animated.div className={'app'} >
+
+                            {/*<div  style={{position: "sticky",bottom: "0px", "paddingTop":"0.5em","paddingBottom":"0.5em",*/}
+                            {/*    borderBottom: "1px solid black", zIndex: "20",display:'flex',background:"#f0f0f0"}}>*/}
+                            {/*    <div>*/}
+                            {/*       Test Content*/}
+                            {/*    </div>*/}
+                            {/*</div>*/}
+
+                            <div  style={{position: "fixed",bottom:0,right:0,paddingRight:"1em",paddingLeft:"1em",zIndex:20}}>
+                                {/*transform: "scaleX(-1)"*/}
+                                <div><img style={{height:"3em",opacity:.5,marginTop:"2em",zIndex:25,marginLeft:"1.5em"}} src={SwipeRight}/></div>
+                                <div style={{zIndex:20}}>
+                                    <FloatingActionButton icon={
+                                        //src: https://v4.mui.com/components/badges/
+                                        <Badge color="secondary" max={999}
+                                               badgeContent={events.length}
+                                            // badgeContent={globalUI.user.display_name}
+                                               anchorOrigin={{
+                                                   vertical: 'bottom',
+                                                   horizontal: 'right',
+                                               }}>
+                                            <EventIcon />
+                                        </Badge>
+                                    }/>
+                                </div>
+
+
+                            </div>
+
+
+                            <div  style={{position: "sticky",top: "0px", "paddingTop":"0.5em","paddingBottom":"0.5em",
+                                borderBottom: "1px solid black", zIndex: "20",display:'flex',background:"#f0f0f0"}}>
+                                <div>
+                                    {/* scrollTop={isVisible}*/}
+                                    <Profile version={pjson.version}/>
+                                </div>
+                                {/*<div><ControlTest/></div>*/}
+                                {/*<input value={code} onChange={(event) =>{setCode(event.target.value)}}  />*/}
+                                {/*<button onClick={() =>{getAuth(code)}}>fake auth </button>*/}
+
+                                {/*<div ref={containerRef} className={classnames(params)}>yeah don't work here either</div>*/}
+
+                            </div>
+                            {/* className={gridControl.gridClass}*/}
+                            {globalUI.access_token ?
+                                <div >
+                                    {/*testing: messed up width of tabs and stats, so disabled this transition for now */}
+                                    {/*- is this gridClass changing here affecting responsive collapsing?*/}
+                                    {/*<div className="tabs" style={{width:gridControl.gridClass === 'defaultGrid' ? "44em":"35em"}} >*/}
+
+
+
+                                    <div style={{background:"#808080"}} >
+                                        {/*testing: not exactly what I was expecting but w/e*/}
+                                        {/*outline:"1px solid blue"*/}
+                                        <div ref={ref} style={{width:"10em",height:".1px"}}></div>
+                                        {globalUI.access_token &&
+                                        <Tabify/>
+                                            // <Accordion setExpanded={setExpanded} expanded={expanded}
+                                            //
+                                            //            content={
+                                            //                <div style={{background:'pink',height:height,width:width}}>
+                                            //                    <Tabify/>
+                                            //                </div>
+                                            //            }
+                                            // />
+                                        }
+                                    </div>
+
+                                    {/*testing: trying framer instead*/}
+                                    {/*<ViewPager />*/}
+
+
+                                    <motion.div
+                                        initial={false}
+                                        // animate={{y: gridControl.collapse ? 0:gridControl.infoBound -80}}
+                                        transition={{ duration: 0.3 }}
+                                        style={{outline: "2px solid red"}}
+
+                                    >
+                                        {globalUI.access_token &&
+                                        <Pager/>}
+                                    </motion.div>
+
+                                    {/*<div style={{marginTop:"2em"}}>*/}
+                                    {/*    {globalUI.access_token &&*/}
+                                    {/*    <>*/}
+                                    {/*       */}
+                                    {/*        <Pager/>*/}
+                                    {/*    </>*/}
+                                    {/*    }*/}
+                                    {/*</div>*/}
+
+
+
+                                </div>
+                                : <div>splash</div>
+
+                            }
+
+                        </animated.div>}
+                    </div>
+
+                </Store>
+            </MuiThemeProvider>
+        </ErrorBoundary>
     );
 }
 

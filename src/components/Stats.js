@@ -9,7 +9,7 @@ import {
 	CHIPGENRES,
 	PIEDATADRILLDOWN,
 	PIEDATA,
-	CHIPGENRESRANKED, EVENTS_VAR
+	EVENTS_VAR
 } from '../storage/withApolloProvider';
 import RedoIcon from "@material-ui/icons/Redo";
 import PieChartIcon from "@material-ui/icons/PieChart";
@@ -40,7 +40,7 @@ import BubbleChart from "./Charts/BubbleChart";
 import './Stats.css'
 import {FormControl, FormControlLabel, Radio, RadioGroup, Select} from "@material-ui/core";
 //testing:
-import ContextStats from './ContextStats'
+//import ContextStats from './ContextStats'
 //import BubbleFamilyGenreChips from "./chips/BubbleFamilyGenreChips";
 import PieChips from "./chips/PieChips";
 import Paper from "@material-ui/core/Paper";
@@ -159,7 +159,6 @@ function Stats(props) {
 
 	const chipFamilies = useReactiveVar(CHIPFAMILIES);
 	const chipGenres = useReactiveVar(CHIPGENRES);
-	const chipGenresRanked = useReactiveVar(CHIPGENRESRANKED);
 
 	//testing: static data (comment out)
 	const pieData = useReactiveVar(PIEDATA);

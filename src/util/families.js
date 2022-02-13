@@ -1,61 +1,64 @@
 import all_genres from "../storage/all_genres";
+var tinycolor = require("tinycolor2");
 
 let familyColors= {};
 
-familyColors["pop"] = 'rgba(255,246,134,1)';
-familyColors["pop2"] = 'rgba(255,246,134,.6)';
+familyColors["pop"] = tinycolor('rgba(255,246,134,1)').darken(10).toString()
+familyColors["pop2"] ='rgba(255,246,134,1)'
+//familyColors["pop2"] = 'rgba(255,246,134,.6)';
 // familyColors["popclicked"] = 'rgba(255,246,134,.6)';
 
 //EDM / DANCE
 //#d52633
-familyColors["electro house"] = 'rgb(213,38,51,1)';
-familyColors["electro house2"] = 'rgb(213,38,51,.7)';
+familyColors["electro house"] = tinycolor('rgb(213,38,51,1)').darken(10).toString()
+familyColors["electro house2"] = 'rgb(213,38,51,1)';
 
 //todo: monkeypatch (see EventsList @ getFamilyClass)
-familyColors["electrohouse"] = 'rgb(213,38,51,1)';
-familyColors["electrohouse2"] = 'rgb(213,38,51,.7)';
+familyColors["electrohouse"] = tinycolor('rgb(213,38,51,1)').darken(10).toString()
+familyColors["electrohouse2"] = 'rgb(213,38,51,1)';
 
 //ROCK
 //#dcb250
-familyColors["rock"] = 'rgba(220,178,80,1)';
-familyColors["rock2"] = 'rgba(220,178,80,.7)';
+familyColors["rock"] = tinycolor('rgba(220,178,80,1)').darken(10).toString()
+familyColors["rock2"] = 'rgba(220,178,80,1)';
+//familyColors["rock2"]  = tinycolor(familyColors["rock"]).darken(10).toString()
 //HARDCORE
-familyColors["punk"] = 'rgba(220,178,80,1)';
+familyColors["punk"] = tinycolor('rgba(220,178,80,1)').darken(10).toString();
 familyColors["punk2"] = 'rgba(220,178,80,1)';
 //GOLDEN AGE
-familyColors["folk"] = 'rgba(220,178,80,1)';
+familyColors["folk"]  = tinycolor('rgba(220,178,80,1)').darken(10).toString();
 familyColors["folk2"] = 'rgba(220,178,80,1)';
 
 //#6c9
-familyColors["r&b"] = 'rgba(102,204,153,1)';
-familyColors["r&b2"] = 'rgba(102,204,153,.7)';
+familyColors["r&b"] = tinycolor('rgba(102,204,153,1)').darken(10).toString();
+familyColors["r&b2"] = 'rgba(102,204,153,1)';
 //#bdcc66
-familyColors["country"] = 'rgba(189,204,102,1)';
-familyColors["country2"] = 'rgba(189,204,102,.7)';
+familyColors["country"] = tinycolor('rgba(189,204,102,1)').darken(10).toString();
+familyColors["country2"] = 'rgba(189,204,102,1)';
 //#d8802f
-familyColors["metal"] = 'rgba(216,128,47,1)';
-familyColors["metal2"] = 'rgba(216,128,47,.7)';
+familyColors["metal"] = tinycolor('rgba(216,128,47,1)').darken(10).toString();
+familyColors["metal2"] = 'rgba(216,128,47,1)';
 
 //BLUE NOTE
 //#4364b3
-familyColors["blues"] = 'rgba(67,100,179,1)';
-familyColors["blues2"] = 'rgba(67,100,179,.7)';
-familyColors["jazz"] = 'rgba(67,100,179,1)';
-familyColors["jazz2"] = 'rgba(67,100,179,.7)';
+familyColors["blues"] = tinycolor('rgba(67,100,179,1)').darken(10).toString();
+familyColors["blues2"] = 'rgba(67,100,179,1)';
+familyColors["jazz"] = tinycolor('rgba(67,100,179,1)').darken(10).toString();
+familyColors["jazz2"] = 'rgba(67,100,179,1)';
 
 //#8e3761
-familyColors["hip hop"] = 'rgb(142,55,97,1)';
-familyColors["hip hop2"] = 'rgb(142,55,97,.7)';
+familyColors["hip hop"] = tinycolor('rgb(142,55,97,1)').darken(10).toString();
+familyColors["hip hop2"] = 'rgb(142,55,97,1)';
 
 //todo: monkeypatch (see EventsList @ getFamilyClass)
-familyColors["hiphop"] = 'rgb(142,55,97,1)';
-familyColors["hiphop2"] = 'rgb(142,55,97,.7)';
+familyColors["hiphop"] =  tinycolor('rgb(142,55,97,1)').darken(10).toString();
+familyColors["hiphop2"] = 'rgb(142,55,97,1)';
 
 
 
 //#6e48af
 familyColors["reggae"] = 'rgb(110,72,175,1)'
-familyColors["reggae2"] = 'rgb(110,72,175,.7)';
+familyColors["reggae2"] = 'rgb(110,72,175,1)';
 
 familyColors["latin"] = '#008000';
 familyColors["latin2"] = '#008000';
