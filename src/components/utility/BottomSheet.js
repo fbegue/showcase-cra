@@ -9,7 +9,9 @@ import {useReactiveVar} from "@apollo/react-hooks";
 import useMeasure from "react-use-measure";
 import {a, useSpring} from "react-spring";
 import DisplayDetailRow from "../tiles/DisplayDetailRow";
+import api from '../../api/api'
 import BubbleFamilyGenreChips from "../chips/BubbleFamilyGenreChips";
+const { DateTime } = require("luxon");
 
 export default function Example() {
 
@@ -27,8 +29,20 @@ export default function Example() {
 		setOpen(false)
 	}
 
+	const [artistInfo, setArtistInfo] = useState(false);
+	let req = {auth:globalUI};
+
 	useEffect(e =>{
-		setOpen(tileSelectControl.tile)
+		api.getArtistInfo({...req,artist:tileSelectControl.tile})
+			.then(r =>{
+				r.yearEarly = DateTime.fromISO(r.release_range.earliest.release_date).year
+				r.yearLate = DateTime.fromISO(r.release_range.latest.release_date).year
+				setArtistInfo(r)
+				setOpen(tileSelectControl.tile)
+			},e =>{
+				console.error(e);
+			})
+
 	},[tileSelectControl.tile])
 
 	let root = document.documentElement;
@@ -56,7 +70,20 @@ export default function Example() {
 								<div style={{marginTop:"1em"}}>
 									<DisplayDetailRow item={tileSelectControl.tile}/>
 								</div>
-								<div>years active: 2002-2010</div>
+								{artistInfo &&
+								<div>
+									<div>onTour: {artistInfo?.onTourUntil ? 'until ' + artistInfo.onTourUntil:'no'}</div>
+									<div>Years Active:
+										{artistInfo.yearEarly} - {artistInfo.yearLate}
+									</div>
+
+									<div>Popularity:
+										index: {artistInfo.popularity}
+										followers: {artistInfo.followers.total}
+									</div>
+								</div>
+								}
+
 							</div>
 							:
 							<div style={{display:"flex",flexDirection:"column"}}>

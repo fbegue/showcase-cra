@@ -1,7 +1,7 @@
 # Soundfound.io developer notes
 
 - use `npm run commit <msg>` then `git push` to commit w/ version update and push
-- change api/redirect addresses in `src/components/Profile.js`
+    - api/redirect addresses in `src/components/Profile.js` will automatically detect where they are (server or local)
 
 ## deploy order
 

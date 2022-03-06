@@ -224,6 +224,26 @@ var getTopArtists =  function(req){
     })
 }
 
+var getArtistInfo =  function(req){
+
+    return new Promise(function(done, fail) {
+        fetch(api_address + '/getArtistInfo', {
+            method: 'POST', // *GET, POST, PUT, DELETE, etc.
+            mode: 'cors', // no-cors, *cors, same-origin
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(req)
+        })
+            .then(res => res.json())
+            .then(function(res){
+                //console.log("retrieved: ",res);
+                done(res)
+            })
+            .catch(e =>{fail(e)})
+    })
+}
+
 //static user methods
 
 var myFetch =  async function(route,req){
@@ -629,6 +649,7 @@ const deleteTodo = (id) =>
     });
 
 export default {
+    getArtistInfo,
     postInfo,
     postInfo2,
     // fetchTodos,

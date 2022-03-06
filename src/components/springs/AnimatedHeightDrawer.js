@@ -8,6 +8,8 @@ import {a, useSpring} from "react-spring";
 import DisplayDetailRow from "../tiles/DisplayDetailRow";
 import BubbleFamilyGenreChips from "../chips/BubbleFamilyGenreChips";
 
+//note: deprecated for dedicated library (built on top of spring) BottomSheet.js
+
 function AnimatedHeightDrawer(props) {
 
 	let statcontrol = StatControl.useContainer();
