@@ -7,6 +7,7 @@ import useMeasure from "react-use-measure";
 import {a, useSpring} from "react-spring";
 import DisplayDetailRow from "../tiles/DisplayDetailRow";
 import BubbleFamilyGenreChips from "../chips/BubbleFamilyGenreChips";
+
 function AnimatedHeightDrawer(props) {
 
 	let statcontrol = StatControl.useContainer();

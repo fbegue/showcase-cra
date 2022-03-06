@@ -84,9 +84,9 @@ const Accordion = ({infoBound,collapse, setCollapse,content }) => {
                     {/*testing: more than 1 avatar = overlap (flex not working)
                        something to do with this entire bar being a little strange maybe?*/}
 
-                    <div style={{display:"flex",flexDirection:"row",opacity:collapse ? 1:.5}}>
+                    <div style={{display:"flex",flexDirection:"row",marginTop:".2em",opacity:collapse ? 1:0}}>
                             <div>
-                                {friendscontrol.guest ? <Avatar dim="40px" rec={{user:friendscontrol.guest}}/> :<div/>}
+                                {friendscontrol.guest ? <Avatar dim="35px" rec={{user:friendscontrol.guest}}/> :<div/>}
                             </div>
                         {/*<div>*/}
                         {/*    {friendscontrol.guest ? <Avatar dim="40px" rec={{user:friendscontrol.guest}}/> :<div/>}*/}

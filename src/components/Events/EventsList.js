@@ -23,6 +23,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
 import PauseCircleOutlineIcon from '@material-ui/icons/PauseCircleOutline';
+import AnimatedPlayBars from'../misc/AnimatedPlayBars'
 import spotifyLogo from '../../assets/spotify_logo_large.png'
 
 
@@ -224,10 +225,13 @@ function EventsList(props) {
 									/>
 								</div>
 								<div>
-									{control.play && control.playArtist === sub.artist.id ?
-										<ApplyPulse target={
-											<PauseCircleOutlineIcon fontSize={'inherit'} style={{fontSize:"30px"}} color={'secondary'} onClick={() => handlePlay(sub.artist)}></PauseCircleOutlineIcon>
-										}/>
+									{/*testing:*/}
+									{/*{control.play && control.playArtist === sub.artist.id ?*/}
+									{true ?
+										<AnimatedPlayBars/>
+										// <ApplyPulse target={
+										// 	<PauseCircleOutlineIcon fontSize={'inherit'} style={{fontSize:"30px"}} color={'secondary'} onClick={() => handlePlay(sub.artist)}></PauseCircleOutlineIcon>
+										// }/>
 										:
 										<ApplyPulse target={
 											<PlayCircleOutlineIcon fontSize={'inherit'} style={{fontSize:"30px"}} color={'secondary'} onClick={() => handlePlay(sub.artist)}></PlayCircleOutlineIcon>

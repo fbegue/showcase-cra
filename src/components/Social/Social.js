@@ -12,7 +12,7 @@ import {
 	CHIPGENRESRANKED,
 	GLOBAL_UI_VAR
 } from "../../storage/withApolloProvider";
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles,withStyles} from '@material-ui/core/styles';
 import styles from './Social.tiles.module.css'
 import './Social.css'
 import CustomizedInputBase from "../utility/CustomizedInputBase";
@@ -20,8 +20,12 @@ import MasonrySimple from  '../Masonry/MasonrySimple'
 import UserTile from "../utility/UserTile";
 import FriendsDisplay from "./FriendsDisplay";
 import InputIcon from '@material-ui/icons/Input';
+import Button from '@material-ui/core/Button';
+import LibraryMusicIcon from '@material-ui/icons/LibraryMusic';
 import RotateSpring from '../springs/RotateSpring.js'
-
+import MoreIconImg from '../../assets/iconmonstr/more-icon.png'
+import PlusOutlinedIconImg from '../../assets/iconmonstr/plus_outlined_icon.png'
+import PlusIconImg from '../../assets/iconmonstr/plus-icon.png'
 //import util from "../util/util";
 import BackdropParent from "../utility/BackdropParent";
 import Drawer from "./Drawer";
@@ -98,7 +102,7 @@ function Social(props) {
 	const barData = useReactiveVar(BARDATA);
 	//const barDrillMap = useReactiveVar(BARDRILLDOWNMAP);
 
-	console.log(comp + "chipGenresRanked",chipGenresRanked);
+	//console.log(comp + "chipGenresRanked",chipGenresRanked);
 
 	let statcontrol = StatControl.useContainer();
 	let tabcontrol = TabControl.useContainer()
@@ -289,7 +293,7 @@ function Social(props) {
 		// 	// { opacity: 0, color: 'rgb(14,26,19)' },
 		// ],
 		// from: { opacity: 0, color: 'red' },
-		opacity:  isDrawerShowing ? 1 : 1,
+		opacity:  isDrawerShowing ? 1 : .6,
 		// "filter": isDrawerShowing ? "brightness(.5)" : "brightness(1)",
 		width: isDrawerShowing ? "22.5em" : "2.2em"
 		// width: isDrawerShowing ? "2.2em":"22.5em"
@@ -297,9 +301,11 @@ function Social(props) {
 
 	const drawerToggleStyle = useSpring({
 		position:"absolute",
-		right:isDrawerShowing ? 0 :-15,
+		right:isDrawerShowing ? 0 :-5,
 		top:2,zIndex:"3",margin:".2em",
-		opacity:  isDrawerShowing ? 1 : .8,
+		opacity:  friendscontrol.guest ?
+			isDrawerShowing ? 1 : 1
+			:0
 		// "filter": isDrawerShowing ? "brightness(.5)" : "brightness(1)",
 		// width: isDrawerShowing ? "22.5em" : "2.2em"
 		// width: isDrawerShowing ? "2.2em":"22.5em"
@@ -353,13 +359,25 @@ function Social(props) {
 
 	}
 
+	const ButtonMore = withStyles((theme) => ({
+		root: {
+			width:"4em",
+			height:"2em",
+			marginLeft:".5em",
+			marginTop:".2em"
+			// '&:hover': {
+			// 	backgroundColor: "grey",
+			// },
+		},
+	}))(Button);
+
 	return(
 		<div>
 			<div id={'social'}
 				 style={{
 					 //todo: have to set explcit height here?
 					 //not undertstanding why it just doesn't adjust to content
-					 height: "18.5em",
+					 height: "21.5em",
 					 outline: "2px solid orange",
 					 position: "relative"
 				 }}
@@ -449,47 +467,77 @@ function Social(props) {
 
 				//	todo: not sure why I can't get this UserTile and guestStats to flex correctly
 
-				<div style={{display:"flex",flexDirection:"column"}}>
+				<div style={{display:"flex",flexDirection:"column",width:"20em"}}>
 					{/*<div><UserTile item={selectedUser} single={true} size={["200px","200px"]} /> </div>*/}
 					{/* style={{"position":"absolute","zIndex":"1"}}*/}
 
 					{/*testing: trying to just take up as little space as possible*/}
 					{/*<div><UserTile item={selectedUser} single={true} size={["auto","16em"]} /> </div>*/}
-					<div style={{display:"flex",flexDirection:"row"}}>
-						<Avatar rec={{user:globalUI.user}}/>
-						<div style={{"fontSize":"2.5em","color":"white","WebkitTextStrokeWidth":"1px","WebkitTextStrokeColor":"black",
-							"marginLeft":"-0.2em","marginRight":"-0.2em","zIndex":"1"}}>X</div>
-						<Avatar rec={{user:friendscontrol.guest}}/>
-					</div>
 
-					{/*,marginLeft:"11.5em"*/}
-					<div style={{"zIndex":"2",display:"flex"}} id={'guestStats'}>
+					{/*note: set height to let Avatar overflow*/}
+					<div style={{display:"flex",flexDirection:"row",marginTop:"1em",height:"2em",marginRight:".5em"}}>
 
-						{/*todo: not sure why BubbleFamilyGenreChips is creeping up here*/}
 						<div style={{color:"white",height:"20px",marginBottom:"1em",width:"fit-content"}}>
 							<Paper elevation={3}>
 								<Typography style={{padding:"1px 4px"}} variant="subtitle1">
-									Genres
+									Top Shared Genres
 								</Typography>
 							</Paper>
 						</div>
+						<div style={{flexGrow:1}}></div>
+						{/*<Avatar rec={{user:globalUI.user}}/>*/}
+						<div  style={{display:"flex",flexDirection:"row",marginTop:"-.8em",marginRight:"1em"}}>
+							<div style={{"fontSize":"1.5em","color":"white","WebkitTextStrokeWidth":"1px","WebkitTextStrokeColor":"black",
+								"marginRight":"-0.5em","marginTop":"1em","zIndex":"1"}}>x</div>
+							<div><Avatar rec={{user:friendscontrol.guest}}/> </div>
+						</div>
+
+
+					</div>
+
+					<div style={{"zIndex":"2",display:"flex",marginTop:".5em"}} id={'guestStats'}>
+
+						{/*todo: not sure why BubbleFamilyGenreChips is creeping up here*/}
+						{/*<div style={{color:"white",height:"20px",marginBottom:"1em",width:"fit-content"}}>*/}
+						{/*	<Paper elevation={3}>*/}
+						{/*		<Typography style={{padding:"1px 4px"}} variant="subtitle1">*/}
+						{/*			Genres*/}
+						{/*		</Typography>*/}
+						{/*	</Paper>*/}
+						{/*</div>*/}
 						<div>
-							<BubbleFamilyGenreChips families={[]} familyDisabled={true} occurred={true}
+							<BubbleFamilyGenreChips families={[]} familyDisabled={true} showOccurred={false} occurred={true}
 													clearable={false} genres={chipGenresRanked} flexDirection={'row'}/>
 						</div>
 
 					</div>
-					<div style={{display:"flex"}}>
-						<div style={{color:"white",height:"20px",marginBottom:"1em",width:"fit-content"}}>
-							<Paper elevation={3}>
-								<Typography style={{padding:"1px 4px"}} variant="subtitle1">
-									Artists
-								</Typography>
-
-							</Paper>
+					{/*,marginLeft:"11.5em"*/}
+					<div style={{display:"flex",flexDirection:"column",width:"17.5em",marginTop:".5em"}}>
+						<div style={{display:"flex"}}>
+							<div style={{color:"white",height:"20px",marginBottom:"1em",width:"fit-content"}}>
+								<Paper elevation={3}>
+									<Typography style={{padding:"1px 4px"}} variant="subtitle1">
+										Top Shared Artists
+									</Typography>
+								</Paper>
+							</div>
+							<Button style={{marginLeft:".5em",maxWidth: '30px', maxHeight: '30px', minWidth: '30px', minHeight: '30px',background:"white"}}>
+								{/*,filter:"invert(1)"*/}
+								{/*<img style={{height:"1.5em",marginLeft:"-3em"}} src={PlusOutlinedIconImg}/>*/}
+								<div style={{height:"1.5em",marginLeft:"0em"}} >
+									<LibraryMusicIcon/>
+								</div>
+								{/*<div>*/}
+								{/*	<img style={{height:"1.5em",transform:"rotate(95deg)",marginTop:"-.7em",marginLeft:"0em"}} src={MoreIconImg}/>*/}
+								{/*</div>*/}
+							</Button>
 						</div>
-						<MasonrySimple data={getTopSharedArtists()}/>
+
+
+						<div style={{marginLeft:".5em"}}><MasonrySimple data={getTopSharedArtists()}/></div>
 					</div>
+
+
 				</div>
 					// </Paper>
 				}

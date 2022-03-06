@@ -1356,7 +1356,7 @@ function useProduceEvents(){
 					return validStart && validEnd
 				}
 				events = events.filter(e =>cids.indexOf(e.metro_id) !== -1)
-					.filter(byDate)
+					// .filter(byDate)
 					.sort((e1,e2) =>{return new Date(e1.start.datetime) - new Date(e2.start.datetime) })
 
 				//todo: strange error here when ... my date result returns to little of # of results?

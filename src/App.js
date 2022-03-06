@@ -14,14 +14,14 @@ import ErrorBoundary from "./util/ErrorBoundary";
 import Store, {Context} from './storage/Store'
 import withApolloProvider from './storage/withApolloProvider';
 import api from "./api/api";
-import {Control, FriendsControl, GridControl} from './index'
+import {Control, FriendsControl, GridControl, StatControl, TabControl} from './index'
 
 //todo: this EVENTS_VAR here just to push that count out is no good
 import { GLOBAL_UI_VAR,EVENTS_VAR} from './storage/withApolloProvider';
 import {useQuery,useReactiveVar} from "@apollo/react-hooks";
 import SplitPane from "react-split-pane";
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
-import { withStyles } from '@material-ui/core/styles';
+import {makeStyles, withStyles} from '@material-ui/core/styles';
 import { createMuiTheme } from '@material-ui/core/styles';
 import SwipeRight from './assets/swipe-right.png'
 // import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
@@ -31,6 +31,9 @@ import Badge from '@material-ui/core/Badge';
 import logo from './assets/sound_found.png'
 import { useDrag } from 'react-use-gesture'
 import {useSpring,animated} from "react-spring";
+import Tabs from "@material-ui/core/Tabs";
+import Tab from "@material-ui/core/Tab";
+import AppBar from "@material-ui/core/AppBar";
 import 'fontsource-roboto';
 import './App.css'
 import './components/tiles/Tiles.css'
@@ -96,11 +99,20 @@ const styles = theme => ({
     }
 });
 
+const useStyles = makeStyles((theme) => ({
+    root: {
+        flexGrow: 1,
+        backgroundColor: "grey"
+    }
+}));
+
 function App(props) {
 
     const isTabletOrMobile = useMediaQuery({ query: '(max-width: 768px)' })
+    const classes = useStyles();
 
-    const { classes } = props;
+    // const { classes } = props;
+
     let [filter, setFilter] = useState('active');
     let control = Control.useContainer()
     //let gridControl = GridControl.useContainer()
@@ -279,6 +291,48 @@ function App(props) {
 
     const ref = useRef()
     const isVisible = useOnScreen(ref)
+
+    let statcontrol = StatControl.useContainer();
+    let tabcontrol = TabControl.useContainer()
+
+    function handleSectionSelect(event,sectionkey){
+        console.log("handleSectionSelect",sectionkey);
+        tabcontrol.setActiveSection(sectionkey)
+
+        switch (sectionkey) {
+            case 1:
+                statcontrol.setStats({name:"artists_saved"})
+                break;
+            case 2:
+                statcontrol.setStats({name:"artists_friends"})
+                break;
+            default:
+        }
+
+        // console.log("handleTabChange",tabMap[tabcontrol.section][tabindex]);
+        // console.log(tabcontrol.tab);
+
+        //tabcontrol.setActiveTab(tabindex);
+        //statcontrol.setStats({name:Object.keys(tabMap[tabcontrol.section][tabindex])[0]})
+
+        //testing: went away from grid control
+        // if(sectionkey === 2){
+        // 	gridControl.setGridClass('friendsGrid')
+        // 	// console.log("pane shift: friends");
+        // 	// paner.setPane(paner.paneSettings['friends'])
+        // }else{
+        // 	gridControl.setGridClass('defaultGrid')
+        // 	// console.log("pane shift: default");
+        // 	// paner.setPane(paner.paneSettings['default'])
+        // }
+
+        //testing: went away from tabs
+        //if the section changed, also trigger tab set (0 as default)
+        // if(sectionkey !== tabcontrol.section){
+        // 	handleTabChange(null,0,sectionkey)
+        // }
+    }
+
     return (
         <ErrorBoundary>
             <MuiThemeProvider theme={muiTheme}>
@@ -426,18 +480,41 @@ function App(props) {
 
 
                             <div  style={{position: "sticky",top: "0px", "paddingTop":"0.5em","paddingBottom":"0.5em",
-                                borderBottom: "1px solid black", zIndex: "20",display:'flex',background:"#f0f0f0"}}>
+                                borderBottom: "1px solid black", zIndex: "20",background:"#f0f0f0"}}>
                                 <div>
                                     {/* scrollTop={isVisible}*/}
                                     <Profile version={pjson.version}/>
                                 </div>
+
+                                <AppBar position="static">
+                                    <Tabs className={classes.root} value={tabcontrol.section} onChange={handleSectionSelect} >
+                                        {/*todo: disabled for now (broke in multiple places)*/}
+                                        {/*<Tab label="Search">*/}
+                                        {/*	<Search></Search>*/}
+                                        {/*</Tab>*/}
+                                        <Tab label="My Profile"/>
+                                        <Tab label="My Library"/>
+                                        <Tab label="My Friends"/>
+                                        {/*todo:*/}
+                                        {/*<Tab label="Billboards">*/}
+                                        {/*	<Tabs>*/}
+                                        {/*		<Tab label="Subtab 2.1">*/}
+                                        {/*			Tab 2 Content 1*/}
+                                        {/*		</Tab>*/}
+                                        {/*		<Tab label="Subtab 2.2">Tab 2 Content 2</Tab>*/}
+                                        {/*		<Tab label="Subtab 2.3">Tab 2 Content 3</Tab>*/}
+                                        {/*	</Tabs>*/}
+                                        {/*</Tab>*/}
+                                    </Tabs>
+                                </AppBar>
+
                                 {/*<div><ControlTest/></div>*/}
                                 {/*<input value={code} onChange={(event) =>{setCode(event.target.value)}}  />*/}
                                 {/*<button onClick={() =>{getAuth(code)}}>fake auth </button>*/}
 
                                 {/*<div ref={containerRef} className={classnames(params)}>yeah don't work here either</div>*/}
-
                             </div>
+
                             {/* className={gridControl.gridClass}*/}
                             {globalUI.access_token ?
                                 <div >

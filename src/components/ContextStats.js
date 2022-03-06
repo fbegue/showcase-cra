@@ -46,11 +46,13 @@ import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
 import Badge from "@material-ui/core/Badge";
 import EventIcon from "@material-ui/icons/Event";
 import AnimatedHeightDrawer from './utility/AnimatedHeightDrawer'
+import BottomSheet from './utility/BottomSheet'
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 import {makeStyles} from "@material-ui/core/styles";
 import Dot from './chips/Dot'
 import Switch from "@material-ui/core/Switch";
+import {animated, useSpring} from "@react-spring/web";
 //todo: for some wild reason, after c/p customScroll.css",firstComp.scss  out to above FirstComp for gen use
 //that don't work - but importing them from another comp that uses them...works?
 //import {FirstComp} from './utility/CustomScroll/FirstComp/FirstComp'
@@ -160,9 +162,9 @@ function ContextStats(props) {
 	const width = 340;
 
 	//note: replaced all references to data-height (designed to be unique values 300-500) with uHeight
-
+	//note: practically, adjusting this will also adjust padding between each tile
 	// const uHeight = 480;
-	const uHeight = 260;
+	const uHeight = 250;
 
 	const tiles = useReactiveVar(TILES);
 
@@ -378,6 +380,9 @@ function ContextStats(props) {
 		//setOpen(!open);
 	};
 
+	const fadeToggleProps = useSpring({
+		opacity: tileSelectControl.tile ?0:1
+	})
 
 	const chipFamilies = useReactiveVar(CHIPFAMILIES);
 	const chipGenres = useReactiveVar(CHIPGENRES);
@@ -434,16 +439,22 @@ function ContextStats(props) {
 					{/*<Paper elevation={3}>*/}
 					<div style={{position: "absolute", zIndex: "10000",marginTop:"30em"}}>
 
-						<button
-							//note: zindex - huh
+						<animated.div style={fadeToggleProps}>
+							<button
+
 							style={{ border: "1px solid red",transform:"rotate(90deg)",
 								boxShadow: "0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23)"}}
 							onClick={() => {
 								toggleDrawer();
 							}}
 						>
-							<RotateSpring toggle={toggle} state={fstate} target={<FilterListIcon fontSize={'inherit'} style={{fontSize:"30px"}} color={'secondary'} />}/>
-						</button>
+							<RotateSpring toggle={toggle} state={fstate}
+										  target={
+										  	<FilterListIcon fontSize={'inherit'}
+											style={{fontSize:"30px"}} color={'secondary'} />
+										  }/>
+							</button>
+						</animated.div>
 						<div style={{display:"flex",marginTop:"-.2em",marginLeft:".5em"}}>
 							{friendscontrol.families.map((fam,i) =>
 								<div  style={{marginLeft:i !== 0 ? ".25em":"initial"}}>
@@ -756,7 +767,8 @@ function ContextStats(props) {
 				</Drawer>
 			</div>
 			<div id={'artist-detail-drawer'}>
-				<AnimatedHeightDrawer/>
+				<BottomSheet/>
+				{/*<AnimatedHeightDrawer/>*/}
 			</div>
 
 

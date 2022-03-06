@@ -684,27 +684,7 @@ export default function Tabify() {
 			</div>}
 			{isTabletOrMobile &&
 			<div>
-				<AppBar position="static">
-					<Tabs className={classes.root} value={tabcontrol.section} onChange={handleSectionSelect} >
-						{/*todo: disabled for now (broke in multiple places)*/}
-						{/*<Tab label="Search">*/}
-						{/*	<Search></Search>*/}
-						{/*</Tab>*/}
-						<Tab label="My Profile"/>
-						<Tab label="My Library"/>
-						<Tab label="My Friends"/>
-						{/*todo:*/}
-						{/*<Tab label="Billboards">*/}
-						{/*	<Tabs>*/}
-						{/*		<Tab label="Subtab 2.1">*/}
-						{/*			Tab 2 Content 1*/}
-						{/*		</Tab>*/}
-						{/*		<Tab label="Subtab 2.2">Tab 2 Content 2</Tab>*/}
-						{/*		<Tab label="Subtab 2.3">Tab 2 Content 3</Tab>*/}
-						{/*	</Tabs>*/}
-						{/*</Tab>*/}
-					</Tabs>
-				</AppBar>
+
 				{/*<a.div style={{...drawerExpandProps}}>*/}
 				<div>
 					{/*todo: disabled for now*/}

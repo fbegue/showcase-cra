@@ -322,7 +322,8 @@ function BubbleFamilyGenreChips(props) {
 										_.find(varied, r =>{return r.id === gOb.id}) ? "outlined" :"default"
 										:"default"}
 								label={
-									props.occurred ? gOb.genre.name + " (" + gOb.occurred.toString() + ")"
+									props.occurred ?
+										props.showOccurred ? gOb.genre.name + " (" + gOb.occurred.toString() + ")": gOb.genre.name
 										: gOb.name
 								}
 
@@ -363,6 +364,7 @@ BubbleFamilyGenreChips.propTypes = {
 	removable :PropTypes.bool,
 	//display dataset which includes occurence values
 	occurred:PropTypes.bool,
+	showOccurred:PropTypes.bool,
 	more:PropTypes.bool,
 	seperator: PropTypes.bool
 

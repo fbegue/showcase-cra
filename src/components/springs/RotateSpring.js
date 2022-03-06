@@ -8,6 +8,7 @@ export default function RotateSpring(props) {
 
 	const sprops = useSpring({
 		rotate: props.vert ? props.state ? 90 : 270: props.state ? 0 : 180
+
 	})
 
 	const {x} = useSpring({
