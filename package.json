@@ -1,6 +1,6 @@
 {
   "name": "showcase-cra",
-  "version": "0.25.0",
+  "version": "0.26.0",
   "private": true,
   "dependencies": {
     "@apollo/client": "^3.3.15",
