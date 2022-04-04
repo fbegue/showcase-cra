@@ -4,7 +4,9 @@ import Popover from '@material-ui/core/Popover';
 import Typography from '@material-ui/core/Typography';
 // import Button from '@material-ui/core/Button';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
+import PlaylistAddIcon from '@material-ui/icons/PlaylistAdd';
 import Fab from '@material-ui/core/Fab';
+// import SPW from '../utility/StopPropagationWrapper'
 
 const useStyles = makeStyles((theme) => ({
 	typography: {
@@ -32,26 +34,34 @@ export default function SimplePopover(props) {
 			{/*<Button aria-describedby={id} variant="contained" color="primary" onClick={handleClick}>*/}
 			{/*	Open Popover*/}
 			{/*</Button>*/}
-			<Fab color="secondary" size={'small'} aria-label="add">
-				<MoreVertIcon onClick={handleClick}/>
-			</Fab>
+			<div onClick={(e) => {
+				e.stopPropagation();
+			}}>
+				<Fab color="secondary" size={'small'} aria-label="add">
+					{/*todo: until there are more features here*/}
+					{/*<MoreVertIcon onClick={handleClick}/>*/}
+					
+					<PlaylistAddIcon onClick={handleClick}/>
 
-			<Popover
-				id={id}
-				open={open}
-				anchorEl={anchorEl}
-				onClose={handleClose}
-				anchorOrigin={{
-					vertical: 'bottom',
-					horizontal: 'left',
-				}}
-				transformOrigin={{
-					vertical: 'top',
-					horizontal: 'center',
-				}}
-			>
-				<Typography className={classes.typography}>{props.content}</Typography>
-			</Popover>
+				</Fab>
+				<Popover
+					id={id}
+					open={open}
+					anchorEl={anchorEl}
+					onClose={handleClose}
+					anchorOrigin={{
+						vertical: 'bottom',
+						horizontal: 'left',
+					}}
+					transformOrigin={{
+						vertical: 'top',
+						horizontal: 'center',
+					}}
+				>
+					<Typography className={classes.typography}>{props.content}</Typography>
+				</Popover>
+			</div>
+
 		</div>
 	);
 }

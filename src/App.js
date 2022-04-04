@@ -350,8 +350,9 @@ function App(props) {
                         </div>
                     </BrowserRouter>
                     {/* style={{overflow:"scroll"}} onScroll={getScrollData}*/}
-
+                    <link href="http://fonts.cdnfonts.com/css/gotham" rel="stylesheet"/>
                     <div>
+
                         {!isTabletOrMobile && <div className={'app'} >
 
                             {/*<div  style={{position: "sticky",bottom: "0px", "paddingTop":"0.5em","paddingBottom":"0.5em",*/}

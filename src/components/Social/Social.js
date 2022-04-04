@@ -49,6 +49,10 @@ import StackedBarDrill from "../Charts/StackedBarDrill/StackedBarDrill";
 import {BARDATA,BARDRILLDOWNMAP} from "../../storage/withApolloProvider";
 import GenreChipsCompact from "../chips/GenreChipsCompact";
 import Avatar from "./Avatar";
+
+import  DisconnectIcon from '../../assets/disconnect-svgrepo-com.svg';
+
+
 const useStyles = makeStyles((theme) => ({
 	root: {
 		width: '100%',
@@ -93,6 +97,7 @@ const Fade = React.forwardRef(function Fade(props, ref) {
 function Social(props) {
 	var comp = "Social |"
 
+
 	const [globalState, globalDispatch] = useContext(Context);
 	const globalUI = useReactiveVar(GLOBAL_UI_VAR);
 	let control = Control.useContainer();
@@ -134,7 +139,8 @@ function Social(props) {
 	//testing:
 	// const [query, setQuery] = React.useState("Dan");
 	const [query, setQuery] = React.useState("");
-	const [items, set] = useState(globalState['spotifyusers'])
+	const [items, set] = useState([])
+	const [searchFocus, setSearchFocus] = React.useState(null);
 	console.log();
 
 
@@ -156,8 +162,10 @@ function Social(props) {
 		// var relatedNotFriends = globalUI.user.related_users.filter(testQuery).filter(r =>{return !(r.friend)})
 		//todo:
 		//var withAllUsers = _.uniqBy(relatedNotFriends.concat(globalState.spotifyusers),'id')
+		console.log(comp + "set(relatedNotFriends)");
+
 		set(relatedNotFriends)
-	}, [query,globalUI.user])
+	}, [query,globalUI.user,searchFocus])
 
 
 	const [heights, gridItems] = useMemo(() => {
@@ -204,10 +212,13 @@ function Social(props) {
 	//https://react-spring.io/common/props
 
 	const [anchorEl, setAnchorEl] = React.useState(null);
+
+
 	const open = Boolean(anchorEl);
 	const id = open ? 'spring-popper' : undefined;
 	const handleClick = (event) => {
 		setAnchorEl(anchorEl ? null : event.currentTarget);
+		setSearchFocus(true)
 	};
 
 	const clearForm = () =>{
@@ -251,12 +262,45 @@ function Social(props) {
 	//deprecated
 	//const [showBackdrop, setShowBackdrop] = React.useState(false);
 
-	const [isDrawerShowing, setDrawerShowing] = useState(true);
+	// const [tstate, toggle] = useState(true);
 
+	//note: RECALL THAT THE FRIENDS PICKER IS THE 'DRAWER'
+	//which is the initial state we want - just sounds backwards b/c a drawer showing isn't the usual start state
+	//const [isDrawerShowing, setDrawerShowing] = useState(true);
+
+	// useEffect(() => {
+	// 	console.log("useEffect",tstate);
+	// 	if(!tstate && friendscontrol.guest){
+	// 			setSelectedUser(friendscontrol.guest)
+	// 			setDrawerShowing(false);
+	// 			toggle(false);
+	// 		}
+	// });
+
+
+	//note: this is used to select a friend as well as add a new one
 	const selectUser = (item) =>{
 
-		statcontrol.setStats({name:"friends",user:item});setSelectedUser(item);clearForm();
-		setDrawerShowing(false);
+		//modify local
+		if(!item.friend){
+			//testing:
+			var newFriend = globalUI.user.related_users.filter(r =>{return r.id === item.id})[0]
+			newFriend.friend = true;
+
+			//note: updating server can be async
+			//todo: but pretty lazy just leaving it to fail here
+			api.addFriend(({auth:globalUI,friend:item}))
+				.then(r =>{console.log("addFriend successful",r);
+				},e =>{console.error("addFriend failure",e);})
+
+		}
+
+		//send to server
+
+		statcontrol.setStats({name:"friends",user:item});
+		//setSelectedUser(item);
+		clearForm();
+		tabcontrol.setDrawerShowing(false);
 		friendscontrol.setGuest(item)
 
 		const handleTabChange = (event, tabindex) => {
@@ -275,7 +319,7 @@ function Social(props) {
 
 
 	const handleToggleDrawer = () => {
-		setDrawerShowing(!isDrawerShowing);
+		tabcontrol.setDrawerShowing(!tabcontrol.isDrawerShowing);
 	};
 
 	//note: example of a contained drawer
@@ -293,18 +337,18 @@ function Social(props) {
 		// 	// { opacity: 0, color: 'rgb(14,26,19)' },
 		// ],
 		// from: { opacity: 0, color: 'red' },
-		opacity:  isDrawerShowing ? 1 : .6,
+		opacity:  tabcontrol.isDrawerShowing ? 1 : .6,
 		// "filter": isDrawerShowing ? "brightness(.5)" : "brightness(1)",
-		width: isDrawerShowing ? "22.5em" : "2.2em"
+		width: tabcontrol.isDrawerShowing ? "22.5em" : "2.2em"
 		// width: isDrawerShowing ? "2.2em":"22.5em"
 	});
 
 	const drawerToggleStyle = useSpring({
 		position:"absolute",
-		right:isDrawerShowing ? 0 :-5,
+		right:tabcontrol.isDrawerShowing ? 0 :-5,
 		top:2,zIndex:"3",margin:".2em",
 		opacity:  friendscontrol.guest ?
-			isDrawerShowing ? 1 : 1
+			tabcontrol.isDrawerShowing ? 1 : 1
 			:0
 		// "filter": isDrawerShowing ? "brightness(.5)" : "brightness(1)",
 		// width: isDrawerShowing ? "22.5em" : "2.2em"
@@ -341,7 +385,7 @@ function Social(props) {
 		}
 	}
 
-	const [tstate, toggle] = useState(true);
+
 
 
 	//todo: this will be replaced by pre-loading all queries (refactor of util.js)
@@ -391,17 +435,17 @@ function Social(props) {
 						style={{ border: "1px solid #ff000094", zIndex: "10000",
 							boxShadow: "0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23)"}}
 					>
-						<RotateSpring toggle={toggle} state={tstate} target={<InputIcon fontSize={'inherit'} style={{fontSize:"32px"}} color={'secondary'} />}/>
+						<RotateSpring toggle={tabcontrol.setDrawerShowing} state={tabcontrol.isDrawerShowing} target={<InputIcon fontSize={'inherit'} style={{fontSize:"32px"}} color={'secondary'} />}/>
 					</button>
 				</animated.div>
 				<animated.div style={drawerSpringStyle}>
 
 					{/*// <button className="openButton" onClick={handleToggleDrawer}>*/}
-					{/*// 	{isDrawerShowing ? "Close" : "Open"}*/}
+					{/*// 	{tabcontrol.isDrawerShowing ? "Close" : "Open"}*/}
 					{/*// </button>*/}
 					{/*}*/}
 					<div className="drawer">
-						{/*style={{display:isDrawerShowing ? 'initial':'none'}}*/}
+						{/*style={{display:tabcontrol.isDrawerShowing ? 'initial':'none'}}*/}
 						<div>
 							<div >
 								{/*<button onClick={changeData}>changeData</button>*/}
@@ -416,7 +460,9 @@ function Social(props) {
 										<div  style={{transform:"scale(.9)",marginLeft:"-.8em"}}>
 											{/*<TextField id="standard-basic" placeholder="search" value={query} onChange={handleChange} onClick={handleClick} />*/}
 											<div style={{flexGrow:"1"}}>
-												<CustomizedInputBase value={query} onChange={handleChange} onClick={handleClick} clearForm={() =>{clearForm()}} placeholder={'search for friends'}/>
+												<CustomizedInputBase value={query} onChange={handleChange} onClick={handleClick} clearForm={() =>{clearForm()}}
+																	 placeholder={anchorEl ? 'search for new friends':'filter friends'}
+												/>
 											</div>
 										</div>
 										{/*<div> <button onClick={() =>{setShowBackdrop(false)}}>return</button></div>*/}
@@ -429,9 +475,10 @@ function Social(props) {
 									</div>
 
 									{/*{globalState['spotifyusers'].length > 0 &&*/}
-									{globalState['spotifyusers'].length > 0 &&
+									{items.length > 0 &&
 									//style={{marginTop:"1em"}}
 									<div>
+
 										<Popper
 											id={id}
 											open={open}
@@ -446,8 +493,10 @@ function Social(props) {
 														{/*<div className={styles.list} style={{ height:"20em" }}>*/}
 														{transitions((style, item) => (
 															<a.div key={item.id} style={style}  onClick={(e =>{item.isUser ? selectUser(item):console.log("can't select non-instantiated user",item)})}>
+																<div>
+																	<UserTile selectedUser={friendscontrol.guest} item={item}/>
+																</div>
 
-																<UserTile selectedUser={selectedUser} item={item}/>
 															</a.div>
 														))}
 													</div>
@@ -463,7 +512,7 @@ function Social(props) {
 					</div>
 				</animated.div>
 
-				{selectedUser && !(isDrawerShowing) &&
+				{friendscontrol.guest && !(tabcontrol.isDrawerShowing) &&
 
 				//	todo: not sure why I can't get this UserTile and guestStats to flex correctly
 

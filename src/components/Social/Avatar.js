@@ -13,7 +13,7 @@ export default function Avatar(props) {
 		//so not having a reason it fine!
 		// || 'ERROR'
 	<div style={{width: props.dim ||"50px"}} >
-		<Tooltip title={props.rec.reason}>
+		<Tooltip title={props.rec.reason || "ERROR:MISSING REC.REASON"}>
 			<img style={{width: props.dim ||"50px",height:props.dim ||"50px",borderRadius: "50%"}} src={getAvatarSRC(props.rec.user)} />
 		</Tooltip>
 	</div>

@@ -396,8 +396,35 @@ function ContextStats(props) {
 
 
 	const [fstate, toggle] = useState(true)
-	const [selectVal,setSelectVal] = useState('artists_saved')
+
+
+	var userContextDropdownOps = [
+		{value:'artists_saved',title:'Saved Artists',style:null},
+		{value:'artists_top',title:'Top Artists',style:null},
+		{value:'tracks_recent',title:'Recent Tracks',style:null},
+		{value:'tracks_top',title:<span style={{paddingRight:".5em"}}>Top Tracks</span>,style:null},
+	]
+
+	var sharedContextDropdownOps = [
+		{value:'artists_friends',title:'Shared Artists',style:null},
+		{value:'tracks_friends',title:'Shared Tracks',style:null},
+	]
+
+	const [selectVal,setSelectVal] = useState("")
+	useEffect(() => {
+		console.log("setting default context selection value for section" + tabcontrol.section);
+		if(tabcontrol.section === 1){
+			setSelectVal('artists_saved')
+		}else{
+			setSelectVal('artists_friends')
+		}
+	},[tabcontrol.section ]);
+
+	//testing: thought about binding this to localstorage
+	//but just doesn't make sense regarding friends (who you *have* to repick)
+
 	const handleChange = (event) =>{
+
 		setSelectVal(event.target.value);
 		statcontrol.setStats({name:event.target.value})
 	}
@@ -457,7 +484,7 @@ function ContextStats(props) {
 						</animated.div>
 						<div style={{display:"flex",marginTop:"-.2em",marginLeft:".5em"}}>
 							{friendscontrol.families.map((fam,i) =>
-								<div  style={{marginLeft:i !== 0 ? ".25em":"initial"}}>
+								<div  key={fam} style={{marginLeft:i !== 0 ? ".25em":"initial"}}>
 									<Dot family={fam}/>
 								</div>
 							)}
@@ -541,10 +568,11 @@ function ContextStats(props) {
 									getContentAnchorEl: null
 								}}
 							>
-								<MenuItem value={'artists_saved'}>Saved Artists</MenuItem>
-								<MenuItem value={'artists_top'}>Top Artists</MenuItem>
-								<MenuItem value={'tracks_top'}>  <span style={{paddingRight:".5em"}}>Top Tracks</span></MenuItem>
-								<MenuItem value={'tracks_recent'}>Recent Tracks</MenuItem>
+								{ tabcontrol.section === 1 &&
+									userContextDropdownOps.map(op => <MenuItem key={op.value} value={op.value}>{op.title}</MenuItem>)}
+
+								{ tabcontrol.section === 2 &&
+								sharedContextDropdownOps.map(op => <MenuItem key={op.value} value={op.value}>{op.title}</MenuItem>)}
 
 							</Select>
 							{/*todo: is source of / should be using Pagination*/}
@@ -623,6 +651,12 @@ function ContextStats(props) {
 					{/*testing: disabled cusotm scroll attempt*/}
 					{/*<div className={'crazy-scroll'}>*/}
 					{/*	<CustomScroll>*/}
+					{(tabcontrol.section === 2 && !friendscontrol.guest) &&
+					<div style={{marginTop:"2em",display:"flex",flexDirection:"column",alignItems:"center"}}>
+						<div>Nothing here ...</div>
+						<div>choose a friend above!</div>
+					</div>
+					}
 					<div className={styles.list} >
 						{transitions((style, item) => (
 							<a.div style={style} onClick={() =>{handleTileSelect(item)}}>

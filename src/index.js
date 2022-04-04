@@ -29,7 +29,7 @@ function useControl(initialState = 0) {
             {"displayName":"Toledo", "id":5649}
         ]};
 
-    let [metro, _selectMetro] = useState([{"displayName":"Columbus", "id":9480}]);
+    let [metro, _selectMetro] = useState([]);
     Date.prototype.addDays = function(days) {
         var date = new Date(this.valueOf());
         date.setDate(date.getDate() + days);
@@ -118,11 +118,11 @@ let GridControl  = createContainer(useGrid);
 
 function useStats(initialState = 0) {
     //note: stats is really tracking active tab...
+    //note: right now this is automatically set in Dispatch after artists load
 
-    //testing: change default page
     //todo: needs to set artists_saved on login - not page load = triggers util to soon
-    // let [stats, setStats] = useState({name:"Home"});
-    //  let [stats, setStats] = useState({name:"artists_saved"});
+    //let [stats, setStats] = useState({name:"Home"});
+    // let [stats, setStats] = useState({name:"artists_saved"});
     let [stats, setStats] = useState({name:"Home"});
     //the default true is context
     const [mode, setMode] = useState(true);
@@ -132,15 +132,30 @@ function useStats(initialState = 0) {
 }
 let StatControl  = createContainer(useStats);
 
+var GSSI = function(verb,key,item){
+    if(verb==='get'){ return localStorage.getItem(key)}
+    else{localStorage.setItem(key,item)}
+   }
+
 function useTabs(initialState = 0) {
 
     //note: library,friends
-     const [section, setActiveSection] = useState(2);
+     var prevSection = GSSI('get','section')
+    // eslint-disable-next-line no-unused-expressions
+    prevSection ? console.log("active section set from localStorage",parseInt(prevSection)):{}
+    const [section, _setActiveSection] = useState(parseInt(prevSection) || 2);
+     var setActiveSection = function(newSection){
+         GSSI('set','section',newSection)
+         _setActiveSection(newSection)
+     }
+
     //note: artists, songs, etc.
     const [tab, setActiveTab] = useState(0);
     //default Pager.jsx page
     const [page, setPage] = useState(1);
-    return { tab,setActiveTab,section,setActiveSection,page, setPage }
+    const [isDrawerShowing, setDrawerShowing] = useState(true);
+    const [selectedUser, setSelectedUser] = React.useState(null);
+    return { tab,setActiveTab,section,setActiveSection,page, setPage,setDrawerShowing,isDrawerShowing,setSelectedUser,selectedUser }
 }
 let TabControl  = createContainer(useTabs);
 

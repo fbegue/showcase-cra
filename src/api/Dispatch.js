@@ -4,7 +4,7 @@ import api from "../api/api.js"
 import {useReactiveVar} from "@apollo/react-hooks";
 import {GLOBAL_UI_VAR} from "../storage/withApolloProvider";
 import {Context, initUser} from "../storage/Store";
-import {Control,StatControl} from "../index";
+import {Control, StatControl, TabControl} from "../index";
 import exampleFetchEvents from '../data/example/fetchEvents'
 import {tabMap} from "../Tabify";
 // import dan2_example from '../data/example/DanielNiemiec#2'
@@ -17,6 +17,7 @@ function Dispatch(props) {
 
 	let control = Control.useContainer();
 	let statcontrol = StatControl.useContainer();
+	let tabcontrol  = TabControl.useContainer();
 	let req = {auth:globalUI};
 
 	async function asyncDispatch() {
@@ -42,10 +43,9 @@ function Dispatch(props) {
 			globalDispatch({type: 'init', payload:{artists:me.artists.artists,stats:null},user: globalUI.user,context:'artists'});
 
 			//testing: as soon as artists is here, set it as default
-			statcontrol.setStats({name:"artists_saved"})
+			statcontrol.setStats(tabcontrol.section === 2 ? 'artists_friends':'artists_saved')
 
 			globalDispatch({type: 'init', payload:me.albums,user: globalUI.user,context:'albums'});
-
 
 			//note: to keep init payload signatures consistent, I reconstruct it below
 			//followedArtists: 			{stats:null,artists:[]}
@@ -75,6 +75,7 @@ function Dispatch(props) {
 			// var r = await Promise.all(userProms)
 
 
+			//===============================================================
 			//testing: getSavedTracks - but  not recentlyPlayed - as a separate step from fetchuser
 			var userProms2 = [];
 			//userProms2.push(api.getRecentlyPlayedTracks(req))
@@ -102,6 +103,12 @@ function Dispatch(props) {
 			//testing:
 			//fer = fer.slice(0,50)
 			globalDispatch({type: 'update_events', payload: fer,context:'events', control:control});
+
+			var metros = await api.fetchMetros()
+			globalDispatch({type: 'init', payload: metros,context:'metros', control:control});
+			var defaultMetro = {"displayName":"Columbus", "id":9480,abbr:"CBUS"}
+			control.selectMetro(defaultMetro)
+
 			//testing:
 			control.setDataLoaded(true)
 
@@ -122,13 +129,15 @@ function Dispatch(props) {
 			friendsProms.push(api.fetchSpotifyUsers({auth:globalUI}))
 
 			//testing:
-			// var fake =  function(){
+			//var fake =  function(){
 			// 	return new Promise(function(done, fail) {
 			// 		done(dan2_example)
 			// 	})
 			// }
 
-			globalUI.user.related_users.filter(r =>{return r.friend})
+			//testing: for now, anyone who is user gets fetched ahead of time
+			//globalUI.user.related_users.filter(r =>{return r.friend})
+			globalUI.user.related_users.filter(r =>{return r.isUser})
 				//testing: Dan only
 				 //.filter(r =>{return r.id === "123028477"})
 				//.filter(r =>{return r.id !== "123028477"})

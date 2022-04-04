@@ -422,6 +422,8 @@ const Reducer = (state, action) => {
 	console.log("reducer action:",action);
 	//console.log("tables",tables);
 	switch (action.type) {
+
+
 		//refilter events based on some filter change (on events itself only)
 		//- changing selected metro
 		//- todo: changing contextual sensivity
@@ -552,6 +554,15 @@ const Reducer = (state, action) => {
 				//tables[action.context] = tables[action.context].concat(action.payload);
 				tables[action.context] = action.payload;
 
+				console.log("stated",action.context);
+				return {
+					...state,
+					[action.context]: tables[action.context]
+					//node:  getJoin({type:"node"}),
+				};
+			}
+			else if(action.context === 'metros'){
+				tables[action.context] = action.payload;
 				console.log("stated",action.context);
 				return {
 					...state,

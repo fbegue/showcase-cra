@@ -1,0 +1,14 @@
+@import url('https://fonts.googleapis.com/css?family=Montserrat');
+
+.artistInfo-title{
+      font-family: 'Montserrat', sans-serif;
+    text-transform: uppercase;
+    color:darkgrey;
+  }
+.artistInfo-value{
+    font-family: 'Montserrat', sans-serif;
+    color:white;
+}
+.col {
+    flex: 1;        /* distributes space on the line equally among items */
+}

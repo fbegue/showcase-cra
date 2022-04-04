@@ -33,6 +33,76 @@ const fakeDatabase = {
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
+var myJSONFetch =  function(req,path){
+    return new Promise(function(done, fail) {
+
+        fetch(api_address + path, {
+            method: 'POST', // *GET, POST, PUT, DELETE, etc.
+            mode: 'cors', // no-cors, *cors, same-origin
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(req)
+        }).then(res => res.json())
+            .then(function(res){
+                //console.log("retrieved: ",res);
+                done(res)
+            }).catch(e =>{
+                var err = {path:path,msg:"fetch failure:",error:e}
+                console.error(err);
+                fail(err)
+        })
+    })
+}
+
+var myFetch =  async function(route,req){
+    let res = null;
+    try{
+        res = await fetch(api_address + route, {
+            method: 'POST', // *GET, POST, PUT, DELETE, etc.
+            mode: 'cors', // no-cors, *cors, same-origin
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(req)
+        })
+        //testing: think I was forgetting to do proper error handling in back
+        // like: res.status(500).send(err) - without which, on errors the res.json() will always fail
+        if(res.status === 200){
+            let result = await res.json()
+            return result
+        }else{
+            let error = await res.json()
+            throw error
+        }
+    }
+    catch(e){
+        console.error("myFetch: " + route,e);
+        console.log(res);
+        debugger;
+        throw e
+    }
+}
+
+
+var addFriend =  function(req,path){
+    return new Promise(function(done, fail) {
+        path = '/addFriend'
+        fetch(api_address + path, {
+            method: 'POST', // *GET, POST, PUT, DELETE, etc.
+            mode: 'cors', // no-cors, *cors, same-origin
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(req)
+        }).then(res => res.json())
+            .then(function(res){
+                //console.log("retrieved: ",res);
+                done(res)
+            }).catch(e =>{
+            var err = {path:path,msg:"fetch failure:",error:e}
+            console.error(err);
+            fail(err)
+        })
+    })
+}
+
 // const fetchTodos = filter =>
 //     delay(1000).then(() => {
 //         switch (filter) {
@@ -246,34 +316,7 @@ var getArtistInfo =  function(req){
 
 //static user methods
 
-var myFetch =  async function(route,req){
-   let res = null;
-    try{
-        res = await fetch(api_address + route, {
-            method: 'POST', // *GET, POST, PUT, DELETE, etc.
-            mode: 'cors', // no-cors, *cors, same-origin
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(req)
-        })
-        //testing: think I was forgetting to do proper error handling in back
-        // like: res.status(500).send(err) - without which, on errors the res.json() will always fail
-        if(res.status === 200){
-            let result = await res.json()
-            return result
-        }else{
-            let error = await res.json()
-            throw error
-        }
-    }
-    catch(e){
-        console.error("myFetch: " + route,e);
-        console.log(res);
-        debugger;
-        throw e
-    }
-}
+
 var fetchStaticUser =  function(req){
     return new Promise(function(done, fail) {
 
@@ -437,6 +480,42 @@ var fetchEvents =  function(req){
         // fakeFetch3().then(r =>{done(r)})
     })
 }
+
+
+var states = {"OH":[
+        {"displayName":"Columbus", "id":9480,abbr:"CBUS"},
+        {"displayName":"Cleveland", "id":14700,abbr:"CLE"},
+        {"displayName":"Cincinnati", "id":22040,abbr:"CIN"},
+        // {"displayName":"Dayton", "id":3673},
+        {"displayName":"Toledo", "id":5649,abbr:"TDO"}
+    ]};
+
+var fetchMetros =  function(){
+    return new Promise(function(done, fail) {
+
+       var fakeMetros =  function(){
+           return new Promise(function(done, fail) {
+               done(states["OH"])
+           })
+       }
+
+        //todo: implement on backend
+        //fetch(api_address + '/fetchMetros', {
+        //     method: 'POST', // *GET, POST, PUT, DELETE, etc.
+        //     mode: 'cors', // no-cors, *cors, same-origin
+        //     headers: {
+        //         'Content-Type': 'application/json'
+        //     },
+        //     // body: JSON.stringify(req)
+        // }).then(res => res.json())
+
+        fakeMetros()
+            .then(function(res){
+                done(res)
+            })
+    })
+}
+
 
 //methods
 
@@ -649,6 +728,7 @@ const deleteTodo = (id) =>
     });
 
 export default {
+    myJSONFetch,
     getArtistInfo,
     postInfo,
     postInfo2,
@@ -675,5 +755,7 @@ export default {
     getAuth,
     refreshAuth,
     createPlaylist,
-    getRecentlyPlayedTracks
+    getRecentlyPlayedTracks,
+    addFriend,
+    fetchMetros
 }

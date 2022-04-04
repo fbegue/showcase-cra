@@ -4,12 +4,15 @@ import api from "../../api/api";
 import {GLOBAL_UI_VAR, EVENTS_VAR, CHIPGENRES, TILES} from "../../storage/withApolloProvider";
 import { StatControl,Control} from "../../index";
 import {familyStyles } from '../../util/families';
-
+import SPW from '../utility/StopPropagationWrapper'
 import './EventsList.css'
 import { DateTime } from "luxon";
+import Fab from '@material-ui/core/Fab';
 import List from '@material-ui/core/List'
 import ListItem from '@material-ui/core/ListItem'
 import ListItemText from '@material-ui/core/ListItemText'
+import DisplayTimeLocation from './DisplayTimeLocation'
+import DateRangeIcon from '@material-ui/icons/DateRange';
 import Tooltip from '@material-ui/core/Tooltip'
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import Collapse from '@material-ui/core/Collapse'
@@ -21,11 +24,12 @@ import Chip from '@material-ui/core/Chip';
 import {useReactiveVar} from "@apollo/react-hooks";
 import { makeStyles } from '@material-ui/core/styles';
 
+import OpenInNewIcon from '@material-ui/icons/OpenInNew';
 import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
 import PauseCircleOutlineIcon from '@material-ui/icons/PauseCircleOutline';
 import AnimatedPlayBars from'../misc/AnimatedPlayBars'
 import spotifyLogo from '../../assets/spotify_logo_large.png'
-
+import songkick_badge_pink from '../../assets/songkick_badge_pink.png'
 
 import Map from '../misc/Map';
 import { useSpring, animated } from '@react-spring/web'
@@ -265,19 +269,6 @@ function EventsList(props) {
 	//-----------------------------------------------------------
 	//events list utilities
 
-	function getTitle(){
-
-		//console.log("getTitle",control.metro);
-		var t = "";
-		control.metro.forEach((m,i) =>{
-			t = t + m.displayName;
-			control.metro.length - 1 > i ? t = t  + "|":{};
-		})
-		return t
-	}
-	function getDate(){
-		return DateTime.fromISO(control.startDate).toFormat('LLL d') + " - " + DateTime.fromISO(control.endDate).toFormat('LLL d')
-	}
 
 	var classes = {menuHeader:"menuHeader",list:"list",root:"root",nested:"nested"};
 	const familyClasses = useStylesFamilies();
@@ -414,7 +405,7 @@ function EventsList(props) {
 	//testing: works, just not suuupper smooth
 	const shrinkSecondaryActionStyle = useSpring({
 		width: drop ?0: 90,
-		 height: "5em"
+		height: "5em"
 	});
 
 	function handleClick(item) {
@@ -531,7 +522,7 @@ function EventsList(props) {
 						}
 
 						return (
-							<div className={getFamilyClass(subOption)}>
+							<div className={getFamilyClass(subOption) + " inner-item"}>
 								{/*<div>ListItem  key={subOption.id}  </div>*/}
 								<ListItem  key={subOption.id}  button onClick={() => handleClick(subOption.id)}>
 
@@ -541,15 +532,15 @@ function EventsList(props) {
 											{/*todo: animate width adjustment?*/}
 
 											<animated.div
-												 style={getRowDisplay(subOption)}
+												style={getRowDisplay(subOption)}
 												//style={shrinkSecondaryActionStyle}
 											>
 												{/*primaryOpen={(!(state[subOption.id]) || state[subOption.id] === false) } */}
 
 												<SpringMultiDrop item={subOption}
-													open={!(state[subOption.id]) || state[subOption.id] === false}
-																/>
-											{/*					 toggle={() =>{handleClick(subOption.id)}} */}
+																 open={!(state[subOption.id]) || state[subOption.id] === false}
+												/>
+												{/*					 toggle={() =>{handleClick(subOption.id)}} */}
 											</animated.div>
 											{/*<div>*/}
 											{/*	{ (!(state[subOption.id]) || state[subOption.id] === false)  &&*/}
@@ -580,7 +571,16 @@ function EventsList(props) {
 													variant="body2"
 													color="textPrimary"
 												>
-
+													{/*testing: disabled for now*/}
+													<div style={{float:"right",marginRight:"1em"}} onClick={() =>{openSongkickExt(subOption)}}
+														 onMouseEnter={() =>{setOpenNew({...openNew,[subOption.id]:!openNew[subOption.id]})}}
+														 onMouseOut={() =>{setOpenNew({})}} className={'songkickExt'}>
+														<img src={songkick_badge_pink} style={{height:"3em",width:"3em"}} />
+														{openNew[subOption.id] && <OpenInNewIcon
+															style={{"fontSize":"1rem","position":"absolute","right":"50px","top":"30px",
+																"visibility": openNew[subOption.id] ?'visible':"hidden"}}
+															fontSize={'inherit'}/>}
+													</div>
 													<div style={{display:"flex",justifyContent:"space-between"}}>
 														<div>
 															<div>
@@ -611,16 +611,6 @@ function EventsList(props) {
 															)}
 														</div>
 														}
-
-
-														{/*testing: disabled for now*/}
-														{/*<div onClick={() =>{openSongkickExt(subOption)}}*/}
-														{/*	 onMouseEnter={() =>{setOpenNew({...openNew,[subOption.id]:!openNew[subOption.id]})}}*/}
-														{/*	 onMouseOut={() =>{setOpenNew({})}} className={'songkickExt'}>*/}
-														{/*	<img src={songkick_badge_pink} style={{height:"3em",width:"3em"}} />*/}
-														{/*	{openNew[subOption.id] && <OpenInNewIcon*/}
-														{/*		style={{"fontSize":"1rem","position":"absolute","right":"50px","top":"30px","visibility":openNew[subOption.id] ?'visible':"hidden"}} fontSize={'inherit'}/>}*/}
-														{/*</div>*/}
 
 														<div style={{width:"1em"}}>{'\u00A0'}</div>
 
@@ -728,77 +718,82 @@ function EventsList(props) {
 				{/*<div style={{marginLeft:"1em"}}>Matched {tiles.length} Items </div>*/}
 				{/*</div>*/}
 				<List>
-					<ListItem button divider key={'locdate'} onClick={handleClickConfig}>
-						<ListItemText primary={
-							<div style={{display:"flex"}}>
+					<ListItem  className={'events-control'}  button divider key={'events-control'} >
+							<ListItemText primary={
+									<div style={{display:"flex"}} className={'inner-events-control'}>
+										<div style={{flexGrow:"1",alignSelf:"center"}}>
+											{/*todo: going to use spring floating menu here*/}
+											{/*todo: also, still propogates 'list row clicked' shadowing*/}
 
-								<div style={{flexGrow:"1",alignSelf:"center"}}>
-									{/*todo: going to use spring floating menu here*/}
-									{/*todo: also, still propogates 'list row clicked' shadowing*/}
+											<div style={{display:"flex"}}>
+												<div >
+													{/*testing: weird spacing (b/c it's expecting text content)*/}
+													{/*<Button variant="outlined" startIcon={<MoreVertIcon/>}></Button>*/}
+													{/*testing: no outline*/}
+													{/*<IconButton aria-label="more"><MoreVertIcon /></IconButton>*/}
+													<SimplePopover content={
+														<div  key={'special'}><CreatePlaylist items={items} control={control}/></div>
+													}/>
+												</div>
+												<div style={{marginLeft:".5em"}}>Friends Liked
+													<Switch
+														checked={friendsFilterOn}
+														// onChange={() =>{setFriendsFilterOn(prev => !(prev))}}
+														color="secondary"
+														onClick={(e) => {
+															e.stopPropagation();
+															setFriendsFilterOn(prev => !(prev));
+															//setDisabledRipple(true);
+														}}
+													/>
+												</div>
+											</div>
+											<div>
+												<Pagination setPage={setPage} page={page} pageSize={pageSize} records={_r}/>
+											</div>
+											{/*<div style={{marginTop:"1em",marginBottom:"1em"}} key={'special'}><CreatePlay/></div>*/}
 
-									<div style={{display:"flex"}}>
-										<div>
-											{/*testing: weird spacing (b/c it's expecting text content)*/}
-											{/*<Button variant="outlined" startIcon={<MoreVertIcon/>}></Button>*/}
-											{/*testing: no outline*/}
-											{/*<IconButton aria-label="more"><MoreVertIcon /></IconButton>*/}
-											<SimplePopover content={
-												<div  key={'special'}><CreatePlaylist items={items} control={control}/></div>
-											}/>
+											{/*note: advanced event filters that change how events are produced from dataset */}
+											{/*<div>*/}
+											{/*	/!*todo: what a mess*/}
+											{/*	1) this needs to be memo'd to stop rerenders caused by handleChange results, but can't find any working examples*/}
+											{/*	2) really made a fuckery of the mapping here*!/*/}
+											{/*	artistSens {control.artistSens}*/}
+											{/*	genreSens {control.genreSens}*/}
+											{/*	<SliderEvents map={control.mapArtist} defaultValue={control.rmapArtist[control.artistSens]} handleChange={(v) =>{control.setArtistSens(v)}}/>*/}
+											{/*	<SliderEvents2 map={control.map} defaultValue={control.rmap[control.genreSens]} handleChange={(v) =>{control.setGenreSens(v)}}/>*/}
+											{/*</div>*/}
+
 										</div>
-										<div>Friends Liked
-											<Switch
-												checked={friendsFilterOn}
-												// onChange={() =>{setFriendsFilterOn(prev => !(prev))}}
-												color="secondary"
-												onClick={(e) => {
-													e.stopPropagation();
-													setFriendsFilterOn(prev => !(prev));
-													//setDisabledRipple(true);
-												}}
-											/>
+
+										<div style={{flexGrow:"1"}}>{'\u00A0'}</div>
+										<div style={{display:"flex",flexDirection:"column"}}>
+											<div>
+												<div style={{color:"#0055ff"}}>{_r.length} events </div>
+												{/*<div style={{color:"#0055ff"}}>{events.filter(EventControlsFilter).length} events </div>*/}
+												<div> found in </div>
+											</div>
+											<DisplayTimeLocation control={control}/>
 										</div>
+										<div style={{position:"relative",left:"20px"}} onClick={handleClickConfig}>
+											<Fab color="secondary" size={'small'} aria-label="add">
+												<DateRangeIcon/>
+											</Fab>
+										</div>
+										{/*testing: vertical*/}
+										{/*<div style={{display:"flex"}}>*/}
+										{/*	<div style={{maxWidth:"5em",marginRight:".5em",display:"flex",flexDirection:"column"}}>*/}
+										{/*		<div style={{color:"#0055ff"}}>{_r.length} events </div>*/}
+										{/*		/!*<div style={{color:"#0055ff"}}>{events.filter(EventControlsFilter).length} events </div>*!/*/}
+										{/*		<div style={{alignSelf:"flex-end" }}> found in:</div>*/}
+										{/*	</div>*/}
+										{/*	<DisplayTimeLocation control={control}/>*/}
+										{/*</div>*/}
 									</div>
-
-									<div onClick={(e) => {
-										e.stopPropagation();
-										//setDisabledRipple(true);
-									}}>
-										<Pagination setPage={setPage} page={page} pageSize={pageSize} records={_r}/>
-									</div>
-									{/*<div style={{marginTop:"1em",marginBottom:"1em"}} key={'special'}><CreatePlay/></div>*/}
-
-									{/*note: advanced event filters that change how events are produced from dataset */}
-									{/*<div>*/}
-									{/*	/!*todo: what a mess*/}
-									{/*	1) this needs to be memo'd to stop rerenders caused by handleChange results, but can't find any working examples*/}
-									{/*	2) really made a fuckery of the mapping here*!/*/}
-									{/*	artistSens {control.artistSens}*/}
-									{/*	genreSens {control.genreSens}*/}
-									{/*	<SliderEvents map={control.mapArtist} defaultValue={control.rmapArtist[control.artistSens]} handleChange={(v) =>{control.setArtistSens(v)}}/>*/}
-									{/*	<SliderEvents2 map={control.map} defaultValue={control.rmap[control.genreSens]} handleChange={(v) =>{control.setGenreSens(v)}}/>*/}
-									{/*</div>*/}
-
-								</div>
-
-								<div style={{flexGrow:"1"}}>{'\u00A0'}</div>
-								<div style={{display:"flex"}}>
-									<div style={{maxWidth:"5em",marginRight:".5em",display:"flex",flexDirection:"column"}}>
-										<div style={{color:"#0055ff"}}>{_r.length} events </div>
-										{/*<div style={{color:"#0055ff"}}>{events.filter(EventControlsFilter).length} events </div>*/}
-										<div style={{alignSelf:"flex-end" }}> found in:</div>
-									</div>
-									<div style={{display:"flex",flexDirection:"column",maxWidth:"10em"}}>
-										<div style={{background:'#80808026'}}>{getTitle()}</div>
-										<div style={{background:'#80808026'}}>{getDate()}</div>
-
-									</div>
-								</div>
-
-							</div>} />
-						{open ? <ExpandLess /> : <ExpandMore />}
+							} />
+							{open ? <ExpandLess /> : <ExpandMore />}
 					</ListItem>
-					<Collapse key={'locdate-collapse'}  in={open} timeout="auto" unmountOnExit>
+					<Collapse key={'events-control-collapse'}  in={open} timeout="auto" unmountOnExit>
 						<Map default={{"displayName":"Columbus", "id":9480}}></Map>
 					</Collapse>
 

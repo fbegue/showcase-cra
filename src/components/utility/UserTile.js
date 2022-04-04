@@ -1,6 +1,7 @@
 import React, {} from 'react';
 import {Button} from "@material-ui/core"
 import {getAvatarSRC} from '../../components/Social/AvatarGenreator'
+import DisconnectIcon from "../../assets/disconnect-svgrepo-com.svg";
 function UserTile(props) {
 
 	const getInvite = (item) =>{
@@ -20,7 +21,7 @@ function UserTile(props) {
 	}
 	return(
 
-		<div id={'UserTile'} style={{display:"flex",flexDirection:"column",position:"relative"}}
+		<div id={'UserTile'} style={{display:"flex",flexDirection:"column",position:"relative",opacity:!props.item.isUser ? '.6':'initial'}}
 			 className={props.single ? null : props.selectedUser && props.selectedUser.id === props.item.id ? 'tile-selected':'tile-unselected'}>
 
 			<div >
@@ -37,6 +38,16 @@ function UserTile(props) {
 				<div style={{padding:"5px"}}>{props.item.display_name}</div>
 				{/*<div>(id: {props.item.id})</div>*/}
 			</div>
+			{
+				!props.isUser &&
+				<div className={'DisconnectIcon'} style={{"position":"relative","zIndex":"1","top":"7em","left":"9em"}}>
+					<img
+						src={DisconnectIcon}
+						style={{ height: "2em", width: "2em" }}
+						alt="website logo"
+					/>
+				</div>
+			}
 
 		</div>
 

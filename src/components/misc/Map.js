@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useContext} from "react";
 import Ohio from '../../data/maps/Ohio'
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -16,22 +16,24 @@ import {
 	MuiPickersUtilsProvider,
 	KeyboardDatePicker,
 } from '@material-ui/pickers';
+import {Context} from "../../storage/Store";
 
 function Map(props) {
 	let control = Control.useContainer();
+	const [globalState, globalDispatch] = useContext(Context);
 	console.log("$map",control);
 
 
 	//testing: just Ohio rn
-	var states = {"OH":[
-			{"displayName":"Columbus", "id":9480},
-			{"displayName":"Cleveland", "id":14700},
-			{"displayName":"Cincinnati", "id":22040},
-			// {"displayName":"Dayton", "id":3673},
-			{"displayName":"Toledo", "id":5649}
-		]};
+	//var states = {"OH":[
+	// 		{"displayName":"Columbus", "id":9480,abbr:"CBUS"},
+	// 		{"displayName":"Cleveland", "id":14700,abbr:"CLE"},
+	// 		{"displayName":"Cincinnati", "id":22040,abbr:"CIN"},
+	// 		// {"displayName":"Dayton", "id":3673},
+	// 		{"displayName":"Toledo", "id":5649,abbr:"TDO"}
+	// 	]};
 	var toggleMap = {};
-	states['OH'].forEach(s =>{
+	globalState['metros'].forEach(s =>{
 		toggleMap[s.id] = 'default'
 		if(props.default.id === s.id){
 			toggleMap[s.id] = 'selected'
@@ -117,7 +119,7 @@ function Map(props) {
 			<div style={{display:"flex"}}>
 				<div style={{"position":"relative","left":"-10px"}}>
 					<List>
-						{states['OH'].map((metro, index) => (
+						{globalState['metros'].map((metro, index) => (
 							<StyledListItem key={index} color={color[metro.id]} metro={metro}></StyledListItem>
 						))}
 					</List>

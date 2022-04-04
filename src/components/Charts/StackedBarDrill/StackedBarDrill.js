@@ -169,7 +169,7 @@ function StackedBarDrill(props) {
 		!(u) ? u = globalUI.user:{};
 		var img = document.createElement('img');
 		img.setAttribute('src',getAvatarSRC(u))
-		img.style.width = "50px";img.style['border-radius'] ="50%"
+		img.style.width = "40px";img.style['border-radius'] ="50%"
 		return img.outerHTML
 		//return`<img src="${src}" style={{width: 50, borderRadius: "50%"}}/>`
 	}
@@ -238,8 +238,8 @@ function StackedBarDrill(props) {
 			//visible: false,
 			title:{ enabled:false},
 			labels:{ enabled:true,align:"left",distance:100,
-				y:-20,
-				x:10,
+				//y:-20, x:10, //width=50px
+				y:-25, x:5,//width=40px
 				// docs on HTML:
 				//https://www.highcharts.com/docs/chart-concepts/labels-and-string-formatting#html
 				useHTML:true,

@@ -1002,7 +1002,7 @@ function useProduceData(){
 	},[
 		statcontrol.stats.name,statcontrol.mode,
 		friendscontrol.compare,friendscontrol.families,friendscontrol.genres,
-		friendscontrol.selectedTabIndex,friendscontrol.sourceFilter,friendscontrol.checkboxes,friendscontrol.query]);
+		friendscontrol.selectedTabIndex,friendscontrol.sourceFilter,friendscontrol.checkboxes,friendscontrol.query,friendscontrol.guest]);
 
 	//todo: add back highlighter
 	//highlighter.hoverState,
@@ -1356,7 +1356,7 @@ function useProduceEvents(){
 					return validStart && validEnd
 				}
 				events = events.filter(e =>cids.indexOf(e.metro_id) !== -1)
-					// .filter(byDate)
+					 .filter(byDate)
 					.sort((e1,e2) =>{return new Date(e1.start.datetime) - new Date(e2.start.datetime) })
 
 				//todo: strange error here when ... my date result returns to little of # of results?
@@ -1373,6 +1373,9 @@ function useProduceEvents(){
 
 				//then later, based on control values, actually apply the filter
 
+				if(debugEvents){
+					debugger;
+				}
 				events.forEach(e =>{
 					e.friends = [];
 					for(var x = 0; x < e.performance.length;x++){

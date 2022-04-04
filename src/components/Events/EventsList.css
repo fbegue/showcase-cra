@@ -14,6 +14,22 @@
   transform: none !important;
 }
 
+.events-control .MuiSvgIcon-root{
+ opacity:0
+}
+
+.events-control .inner-events-control .MuiSvgIcon-root{
+  position: initial;
+  opacity:initial;
+  /*top: 25px;*/
+  /*right: 5px;*/
+}
+
+.inner-item .MuiSvgIcon-root{
+  position: relative;
+  top: 25px;
+  right: 5px;
+}
 
 /*.MuiListItemText-multiline{*/
 /*  min-height:5em !important;*/
