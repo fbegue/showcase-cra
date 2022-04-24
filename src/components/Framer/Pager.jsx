@@ -2,7 +2,7 @@ import * as React from "react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import './Pager.css'
-import Stats from "../Stats";
+//import Stats from "../Stats";
 import ContextStats from "../ContextStats";
 import EventsList from "../Events/EventsList";
 import {TabControl} from '../../index'
@@ -67,9 +67,11 @@ const Pager = () => {
 
   const pages = [
     {
+      //testing: disabling dedicated chart page for now
       content:
           <div >
-            <Stats/>
+
+            {/*<Stats/>*/}
           </div>
     },
     {

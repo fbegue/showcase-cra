@@ -7,10 +7,10 @@ import EventImageFader from "../Events/EventImageFader";
 
 export default function SpringMultiDrop(props) {
 	var comp = "SpringMultiDrop|"
-	const [open, toggle] = useState(false)
+	const [open, toggle] = useState(true)
 	const [ref, { width }] = useMeasure()
 
-	//console.log(comp,props);
+	console.log(comp,props);
 
 	// const [items, setItems] = useState( [])
 
@@ -73,9 +73,9 @@ export default function SpringMultiDrop(props) {
 
 	},[props.item])
 
-	useEffect(() => {
-		toggle(props.open)
-	},[props.open]);
+	// useEffect(() => {
+	// 	toggle(props.open)
+	// },[props.open]);
 
 	const handleDropClick = () =>{
 		console.log("handleDropClick SpringMultiDrop");
@@ -127,7 +127,7 @@ export default function SpringMultiDrop(props) {
 					position: 'absolute',
 					// top:"-7px",
 					opacity: props.ind === 1 && !(open)? "0%":"100%",
-					transform: props.cordSet.to((x, y, z) => `translate3d(${x}px, ${y}px, ${z}px)`),
+					// transform: props.cordSet.to((x, y, z) => `translate3d(${x}px, ${y}px, ${z}px)`),
 
 				}}>
 				{props.content}
@@ -140,8 +140,8 @@ export default function SpringMultiDrop(props) {
 					width: '5em',
 					zIndex:items.length -props.ind,
 					position: 'absolute',
-					transform: props.cordSet.to((x, y, z) => `translate3d(${x}px, ${y}px, ${z}px)`),
-					...fader
+					// transform: props.cordSet.to((x, y, z) => `translate3d(${x}px, ${y}px, ${z}px)`),
+					// ...fader
 				}}>
 				{/*{props.content ? props.content: <img style={{height:"5em",width:"5em"}} src={props.url}></img>}*/}
 				{props.content}

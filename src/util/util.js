@@ -1018,6 +1018,7 @@ function useProduceData(){
 var lastTab = null;
 var prevBarUsersNum = null;
 function useProduceEvents(){
+	debugger
 	let control = Control.useContainer();
 	let statcontrol = StatControl.useContainer();
 	//let highlighter = Highlighter.useContainer();
@@ -1124,12 +1125,16 @@ function useProduceEvents(){
 
 
 				//todo: preserve data we've already produced (move to before chooseData so it can check this cache)
-				//testing: make chooseData produce array n users in length
-				var userMapStore = {};
-				var chooseDataEx = [{id:"dacandyman01",artists:artists_user}]
-				if(data_guest.length > 0){chooseDataEx.push({id:"123028477#2",artists:artists_guest})}
 
-				chooseDataEx.forEach(r =>{
+				//todo: make chooseData produce array n users in length
+				//note: believe above is referring to changes I *started* to make for mutiple guests?
+
+				var userMapStore = {};
+				var chooseDataExOutput =  [{id:globalUI.user.id,artists:artists_user}]
+
+				if(data_guest.length > 0){chooseDataExOutput.push({id:friendscontrol.guest.id,artists:artists_guest})}
+
+				chooseDataExOutput.forEach(r =>{
 					userMapStore[r.id] = {id:r.id,artists:r.artists}
 				})
 
@@ -1728,6 +1733,7 @@ function useProduceEvents(){
 
 				//console.log("prevBarUsersNum",tempBarData[0]?.data.length + " | " + prevBarUsersNum);
 
+				//debugger
 				//testing: stop setting when I don't need to
 				if(tempBarData[0]?.data.length !== prevBarUsersNum){
 
@@ -1736,6 +1742,10 @@ function useProduceEvents(){
 					BARDATA(tempBarData)
 					console.log("$tempBarDrillMap",tempBarDrillMap);
 					BARDRILLDOWNMAP(tempBarDrillMap)
+
+				}else{
+					debugger
+					console.log("skipped bar data update");
 
 				}
 				prevBarUsersNum === null? prevBarUsersNum = tempBarData[0]?.data.length:{};
@@ -1988,7 +1998,7 @@ function useProduceEvents(){
 		},
 		[statcontrol.stats.name,statcontrol.mode,
 			friendscontrol.compare,friendscontrol.families,friendscontrol.genres,friendscontrol.selectedTabIndex,friendscontrol.sourceFilter,friendscontrol.checkboxes,friendscontrol.query,
-			control.metro,control.startDate,control.endDate,control.genreSens,control.artistSens,control.dataLoaded
+			friendscontrol.guest,control.metro,control.startDate,control.endDate,control.genreSens,control.artistSens,control.dataLoaded
 		]
 	)
 

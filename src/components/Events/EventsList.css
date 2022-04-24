@@ -7,6 +7,43 @@
 }
 
 /*testing: secondary action auto-floats to right*/
+
+/*.rdp{*/
+/*  font-size: 1rem;*/
+/*  font-family: Roboto,"Helvetica Neue",Arial,sans-serif !important;*/
+/*  font-family: "cursive";*/
+/*  font-weight: 400;*/
+/*  line-height: 1.5;*/
+/*  text-transform: none;*/
+/*}*/
+
+:root{
+  /*--rdp-accent-color: #0055ff;*/
+  --rdp-accent-color: #0055ff !important;
+}
+
+.rdp{
+  margin:.5em  !important;
+  height:17em;
+}
+.rdp-caption{
+  font-size: 1rem;
+  font-family: Roboto,"Helvetica Neue",Arial,sans-serif !important;
+  /*font-family: "cursive";*/
+  font-weight: 400;
+  line-height: 1.5;
+  text-transform: none;
+}
+.rdp-button{
+  font-family: Roboto,"Helvetica Neue",Arial,sans-serif !important;
+}
+
+.rdp-head_cell{
+  font-family: Roboto,"Helvetica Neue",Arial,sans-serif !important;
+}
+
+
+
 .MuiListItemSecondaryAction-root{
   /*top: 50%;*/
   right: 16px !important;
@@ -25,10 +62,19 @@
   /*right: 5px;*/
 }
 
+/*testing: eh fuck this*/
+/*.inner-item .MuiSvgIcon-root{*/
+/*  position: relative;*/
+/*  top: 25px;*/
+/*  right: 5px;*/
+/*}*/
+
 .inner-item .MuiSvgIcon-root{
-  position: relative;
-  top: 25px;
-  right: 5px;
+  display:none;
+}
+
+.inner-item .MuiSvgIcon-root .inner-skip{
+  display:block;
 }
 
 /*.MuiListItemText-multiline{*/
@@ -91,18 +137,32 @@ cursor:pointer;
   opacity: 1;
 }
 
+.fade-out-image {
+  opacity: 0;
+  width:0;
+  height:5em;
+  transition:opacity .5s, width .5s
+}
+
+.fade-in-image {
+  opacity:100%;
+  width:5em;
+  height:5em;
+  transition:opacity .5s, width .5s
+}
+
 #events-collapse {
   padding-top:0px !important;
   padding-bottom:0px !important;
 }
 
- .MuiCollapse-entered{
+.MuiCollapse-entered{
   min-height: 0px !important;
   /*height: 39em !important;*/
   overflow-y: scroll !important;
-   overflow-x: hidden !important;
-   padding-bottom: 1em;
-/*'&::-webkit-scrollbar': width: '0.4em';*/
+  overflow-x: hidden !important;
+  padding-bottom: 1em;
+  /*'&::-webkit-scrollbar': width: '0.4em';*/
 }
 
 /*::-webkit-scrollbar {*/

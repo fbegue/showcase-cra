@@ -83,9 +83,9 @@ var myFetch =  async function(route,req){
 }
 
 
-var addFriend =  function(req,path){
+var modifyFriends =  function(req, path){
     return new Promise(function(done, fail) {
-        path = '/addFriend'
+        path = '/modifyFriends'
         fetch(api_address + path, {
             method: 'POST', // *GET, POST, PUT, DELETE, etc.
             mode: 'cors', // no-cors, *cors, same-origin
@@ -756,6 +756,6 @@ export default {
     refreshAuth,
     createPlaylist,
     getRecentlyPlayedTracks,
-    addFriend,
+    modifyFriends,
     fetchMetros
 }

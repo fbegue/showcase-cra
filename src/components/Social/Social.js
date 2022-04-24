@@ -45,10 +45,11 @@ import BubbleFamilyGenreChips from "../chips/BubbleFamilyGenreChips";
 import Paper from "@material-ui/core/Paper";
 import {tabMap} from "../../Tabify";
 import FilterListIcon from "@material-ui/icons/FilterList";
-import StackedBarDrill from "../Charts/StackedBarDrill/StackedBarDrill";
+// import StackedBarDrill from "../Charts/StackedBarDrill/StackedBarDrill";
 import {BARDATA,BARDRILLDOWNMAP} from "../../storage/withApolloProvider";
 import GenreChipsCompact from "../chips/GenreChipsCompact";
 import Avatar from "./Avatar";
+//import util from '../../util/util'
 
 import  DisconnectIcon from '../../assets/disconnect-svgrepo-com.svg';
 
@@ -289,7 +290,7 @@ function Social(props) {
 
 			//note: updating server can be async
 			//todo: but pretty lazy just leaving it to fail here
-			api.addFriend(({auth:globalUI,friend:item}))
+			api.modifyFriends(({auth:globalUI,friend:item}))
 				.then(r =>{console.log("addFriend successful",r);
 				},e =>{console.error("addFriend failure",e);})
 
@@ -318,9 +319,32 @@ function Social(props) {
 	}
 
 
+	//todo: correcting this to user proper callback makes it fail :(
+	//so just leaving for now ....
+	//const handleToggleDrawer = () => {tabcontrol.setDrawerShowing(prev => !prev)};
+
 	const handleToggleDrawer = () => {
 		tabcontrol.setDrawerShowing(!tabcontrol.isDrawerShowing);
+		setTimeout(e =>{
+			if(!tabcontrol.isDrawerShowing){
+				friendscontrol.setGuest(false)
+				friendscontrol.setGuest(false)
+			}
+		},1000)
+
+
+
+		// tabcontrol.setDrawerShowing(prev =>{
+		// 	if(!prev){
+		// 		friendscontrol.setGuest({})
+		// 	}
+		// 	return !prev
+		// });
 	};
+
+
+
+
 
 	//note: example of a contained drawer
 	const drawerSpringStyle = useSpring({
@@ -540,7 +564,6 @@ function Social(props) {
 								"marginRight":"-0.5em","marginTop":"1em","zIndex":"1"}}>x</div>
 							<div><Avatar rec={{user:friendscontrol.guest}}/> </div>
 						</div>
-
 
 					</div>
 

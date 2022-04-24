@@ -5,7 +5,7 @@ import {Context} from "../storage/Store";
 import {FriendsControl, StatControl, TabControl, TileSelectControl} from "../index";
 import {useReactiveVar} from "@apollo/react-hooks";
 import Paper from '@material-ui/core/Paper';
-import ItemCarousel from './libraries/ItemCarousel/ItemCarousel'
+//import ItemCarousel from './libraries/ItemCarousel/ItemCarousel'
 import useMeasure from "react-use-measure";
 import {a, useSpring} from "react-spring";
 import ExpandLessIcon from "@material-ui/icons/ExpandLess";
@@ -268,7 +268,17 @@ function InfoPanel(props) {
 						{/*</div>*/}
 						{/*<ListArtistPanels artists={globalState[globalUI.user.id + "_tracks_stats"].artists_top} />*/}
 
-							<ItemCarousel style={{marginTop:"-1em"}} artists={getArtists()} handleSelect={handleCarouselItemSelect} />
+							{/*todo: fix carousel dependency issue*/}
+							{/*Found: react@17.0.2*/}
+							{/*npm ERR! node_modules/react*/}
+							{/*npm ERR!   react@"^17.0.2" from the root project*/}
+							{/*npm ERR!*/}
+							{/*npm ERR! Could not resolve dependency:*/}
+							{/*npm ERR! peer react@"^16.4.1" from react-cover-carousel@0.0.5*/}
+							{/*npm ERR! node_modules/react-cover-carousel*/}
+							{/*npm ERR!   react-cover-carousel@"0.0.5" from the root project*/}
+							<div>TODO: ItemCarouselItemCarousel</div>
+						{/*<ItemCarousel style={{marginTop:"-1em"}} artists={getArtists()} handleSelect={handleCarouselItemSelect} />*/}
 						</div>
 
 					<div id={'drawer'}>

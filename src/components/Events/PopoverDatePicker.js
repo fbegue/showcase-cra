@@ -2,7 +2,8 @@ import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Popover from '@material-ui/core/Popover';
 import Typography from '@material-ui/core/Typography';
-import PlaylistAddIcon from '@material-ui/icons/PlaylistAdd';
+// import PlaylistAddIcon from '@material-ui/icons/PlaylistAdd';
+import DateRangeIcon from '@material-ui/icons/DateRange';
 import Fab from '@material-ui/core/Fab';
 import DatePicker from "./DatePicker";
 const useStyles = makeStyles((theme) => ({
@@ -11,7 +12,7 @@ const useStyles = makeStyles((theme) => ({
 	},
 }));
 
-export default function SimplePopover(props) {
+export default function PopoverDatePicker(props) {
 	const classes = useStyles();
 	const [anchorEl, setAnchorEl] = React.useState(null);
 
@@ -34,11 +35,11 @@ export default function SimplePopover(props) {
 			<div onClick={(e) => {
 				e.stopPropagation();
 			}}>
-				<Fab color="secondary" size={'small'} aria-label="add">
+				<Fab component={'div'} color="secondary" size={'small'} aria-label="add">
 					{/*todo: until there are more features here*/}
 					{/*<MoreVertIcon onClick={handleClick}/>*/}
-
-					<PlaylistAddIcon onClick={handleClick}/>
+					<DateRangeIcon onClick={handleClick}/>
+					{/*<PlaylistAddIcon onClick={handleClick}/>*/}
 
 				</Fab>
 				<Popover
@@ -55,9 +56,9 @@ export default function SimplePopover(props) {
 						horizontal: 'center',
 					}}
 				>
-					<Typography className={classes.typography}>
+
 						<DatePicker/>
-					</Typography>
+
 				</Popover>
 			</div>
 

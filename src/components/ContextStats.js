@@ -430,7 +430,8 @@ function ContextStats(props) {
 	}
 
 	const classes= useStyles()
-	const [friendsFilterOn, setFriendsFilterOn] = useState(false);
+	//const [friendscontrol.friendsFilterOn, friendscontrol.setFriendsFilterOn] = useState(false);
+
 
 	//see todo: alright fuck this bullshit in StackedBarDrill.js
 	var getMargin = () =>{
@@ -714,16 +715,18 @@ function ContextStats(props) {
 							</div>
 							<div style={{display:"flex",flexDirection:"column"}}>
 								<Switch
-									checked={friendsFilterOn}
-									// onChange={() =>{setFriendsFilterOn(prev => !(prev))}}
+									checked={friendscontrol.friendsFilterOn}
+									//note: this is in fact broken - if you hit this before
+									disabled={!friendscontrol.guest}
+									// onChange={() =>{friendscontrol.setFriendsFilterOn(prev => !(prev))}}
 									color="secondary"
 									onClick={(e) => {
-										setFriendsFilterOn(prev => !(prev));
+										friendscontrol.setFriendsFilterOn(prev => !(prev));
 										//setDisabledRipple(true);
 									}}
 								/>
 
-								<div style={{width:"4em",marginTop:"-.5em"}}>
+								<div style={{width:"4em",marginTop:"-.5em",opacity:!friendscontrol.guest?.5:1}}>
 									<PersonIcon style={{marginRight:".6em"}}/>
 									<PeopleAltIcon/>
 								</div>
@@ -758,7 +761,7 @@ function ContextStats(props) {
 							{/*</div>*/}
 						</div>
 
-						<div style={{width:"1em",display: !friendsFilterOn ? 'initial':'none'}}>
+						<div style={{width:"1em",display: !friendscontrol.friendsFilterOn ? 'initial':'none'}}>
 
 							<div style={{"padding":"5px","zIndex":"5","flexGrow":"1","overflowY":"auto","overflowX":"hidden","maxHeight":"23.5em",width:"21em"}}>
 								<BubbleFamilyGenreChips families={chipFamilies} genres={chipGenres} flexDirection={'row'} clearable={true} seperator={true}/>
@@ -772,12 +775,12 @@ function ContextStats(props) {
 
 						</div>
 
-						<div id={'stats'} style={{outline: "2px solid purple",display: friendsFilterOn ? 'initial':'none'}} >
+						<div id={'stats'} style={{outline: "2px solid purple",display: friendscontrol.friendsFilterOn ? 'initial':'none'}} >
 
 							<div style={{"display":"flex",flexDirection:"column"}}>
 
 								<div>
-									{/*{barData.length > 0  &&*/}
+									{/*{friendscontrol.guest  &&*/}
 									<StackedBarDrill barData={barData} barDrillMap={barDrillMap}
 													// callback={(ref) => {refCallBack(ref, appref);}}
 										//ref={appref}

@@ -11,7 +11,7 @@ import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import AppBar from "@material-ui/core/AppBar";
 
-import MaterialTable from "material-table";
+//import MaterialTable from "material-table";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
@@ -33,7 +33,7 @@ import {useQuery,useReactiveVar} from "@apollo/react-hooks";
 import Home from './components/Home';
 import TabPanel from './components/utility/CustomTabPanel'
 import Social from "./components/Social/Social";
-import MatTableTreeTest from './components/deprecated/MatTableTreeTest'
+//import MatTableTreeTest from './components/deprecated/MatTableTreeTest'
 import Box from "@material-ui/core/Box";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";

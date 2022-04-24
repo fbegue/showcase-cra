@@ -41,6 +41,10 @@ https://eslint.org/docs/rules/no-unused-expressions
     //https://github.com/framer/motion/issues/1307
     //https://github.com/reactioncommerce/reaction-component-library/issues/399#issuecomment-467860022
 
+- after npm installing for the first time in awhile, went thru and deleted old libraries that were having dep issues.
+  after however, started to get 'process is not defined' whenever I would hot-reload:
+    https://stackoverflow.com/questions/70357360/process-is-not-defined-on-hot-reload
+    
 ## unused components (POCs)
 
 - src/components/utility/CssFade

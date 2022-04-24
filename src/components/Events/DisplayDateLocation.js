@@ -1,7 +1,14 @@
 /* eslint-disable no-unused-expressions */
 import React, {} from 'react';
 import { DateTime } from "luxon";
-function Main(props) {
+
+function DisplayDate(props){
+	function getDate(){
+		return DateTime.fromISO(props.control.startDate).toFormat('LLL d') + " - " + DateTime.fromISO(props.control.endDate).toFormat('LLL d')
+	}
+	return (	<div style={{background:'#80808026'}}>{getDate()}</div>)
+}
+function DisplayLocation(props) {
 
 	function getTitle(){
 		//console.log("getTitle",props.control.metro);
@@ -20,15 +27,11 @@ function Main(props) {
 		}
 		return t
 	}
-	function getDate(){
-		return DateTime.fromISO(props.control.startDate).toFormat('LLL d') + " - " + DateTime.fromISO(props.control.endDate).toFormat('LLL d')
-	}
+
 	return(
-		//note: minWidth = length of
-		<div style={{display:"flex",flexDirection:"column",width:"8em"}}>
+		// <div style={{display:"flex",flexDirection:"column",width:"8em"}}>
 			<div style={{background:'#80808026'}}>{getTitle()}</div>
-			<div style={{background:'#80808026'}}>{getDate()}</div>
-		</div>
+		// </div>
 	)
 }
-export default Main;
+export {DisplayDate,DisplayLocation}

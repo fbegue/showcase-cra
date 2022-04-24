@@ -19,7 +19,7 @@ import {Control, FriendsControl, GridControl, StatControl, TabControl} from './i
 //todo: this EVENTS_VAR here just to push that count out is no good
 import { GLOBAL_UI_VAR,EVENTS_VAR} from './storage/withApolloProvider';
 import {useQuery,useReactiveVar} from "@apollo/react-hooks";
-import SplitPane from "react-split-pane";
+//import SplitPane from "react-split-pane";
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import {makeStyles, withStyles} from '@material-ui/core/styles';
 import { createMuiTheme } from '@material-ui/core/styles';
@@ -370,7 +370,7 @@ function App(props) {
                                         //src: https://v4.mui.com/components/badges/
                                         <Badge color="secondary" max={999}
                                                badgeContent={events.length}
-                                            // badgeContent={globalUI.user.display_name}
+                                               overlap={'rectangular'}
                                                anchorOrigin={{
                                                    vertical: 'bottom',
                                                    horizontal: 'right',
@@ -466,7 +466,7 @@ function App(props) {
                                         //src: https://v4.mui.com/components/badges/
                                         <Badge color="secondary" max={999}
                                                badgeContent={events.length}
-                                            // badgeContent={globalUI.user.display_name}
+                                               overlap={'rectangular'}
                                                anchorOrigin={{
                                                    vertical: 'bottom',
                                                    horizontal: 'right',

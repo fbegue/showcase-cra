@@ -24,7 +24,7 @@ drilldown(Highcharts)
 
 
 //todo: a little sketchy - this config kept initing w/ {} initial props.barDrillMap value
-//so comp only stores it locally (outside comp scope) when it's be initialized
+//so comp only stores it locally (outside comp scope) when it's been initialized
 
 var temp = null;
 var prevLen = null;
@@ -166,6 +166,7 @@ function StackedBarDrill(props) {
 		var userDataEx = props.barData[0].data[chartInd]
 		//if I can't find the user in my fiends, its me.
 		var u = globalUI.user.related_users.filter(r =>{return r.id === userDataEx.id})[0]
+
 		!(u) ? u = globalUI.user:{};
 		var img = document.createElement('img');
 		img.setAttribute('src',getAvatarSRC(u))

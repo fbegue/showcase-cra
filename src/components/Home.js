@@ -8,7 +8,7 @@ import data from './Masonry/data'
 // import './Masonry/styles.css'
 import { DateTime } from "luxon";
 
-import {Tab} from "react-tabify";
+//import {Tab} from "react-tabify";
 import RedoIcon from "@material-ui/icons/Redo";
 import PieChartIcon from "@material-ui/icons/PieChart";
 import CloudIcon from "@material-ui/icons/Cloud";

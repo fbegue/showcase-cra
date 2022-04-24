@@ -179,11 +179,11 @@ function useFriends(initialState = 0) {
         spotify: false,
     });
     let [query, setQuery] = React.useState("");
-
+    let [friendsFilterOn, setFriendsFilterOn] = useState(false);
 
 
     return { guest,setGuest,compare,setCompare,families, setFamilies,genres,setGenres,setCheckboxes, checkboxes,query, setQuery,
-        selectedTabIndex,setTabIndex,sourceFilter,setSourceFilter}
+        selectedTabIndex,setTabIndex,sourceFilter,setSourceFilter,friendsFilterOn,setFriendsFilterOn}
 }
 
 let FriendsControl  = createContainer(useFriends);

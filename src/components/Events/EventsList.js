@@ -11,9 +11,11 @@ import Fab from '@material-ui/core/Fab';
 import List from '@material-ui/core/List'
 import ListItem from '@material-ui/core/ListItem'
 import ListItemText from '@material-ui/core/ListItemText'
-import DisplayTimeLocation from './DisplayTimeLocation'
-import DateRangeIcon from '@material-ui/icons/DateRange';
+import {DisplayDate,DisplayLocation} from './DisplayDateLocation'
+
 import Tooltip from '@material-ui/core/Tooltip'
+import LocationOnIcon from '@material-ui/icons/LocationOn';
+import PopoverDatePicker from './PopoverDatePicker'
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import Collapse from '@material-ui/core/Collapse'
 import ExpandLess from '@material-ui/icons/ExpandLess'
@@ -31,7 +33,7 @@ import AnimatedPlayBars from'../misc/AnimatedPlayBars'
 import spotifyLogo from '../../assets/spotify_logo_large.png'
 import songkick_badge_pink from '../../assets/songkick_badge_pink.png'
 
-import Map from '../misc/Map';
+import Map from './Map';
 import { useSpring, animated } from '@react-spring/web'
 import EventImageFader from "./EventImageFader";
 import TextField from "@material-ui/core/TextField";
@@ -55,11 +57,13 @@ import SimplePopover from "../utility/Popover";
 import CreatePlaylist from "./CreatePlaylist";
 import util from "../../util/util";
 import SpringMultiDrop from "../springs/SpringMultiDrop";
+import ShowPlay from './ShowPlay'
 import {useImage} from 'react-image'
 import PlaylistAddIcon from "@material-ui/icons/PlaylistAdd";
 import Button from '@material-ui/core/Button';
 import SliderEvents from '../Sliders/Slider-Events'
 import SliderEvents2 from '../Sliders/Slider-Events2'
+import DatePicker from "./DatePicker";
 
 //import GenreChipsDumb from '../chips/GenreChipsDumb.js'
 // import '../utility/CustomScroll/contextStats.scss'
@@ -103,7 +107,7 @@ function ChipsArray_dep(props) {
 	);
 }
 
-var oldId = null;
+
 
 const useStylesFamilies = makeStyles(familyStyles);
 
@@ -115,7 +119,7 @@ function EventsList(props) {
 
 	const [friendsFilterOn, setFriendsFilterOn] = useState(false);
 	//const [globalState, globalDispatch] = useContext(Context);
-	const globalUI = useReactiveVar(GLOBAL_UI_VAR);
+	// const globalUI = useReactiveVar(GLOBAL_UI_VAR);
 	const events= useReactiveVar(EVENTS_VAR);
 	//console.log(comp + " events",events);
 	//testing: after applying this filter, the events that were left couldn't be expanded?
@@ -164,27 +168,7 @@ function EventsList(props) {
 	let statcontrol = StatControl.useContainer()
 
 
-	function handlePlay(item) {
-		console.log("$handlePlay",item);
-		api.getArtistTopTracks(({auth:globalUI,artist:item}))
-			.then(r =>{
-				control.setId(r[0].id)
-				control.setPlayArtist(item.id)
-				oldId === null ? oldId = r[0].id:{}
 
-				//pause/unpause the same track
-				if(oldId === r[0].id){
-					control.togglePlay((prevPlay) =>{return !(prevPlay)})
-				}else{
-					//if we changed play track id, only toggle true if we were already paused
-					oldId = r[0].id;
-					if(!(control.play)){control.togglePlay(true)}
-				}
-
-				//!(control.play) ? control.togglePlay(true):{};
-
-			})
-	}
 
 
 	//note: abstracted all rows clicks into map
@@ -214,43 +198,7 @@ function EventsList(props) {
 		if (newWindow) newWindow.opener = null
 	}
 
-	function showPlay(sub){
 
-		//console.log("$showPlay",sub);
-		return <div>
-			<div className={'play-events'}>
-				{/*todo: assuming no genres = tried to locate in spotify but couldn't find it, so can't play*/}
-				<div style={{marginTop:"-.4em"}}>
-					{(sub.artist.genres.length >0 ?
-							<div style={{display:"flex"}}>
-								<div>
-									<img onClick={() => openInNewTab("spotify:artist:" + sub.artist.id)} src={spotifyLogo}
-										 style={{"position":"absolute",left:"-2em",zIndex:"10",height:"1.5em",width:"1.5em"}}
-									/>
-								</div>
-								<div>
-									{/*testing:*/}
-									{/*{control.play && control.playArtist === sub.artist.id ?*/}
-									{true ?
-										<AnimatedPlayBars/>
-										// <ApplyPulse target={
-										// 	<PauseCircleOutlineIcon fontSize={'inherit'} style={{fontSize:"30px"}} color={'secondary'} onClick={() => handlePlay(sub.artist)}></PauseCircleOutlineIcon>
-										// }/>
-										:
-										<ApplyPulse target={
-											<PlayCircleOutlineIcon fontSize={'inherit'} style={{fontSize:"30px"}} color={'secondary'} onClick={() => handlePlay(sub.artist)}></PlayCircleOutlineIcon>
-										}/>
-									}
-								</div>
-							</div>:<div></div>
-					)}
-				</div>
-				<div>{sub.displayName}</div>
-			</div>
-		</div>
-		// return <span>{sub.displayName}</span>
-		// return (sub.artist.spotifyTopFive ? <PlayCircleOutlineIcon onClick={() => handlePlay(sub.artist)}> </PlayCircleOutlineIcon>:{})
-	};
 
 
 
@@ -414,7 +362,7 @@ function EventsList(props) {
 		// // setState(prevState => ({ [item]: !prevState[item] }));
 		// if(){}
 		//setDrop(true)
-		setDrop(prevState => !prevState);
+		//setDrop(prevState => !prevState);
 		setState(prevState => {
 			console.log("prevState",prevState);
 			return { [item]: !prevState[item] }});
@@ -422,6 +370,10 @@ function EventsList(props) {
 
 	//=======================================================================
 
+	var stopPrevent = (event)=>{
+		event.preventDefault()
+		event.stopPropagation()
+	}
 	function handler(children,key) {
 
 		// var moment = function(dt,format){
@@ -448,15 +400,19 @@ function EventsList(props) {
 		//testing: would like to replace with animated width (above)
 		//shrinkSecondaryActionStyle
 
+		//const styles = useSpring({ opacity: state[subOption.id] ? 1 : 0 })
 		const getRowDisplay = (subOption) =>{
 
-			if(!(state[subOption.id]) || state[subOption.id] === false){
-				return {width:"5em",height:"5em"}
-			}
-			else{
-				return {width:"",height:""}
-			}
-		}
+			return { opacity: state[subOption.id] ? 0 : 1,width: state[subOption.id]  ?"":"5em",height: state[subOption.id] ? "":"5em" }
+		// 	if(!(state[subOption.id]) || state[subOption.id] === false){
+		// 		debugger
+		// 		return {width:"5em",height:"5em"}
+		// 	}
+		// 	else{
+		// 		debugger
+		// 		return {width:"",height:""}
+		// 	}
+		 }
 
 		return(
 			<div style={{maxHeight:"33em"}}>
@@ -469,52 +425,100 @@ function EventsList(props) {
 						if (!subOption.childrenKey) {
 							return (
 								// <div key={subOption.id} >{subOption.id}</div>
+								// <ListItem>
+								// 	<ListItemText
+								// 		style={{marginLeft:"2em"}}
+								// 		inset
+								// 		// classes={{root:classes2.multiline}}
+								// 		disableTypography
+								// 		primary={ <div>primary</div>}
+								// 		secondary={<div>secondary secondary secondary</div>}>
+								// 	</ListItemText>
+								// 	<ListItemSecondaryAction >
+								// 		{/*classes={{root:classes2.root}}*/}
+								// 		{subOption.artist.images && subOption.artist.images.length > 0 &&
+								// 		<img style={{height: "5em", width: "5em"}}
+								// 			 src={subOption.artist.images[0].url}></img>
+								// 		}
+								// 	</ListItemSecondaryAction>
+								// </ListItem>
+
 								<div key={subOption.id}>
 									<ListItemText
 										style={{marginLeft:"2em"}}
 										inset
 										classes={{root:classes2.multiline}}
 										disableTypography
-										primary={ showPlay(subOption)}
+										// primary={ showPlay(subOption)}
 										secondary={
 											<React.Fragment>
 
-												{/*<div style={{display:"flex"}}>*/}
+												<div style={{display:"flex"}}>
 												{/*	<div>*/}
 												{/*	</div>*/}
 												{/*	<div>*/}									{/*<div>{subOption.id}</div>*/}
 
 												{/*<GenreChipsDumb familyAgg={subOption.artist.familyAgg} chipData={subOption.artist.genres}>*/}
 												{/*</GenreChipsDumb>*/}
-												<BubbleFamilyGenreChips families={[]} familyDisabled={true} varied={true} genres={subOption.artist.genres} genresFilter={chipGenres}>
-												</BubbleFamilyGenreChips>
+													<div style={{position:"relative","marginLeft":"-5em","marginRight":"5em"}}>
+														{subOption.artist.images && subOption.artist.images.length > 0 &&
+														//	todo: when I was trying to make these fall delayed based on i
+
+															<div>
+																<div style={{position:"absolute",zIndex:1,left:"2em"}}>
+																	<ShowPlay sub={subOption}/>
+																</div>
+																<div >
+																	<EventImageFader type={'artist'} item={subOption}/>
+																</div>
+																{/*<animated.div style={opacityArr[i]}>*/}
+																{/*	<img style={{height: "5em", width: "5em"}}*/}
+																{/*		 src={subOption.artist.images[0].url}></img>*/}
+																{/*</animated.div>*/}
+																{/*<img style={{height: "5em", width: "5em"}}*/}
+																{/*	 src={subOption.artist.images[0].url}></img>*/}
+															</div>
+
+														}
+													</div>
+
+													<div style={{display:"flex",flexDirection:"column",marginLeft:".5em"}}>
+
+														<div style={{marginLeft:".5em"}}>{subOption.artist.displayName}</div>
+														<BubbleFamilyGenreChips families={[]} familyDisabled={true} varied={true} genres={subOption.artist.genres} genresFilter={chipGenres}>
+														</BubbleFamilyGenreChips>
+
+													</div>
+
 
 												{/*	</div>*/}
-												{/*</div>*/}
+												</div>
 
 												{/*{subOption.venue.displayName} -*/}
 												{/*{subOption.location.city.toString().replace(", US","")}*/}
 											</React.Fragment>
 										}
 									/>
-									<ListItemSecondaryAction classes={{root:classes2.root}}>
-										<div style={{position:"relative"}}>
-											{subOption.artist.images && subOption.artist.images.length > 0 &&
-											<animated.div
-												style={opacityArr[i]}
-												// style={{
-												// 	opacity: getSpring(i).to({
-												// 		range: [0, 1],
-												// 		output: [0.5,1],
-												// 	}),
-												// }}
-											>
-												<img style={{height: "5em", width: "5em"}}
-													 src={subOption.artist.images[0].url}></img>
-											</animated.div>
-											}
-										</div>
-									</ListItemSecondaryAction>
+
+
+									{/*<ListItemSecondaryAction classes={{root:classes2.root}}>*/}
+									{/*	<div style={{position:"relative"}}>*/}
+									{/*		{subOption.artist.images && subOption.artist.images.length > 0 &&*/}
+									{/*		<animated.div*/}
+									{/*			style={opacityArr[i]}*/}
+									{/*			// style={{*/}
+									{/*			// 	opacity: getSpring(i).to({*/}
+									{/*			// 		range: [0, 1],*/}
+									{/*			// 		output: [0.5,1],*/}
+									{/*			// 	}),*/}
+									{/*			// }}*/}
+									{/*		>*/}
+									{/*			<img style={{height: "5em", width: "5em"}}*/}
+									{/*				 src={subOption.artist.images[0].url}></img>*/}
+									{/*		</animated.div>*/}
+									{/*		}*/}
+									{/*	</div>*/}
+									{/*</ListItemSecondaryAction>*/}
 
 
 								</div>
@@ -526,22 +530,27 @@ function EventsList(props) {
 								{/*<div>ListItem  key={subOption.id}  </div>*/}
 								<ListItem  key={subOption.id}  button onClick={() => handleClick(subOption.id)}>
 
-
 									<ListItemSecondaryAction>
 										<div style={{position:"relative"}}>
-											{/*todo: animate width adjustment?*/}
 
-											<animated.div
-												style={getRowDisplay(subOption)}
-												//style={shrinkSecondaryActionStyle}
-											>
-												{/*primaryOpen={(!(state[subOption.id]) || state[subOption.id] === false) } */}
+											<div className={state[subOption.id]  ? 'fade-out-image':'fade-in-image'}>
+												<EventImageFader type={'event'} item={subOption}/>
+											</div>
 
-												<SpringMultiDrop item={subOption}
-																 open={!(state[subOption.id]) || state[subOption.id] === false}
-												/>
-												{/*					 toggle={() =>{handleClick(subOption.id)}} */}
-											</animated.div>
+											{/*<animated.div*/}
+											{/*	style={getRowDisplay(subOption)}*/}
+											{/*	//style={shrinkSecondaryActionStyle}*/}
+											{/*>*/}
+											{/*	/!*primaryOpen={(!(state[subOption.id]) || state[subOption.id] === false) } *!/*/}
+
+
+											{/*	<SpringMultiDrop item={subOption}*/}
+											{/*					 open={!(state[subOption.id]) }*/}
+											{/*					 toggle={() =>{handleClick(subOption.id)}}*/}
+											{/*	/>*/}
+
+											{/*</animated.div>*/}
+
 											{/*<div>*/}
 											{/*	{ (!(state[subOption.id]) || state[subOption.id] === false)  &&*/}
 											{/*	<div style={{marginRight:"5em",marginBottom:"4em"}}>*/}
@@ -558,11 +567,10 @@ function EventsList(props) {
 										</div>
 									</ListItemSecondaryAction>
 
-
 									<ListItemText
 										// inset
 										disableTypography
-										primary={ formatEventName(subOption)}
+										primary={ <div style={{maxWidth:"18em"}} id={'primary'}>{formatEventName(subOption)}</div>}
 										classes={{multiline:classes2.multiline}}
 										secondary={
 											<React.Fragment>
@@ -572,15 +580,27 @@ function EventsList(props) {
 													color="textPrimary"
 												>
 													{/*testing: disabled for now*/}
-													<div style={{float:"right",marginRight:"1em"}} onClick={() =>{openSongkickExt(subOption)}}
-														 onMouseEnter={() =>{setOpenNew({...openNew,[subOption.id]:!openNew[subOption.id]})}}
-														 onMouseOut={() =>{setOpenNew({})}} className={'songkickExt'}>
-														<img src={songkick_badge_pink} style={{height:"3em",width:"3em"}} />
-														{openNew[subOption.id] && <OpenInNewIcon
-															style={{"fontSize":"1rem","position":"absolute","right":"50px","top":"30px",
-																"visibility": openNew[subOption.id] ?'visible':"hidden"}}
-															fontSize={'inherit'}/>}
-													</div>
+
+
+														{/*testing: wanted to disable but also keep free opacity transition??*/}
+
+														<div id={'songkickLink'} style={{float:"right",marginRight:"5em", opacity:state[subOption.id]  ? '100%':'0%',pointerEvents:state[subOption.id] ? "initial":"none"}}
+															  onClick={(e) =>{
+															openSongkickExt(subOption);stopPrevent(e)}}
+															 onMouseEnter={() =>{setOpenNew({...openNew,[subOption.id]:!openNew[subOption.id]})}}
+															 onMouseOut={() =>{setOpenNew({})}} className={'songkickExt'}>
+															<img src={songkick_badge_pink} style={{height:"2.5em",width:"2.5em"}} />
+															{<OpenInNewIcon
+																style={{"fontSize":"1rem","position":"absolute","right":"39px","top":"53px","display":"block"}}
+																fontSize={'inherit'}/>}
+
+															{/*todo: think I had some stuff from when I was focusing on desktop w/ this openNew business*/}
+															{/*{openNew[subOption.id] && <OpenInNewIcon*/}
+															{/*	style={{"fontSize":"1rem","position":"absolute","right":"50px","top":"30px",*/}
+															{/*		"visibility": openNew[subOption.id] ?'visible':"hidden"}}*/}
+															{/*	fontSize={'inherit'}/>}*/}
+														</div>
+
 													<div style={{display:"flex",justifyContent:"space-between"}}>
 														<div>
 															<div>
@@ -718,7 +738,7 @@ function EventsList(props) {
 				{/*<div style={{marginLeft:"1em"}}>Matched {tiles.length} Items </div>*/}
 				{/*</div>*/}
 				<List>
-					<ListItem  className={'events-control'}  button divider key={'events-control'} >
+					<ListItem disableTouchRipple={true} className={'events-control'}  button divider key={'events-control'} >
 							<ListItemText primary={
 									<div style={{display:"flex"}} className={'inner-events-control'}>
 										<div style={{flexGrow:"1",alignSelf:"center"}}>
@@ -736,16 +756,18 @@ function EventsList(props) {
 													}/>
 												</div>
 												<div style={{marginLeft:".5em"}}>Friends Liked
+
 													<Switch
 														checked={friendsFilterOn}
 														// onChange={() =>{setFriendsFilterOn(prev => !(prev))}}
+
 														color="secondary"
 														onClick={(e) => {
-															e.stopPropagation();
 															setFriendsFilterOn(prev => !(prev));
 															//setDisabledRipple(true);
 														}}
 													/>
+
 												</div>
 											</div>
 											<div>
@@ -768,18 +790,15 @@ function EventsList(props) {
 
 										<div style={{flexGrow:"1"}}>{'\u00A0'}</div>
 										<div style={{display:"flex",flexDirection:"column"}}>
-											<div>
-												<div style={{color:"#0055ff"}}>{_r.length} events </div>
-												{/*<div style={{color:"#0055ff"}}>{events.filter(EventControlsFilter).length} events </div>*/}
-												<div> found in </div>
+											<div  style={{display:"flex",flexDirection:"row"}}>
+												<div style={{width:"4em"}}>
+													<div style={{color:"#0055ff"}}>{_r.length} events </div>
+													{/*<div style={{color:"#0055ff"}}>{events.filter(EventControlsFilter).length} events </div>*/}
+													<div> found in </div>
+												</div>
 											</div>
-											<DisplayTimeLocation control={control}/>
 										</div>
-										<div style={{position:"relative",left:"20px"}} onClick={handleClickConfig}>
-											<Fab color="secondary" size={'small'} aria-label="add">
-												<DateRangeIcon/>
-											</Fab>
-										</div>
+
 										{/*testing: vertical*/}
 										{/*<div style={{display:"flex"}}>*/}
 										{/*	<div style={{maxWidth:"5em",marginRight:".5em",display:"flex",flexDirection:"column"}}>*/}
@@ -791,15 +810,38 @@ function EventsList(props) {
 										{/*</div>*/}
 									</div>
 							} />
+							{/*todo: what is this here for?*/}
 							{open ? <ExpandLess /> : <ExpandMore />}
 					</ListItem>
-					<Collapse key={'events-control-collapse'}  in={open} timeout="auto" unmountOnExit>
-						<Map default={{"displayName":"Columbus", "id":9480}}></Map>
+					<Collapse  key={'events-control-collapse'}></Collapse>
+
+					<Collapse key={'events-location-collapse'}  collapsedSize={'2.4em'} in={open} timeout="auto">
+						<div style={{position:"relative",display:"flex",flexDirection:"column"}} onClick={handleClickConfig} >
+							<div style={{display:"flex",justifyContent:"flex-end"}}>
+								<DisplayLocation control={control}/>
+								<Fab color="secondary" size={'small'} aria-label="add" component={'div'}>
+									<LocationOnIcon/>
+								</Fab>
+								<div>{open ? <ExpandLess /> : <ExpandMore />}</div>
+							</div>
+							<Map default={{"displayName":"Columbus", "id":9480}}></Map>
+						</div>
+
+					</Collapse>
+					<Collapse key={'events-date-collapse'} collapsedSize={'2.4em'}  in={open2} timeout="auto" >
+						<div style={{display:"flex",justifyContent:"flex-end"}}  onClick={handleClickConfig2}>
+							<DisplayDate control={control}/>
+							<div style={{position:"relative"}} >
+									<PopoverDatePicker/>
+							</div>
+							<div>{open2 ? <ExpandLess /> : <ExpandMore />}</div>
+						</div>
 					</Collapse>
 
-					<ListItem id={'events-collapse'} key={'events'} button divider onClick={handleClickConfig2}>
+					<ListItem key={'events'} button divider >
+					{/*	invisible, just here for mui consistency*/}
 					</ListItem>
-					<Collapse  key={'events-collapse'}  in={open2} timeout="auto" unmountOnExit>
+					<Collapse  key={'events-collapse'}  in={true} timeout="auto" unmountOnExit>
 						{handler(items)}
 					</Collapse>
 				</List>

@@ -118,14 +118,16 @@ function FriendsDisplay(props) {
 
 	const [globalState, globalDispatch] = useContext(Context);
 
-	return(<div>
+	return(
+		<div>
+			{props.users.length === 0 && <div>So lonely ...</div> }
 		<div className={styles.list} style={{ height: Math.max(...heights) }}>
 			{/*<div className={styles.list} style={{ height:"20em" }}>*/}
 			{transitions((style, item) => (
 				<a.div style={style} onClick={() =>{props.onClick(item)}}>
 					{/*todo: just looking at artists rn*/}
-					{!(globalState[item.id + "_artists"]) && <PulseSpinnerSpring fontSize={'50px'}/>}
-					<UserTile item={item}/>
+					{/*{!(globalState[item.id + "_artists"]) && <PulseSpinnerSpring fontSize={'50px'}/>}*/}
+					<UserTile loaded={globalState[item.id + "_artists"]} item={item}/>
 				</a.div>
 			))}
 		</div>
