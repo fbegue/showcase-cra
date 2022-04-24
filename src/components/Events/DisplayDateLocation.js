@@ -24,7 +24,8 @@ function Main(props) {
 		return DateTime.fromISO(props.control.startDate).toFormat('LLL d') + " - " + DateTime.fromISO(props.control.endDate).toFormat('LLL d')
 	}
 	return(
-		<div style={{display:"flex",flexDirection:"column",maxWidth:"10em"}}>
+		//note: minWidth = length of
+		<div style={{display:"flex",flexDirection:"column",width:"8em"}}>
 			<div style={{background:'#80808026'}}>{getTitle()}</div>
 			<div style={{background:'#80808026'}}>{getDate()}</div>
 		</div>

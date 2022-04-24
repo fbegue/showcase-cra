@@ -12,11 +12,9 @@ import { withStyles,makeStyles } from '@material-ui/core/styles';
 
 import LuxonUtils from '@date-io/luxon';
 
-import {
-	MuiPickersUtilsProvider,
-	KeyboardDatePicker,
-} from '@material-ui/pickers';
+//import {MuiPickersUtilsProvider, KeyboardDatePicker,} from '@material-ui/pickers';
 import {Context} from "../../storage/Store";
+import Typography from "@material-ui/core/Typography";
 
 function Map(props) {
 	let control = Control.useContainer();
@@ -83,7 +81,12 @@ function Map(props) {
 						 key={metro.id}
 						 onClick={(e) => setSelect(e,metro)}>
 
-			{metro.displayName}
+			<Typography
+				component={'span'}
+				variant="body1"
+				color="textPrimary"
+			>{metro.displayName}</Typography>
+
 		</ListItem>
 	}
 	const StyledListItem = withStyles(styles)(_StyledListItem)
@@ -130,40 +133,42 @@ function Map(props) {
 					</div>
 				</div>
 			</div>
-			<div style={{display:"flex"}}>
-				<div>
-					<MuiPickersUtilsProvider utils={LuxonUtils}>
-						<KeyboardDatePicker
-					disableToolbar
-					variant="inline"
-					format="MM/dd/yyyy"
-					margin="normal"
-					id="date-picker-inline"
-					label="start"
-					value={control.startDate}
-					onChange={(date) =>{handleDateChange(date,'start')}}
-					KeyboardButtonProps={{
-						'aria-label': 'change date',
-					}}
-						/></MuiPickersUtilsProvider>
-				</div>
-				<div>
-					<MuiPickersUtilsProvider utils={LuxonUtils}>
-						<KeyboardDatePicker
-							disableToolbar
-							variant="inline"
-							format="MM/dd/yyyy"
-							margin="normal"
-							id="date-picker-inline"
-							label="end"
-							value={control.endDate}
-							onChange={(date) =>{handleDateChange(date,'end')}}
-							KeyboardButtonProps={{
-								'aria-label': 'change date',
-							}}
-						/></MuiPickersUtilsProvider>
-				</div>
-			</div>
+			{/*<div style={{display:"flex"}}>*/}
+			{/*	<div>*/}
+			{/*		<MuiPickersUtilsProvider utils={LuxonUtils}>*/}
+			{/*			<KeyboardDatePicker*/}
+			{/*		disableToolbar*/}
+			{/*		disablePast*/}
+			{/*		variant="inline"*/}
+			{/*		format="MM/dd/yyyy"*/}
+			{/*		margin="normal"*/}
+			{/*		id="date-picker-inline"*/}
+			{/*		label="start"*/}
+			{/*		value={control.startDate}*/}
+			{/*		showTodayButton={true}*/}
+			{/*		onChange={(date) =>{handleDateChange(date,'start')}}*/}
+			{/*		KeyboardButtonProps={{*/}
+			{/*			'aria-label': 'change date',*/}
+			{/*		}}*/}
+			{/*			/></MuiPickersUtilsProvider>*/}
+			{/*	</div>*/}
+			{/*	<div>*/}
+			{/*		<MuiPickersUtilsProvider utils={LuxonUtils}>*/}
+			{/*			<KeyboardDatePicker*/}
+			{/*				disableToolbar*/}
+			{/*				variant="inline"*/}
+			{/*				format="MM/dd/yyyy"*/}
+			{/*				margin="normal"*/}
+			{/*				id="date-picker-inline"*/}
+			{/*				label="end"*/}
+			{/*				value={control.endDate}*/}
+			{/*				onChange={(date) =>{handleDateChange(date,'end')}}*/}
+			{/*				KeyboardButtonProps={{*/}
+			{/*					'aria-label': 'change date',*/}
+			{/*				}}*/}
+			{/*			/></MuiPickersUtilsProvider>*/}
+			{/*	</div>*/}
+			{/*</div>*/}
 		</div>
 
 	)}
