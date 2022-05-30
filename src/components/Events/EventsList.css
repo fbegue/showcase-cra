@@ -1,3 +1,9 @@
+/*misc (anything in Events folder)*/
+
+.display-playlist-params > div{
+  margin-bottom: .5em
+}
+
 .MuiListItem-divider-123{
   border-bottom:none !important;
 }
@@ -43,6 +49,13 @@
 }
 
 
+/*mui overrides*/
+
+.MuiPopover-paper{
+max-width: calc(100%) !important;
+  top:initial !important;
+  left:initial !important;
+}
 
 .MuiListItemSecondaryAction-root{
   /*top: 50%;*/
@@ -62,7 +75,7 @@
   /*right: 5px;*/
 }
 
-/*testing: eh fuck this*/
+/*testing: eh fuck this thing*/
 /*.inner-item .MuiSvgIcon-root{*/
 /*  position: relative;*/
 /*  top: 25px;*/
@@ -73,7 +86,7 @@
   display:none;
 }
 
-.inner-item .MuiSvgIcon-root .inner-skip{
+.inner-item .inner-skip .MuiSvgIcon-root {
   display:block;
 }
 

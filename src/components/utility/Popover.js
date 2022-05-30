@@ -10,7 +10,9 @@ import Fab from '@material-ui/core/Fab';
 
 const useStyles = makeStyles((theme) => ({
 	typography: {
-		padding: theme.spacing(2),
+		// paddingLeft: theme.spacing(2),
+		// paddingRight: theme.spacing(2),
+		// paddingBottom: theme.spacing(2),
 	},
 }));
 
@@ -40,7 +42,7 @@ export default function SimplePopover(props) {
 				<Fab color="secondary" size={'small'} aria-label="add">
 					{/*todo: until there are more features here*/}
 					{/*<MoreVertIcon onClick={handleClick}/>*/}
-					
+
 					<PlaylistAddIcon onClick={handleClick}/>
 
 				</Fab>
@@ -58,7 +60,7 @@ export default function SimplePopover(props) {
 						horizontal: 'center',
 					}}
 				>
-					<Typography className={classes.typography}>{props.content}</Typography>
+					<Typography component={'div'} className={classes.typography}>{props.content}</Typography>
 				</Popover>
 			</div>
 

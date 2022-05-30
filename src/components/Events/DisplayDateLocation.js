@@ -3,8 +3,18 @@ import React, {} from 'react';
 import { DateTime } from "luxon";
 
 function DisplayDate(props){
+
 	function getDate(){
-		return DateTime.fromISO(props.control.startDate).toFormat('LLL d') + " - " + DateTime.fromISO(props.control.endDate).toFormat('LLL d')
+		//note: to can become undefined, but 'from' looks like there's always a value
+		var from = new DateTime.fromJSDate(props.control.dateRange.from)
+		var to = new DateTime.fromJSDate(props.control.dateRange.to);
+		if(props.control.dateRange.to){
+			return from.toFormat('LLL d') + " - " + to.toFormat('LLL d')
+		}else{
+			debugger
+			return from.toFormat('LLL d') + " - " + "???"
+		}
+
 	}
 	return (	<div style={{background:'#80808026'}}>{getDate()}</div>)
 }

@@ -3,6 +3,8 @@ import {Button} from "@material-ui/core"
 import {getAvatarSRC} from '../../components/Social/AvatarGenreator'
 import DisconnectIcon from "../../assets/disconnect-svgrepo-com.svg";
 import PulseSpinnerSpring from "../springs/PulseSpinnerSpring";
+import CheckCircleIcon from '@material-ui/icons/CheckCircle';
+import InputIcon from "@material-ui/icons/Input";
 function UserTile(props) {
 
 	const getInvite = (item) =>{
@@ -33,7 +35,19 @@ function UserTile(props) {
 			<div id='loadFriend' style={{"position":"absolute","left":"25%","top":"25%","zIndex":"1"}}>
 				<PulseSpinnerSpring fontSize={'50px'}/></div>
 			}
-			<div >
+
+			<div style={{"position":"absolute","left":"79%","top":"73%","zIndex":"1"}}>
+				{(props.selectedUser && props.selectedUser.id === props.item.id) &&
+				<div>
+					{props.selectedUser && props.selectedUser.id === props.item.id}
+					<CheckCircleIcon style={{fontSize:"22px"}} color={'secondary'} />
+				</div>
+				}
+			</div>
+
+
+
+			<div>
 
 				{/*{!(props.item.isUser) ? getInvite(props.item):""}*/}
 				{/* width="150px" height="150px"*/}
@@ -58,6 +72,8 @@ function UserTile(props) {
 					/>
 				</div>
 			}
+
+
 
 		</div>
 

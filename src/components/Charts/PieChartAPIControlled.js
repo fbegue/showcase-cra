@@ -7,7 +7,7 @@ import {FriendsControl} from "../../index";
 import _ from "lodash";
 HC_more(Highcharts)
 
-function PieChart(props) {
+function PieChartAPIControlled(props) {
 
 	let chart = null;
 
@@ -192,4 +192,4 @@ function PieChart(props) {
 	</div>)
 
 }
-export default PieChart;
+export default PieChartAPIControlled;

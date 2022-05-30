@@ -64,6 +64,7 @@ import Button from '@material-ui/core/Button';
 import SliderEvents from '../Sliders/Slider-Events'
 import SliderEvents2 from '../Sliders/Slider-Events2'
 import DatePicker from "./DatePicker";
+import DateRangeIcon from "@material-ui/icons/DateRange";
 
 //import GenreChipsDumb from '../chips/GenreChipsDumb.js'
 // import '../utility/CustomScroll/contextStats.scss'
@@ -118,7 +119,6 @@ function EventsList(props) {
 
 
 	const [friendsFilterOn, setFriendsFilterOn] = useState(false);
-	//const [globalState, globalDispatch] = useContext(Context);
 	// const globalUI = useReactiveVar(GLOBAL_UI_VAR);
 	const events= useReactiveVar(EVENTS_VAR);
 	//console.log(comp + " events",events);
@@ -138,6 +138,7 @@ function EventsList(props) {
 		//note: on every render, first process event list control values
 
 		function eventControlsFilter(e){
+
 			if(friendsFilterOn){return e.friends?.length >0}
 			else{return true}
 		}
@@ -160,7 +161,7 @@ function EventsList(props) {
 		}
 		console.log("setEvents",_r);
 		setItems(_r)
-	}, [page,_r])
+	}, [page,_r,friendsFilterOn])
 
 	const chipGenres = useReactiveVar(CHIPGENRES);
 
@@ -203,7 +204,7 @@ function EventsList(props) {
 
 
 	const [open, setOpen] = React.useState(false);
-	const [open2, setOpen2] = React.useState(true);
+	const [open2, setOpen2] = React.useState(false);
 	const [open3, setOpen3] = React.useState(true);
 	const handleClickConfig = () => {
 		setOpen(!open);
@@ -374,6 +375,10 @@ function EventsList(props) {
 		event.preventDefault()
 		event.stopPropagation()
 	}
+
+
+	//todo: would it help debugging path to break this out into it's own comp?
+	//will be labor intensive to have to copy over a lot of state stuff / helper functions...
 	function handler(children,key) {
 
 		// var moment = function(dt,format){
@@ -464,27 +469,33 @@ function EventsList(props) {
 														{subOption.artist.images && subOption.artist.images.length > 0 &&
 														//	todo: when I was trying to make these fall delayed based on i
 
-															<div>
-																<div style={{position:"absolute",zIndex:1,left:"2em"}}>
-																	<ShowPlay sub={subOption}/>
+															<SPW>
+																<div>
+																	<div style={{position:"absolute",zIndex:1,left:"2em"}}>
+																		<ShowPlay sub={subOption}/>
+																	</div>
+																	<div >
+																		<EventImageFader type={'artist'} item={subOption}/>
+																	</div>
+																	{/*<animated.div style={opacityArr[i]}>*/}
+																	{/*	<img style={{height: "5em", width: "5em"}}*/}
+																	{/*		 src={subOption.artist.images[0].url}></img>*/}
+																	{/*</animated.div>*/}
+																	{/*<img style={{height: "5em", width: "5em"}}*/}
+																	{/*	 src={subOption.artist.images[0].url}></img>*/}
 																</div>
-																<div >
-																	<EventImageFader type={'artist'} item={subOption}/>
-																</div>
-																{/*<animated.div style={opacityArr[i]}>*/}
-																{/*	<img style={{height: "5em", width: "5em"}}*/}
-																{/*		 src={subOption.artist.images[0].url}></img>*/}
-																{/*</animated.div>*/}
-																{/*<img style={{height: "5em", width: "5em"}}*/}
-																{/*	 src={subOption.artist.images[0].url}></img>*/}
-															</div>
+															</SPW>
 
 														}
 													</div>
 
 													<div style={{display:"flex",flexDirection:"column",marginLeft:".5em"}}>
 
-														<div style={{marginLeft:".5em"}}>{subOption.artist.displayName}</div>
+														<div style={{display:"flex"}}>
+															<div style={{marginLeft:".5em"}}>{subOption.artist.displayName}</div>
+															{control.play && control.playArtist === subOption.artist.id ? <AnimatedPlayBars />:<div></div>}
+														</div>
+
 														<BubbleFamilyGenreChips families={[]} familyDisabled={true} varied={true} genres={subOption.artist.genres} genresFilter={chipGenres}>
 														</BubbleFamilyGenreChips>
 
@@ -739,7 +750,7 @@ function EventsList(props) {
 				{/*</div>*/}
 				<List>
 					<ListItem disableTouchRipple={true} className={'events-control'}  button divider key={'events-control'} >
-							<ListItemText primary={
+							<ListItemText disableTypography={true} primary={
 									<div style={{display:"flex"}} className={'inner-events-control'}>
 										<div style={{flexGrow:"1",alignSelf:"center"}}>
 											{/*todo: going to use spring floating menu here*/}
@@ -752,7 +763,7 @@ function EventsList(props) {
 													{/*testing: no outline*/}
 													{/*<IconButton aria-label="more"><MoreVertIcon /></IconButton>*/}
 													<SimplePopover content={
-														<div  key={'special'}><CreatePlaylist items={items} control={control}/></div>
+														<div  key={'special'}><CreatePlaylist events={events} control={control}/></div>
 													}/>
 												</div>
 												<div style={{marginLeft:".5em"}}>Friends Liked
@@ -770,22 +781,23 @@ function EventsList(props) {
 
 												</div>
 											</div>
-											<div>
-												<Pagination setPage={setPage} page={page} pageSize={pageSize} records={_r}/>
+											<div style={{display:"flex"}} >
+												<div>
+													<Pagination setPage={setPage} page={page} pageSize={pageSize} records={_r}/>
+												</div>
+												<div>
+													{/*note: advanced event filters that change how events are produced from dataset */}
+													{/*<div>*/}
+													{/*	/!*todo: what a mess*/}
+													{/*	1) this needs to be memo'd to stop rerenders caused by handleChange results, but can't find any working examples*/}
+													{/*	2) really made a fuckery of the mapping here*!/*/}
+													artistSens {control.artistSens}
+													{/*	genreSens {control.genreSens}*/}
+													<SliderEvents map={control.mapArtist} defaultValue={control.rmapArtist[control.artistSens]} handleChange={(v) =>{control.setArtistSens(v)}}/>
+													{/*	<SliderEvents2 map={control.map} defaultValue={control.rmap[control.genreSens]} handleChange={(v) =>{control.setGenreSens(v)}}/>*/}
+													{/*</div>*/}
+												</div>
 											</div>
-											{/*<div style={{marginTop:"1em",marginBottom:"1em"}} key={'special'}><CreatePlay/></div>*/}
-
-											{/*note: advanced event filters that change how events are produced from dataset */}
-											{/*<div>*/}
-											{/*	/!*todo: what a mess*/}
-											{/*	1) this needs to be memo'd to stop rerenders caused by handleChange results, but can't find any working examples*/}
-											{/*	2) really made a fuckery of the mapping here*!/*/}
-											{/*	artistSens {control.artistSens}*/}
-											{/*	genreSens {control.genreSens}*/}
-											{/*	<SliderEvents map={control.mapArtist} defaultValue={control.rmapArtist[control.artistSens]} handleChange={(v) =>{control.setArtistSens(v)}}/>*/}
-											{/*	<SliderEvents2 map={control.map} defaultValue={control.rmap[control.genreSens]} handleChange={(v) =>{control.setGenreSens(v)}}/>*/}
-											{/*</div>*/}
-
 										</div>
 
 										<div style={{flexGrow:"1"}}>{'\u00A0'}</div>
@@ -828,11 +840,26 @@ function EventsList(props) {
 						</div>
 
 					</Collapse>
+
 					<Collapse key={'events-date-collapse'} collapsedSize={'2.4em'}  in={open2} timeout="auto" >
-						<div style={{display:"flex",justifyContent:"flex-end"}}  onClick={handleClickConfig2}>
-							<DisplayDate control={control}/>
-							<div style={{position:"relative"}} >
-									<PopoverDatePicker/>
+						{/*todo: reenable onClick={handleClickConfig2}*/}
+						<div style={{display:"flex",justifyContent:"flex-end"}} onClick={handleClickConfig2}>
+
+							<div style={{position:"relative",display:"flex",flexDirection:"column"}} >
+								<div style={{position:"relative",display:"flex",justifyContent:"flex-end"}} >
+									<DisplayDate control={control}/>
+									<Fab component={'div'} color="secondary" size={'small'} aria-label="add">
+										{/*todo: until there are more features here*/}
+										{/*<MoreVertIcon onClick={handleClick}/>*/}
+										<DateRangeIcon onClick={handleClick}/>
+										{/*<PlaylistAddIcon onClick={handleClick}/>*/}
+									</Fab>
+								</div>
+
+								<SPW>
+									<DatePicker control={control} />
+								</SPW>
+
 							</div>
 							<div>{open2 ? <ExpandLess /> : <ExpandMore />}</div>
 						</div>

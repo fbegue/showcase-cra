@@ -10,7 +10,7 @@ import {useReactiveVar} from "@apollo/react-hooks";
 import {
 	GLOBAL_UI_VAR, TILES, EVENTS_VAR, STATS, CHIPFAMILIES, CHIPGENRES,
 	CHIPGENRESRANKED, CHIPFAMILIESRANKED, CHIPGENRESCOLORMAP, CHIPGENRESCOMBINEDMAP, BARDATA,BARDRILLDOWNMAP,
-	CHIPGENRESRANKEDMAP,CHIPFAMILIESRANKEDMAP
+	CHIPGENRESRANKEDMAP,CHIPFAMILIESRANKEDMAP,PIEDATA,PIEDATAGUEST
 } from "../storage/withApolloProvider";
 
 import {data1} from './testData'
@@ -147,6 +147,12 @@ function chooseData(statcontrol,friendscontrol,tabcontrol,globalState,globalUI){
 
 	var data_user = [];
 	var data_guest = [];
+
+
+	if(!globalState[globalUI.user.id + "_artists"]){
+		console.log("chooseData wasn't ready; skipped");
+
+	}else{
 
 
 	console.log("chooseData",statcontrol.stats.name);
@@ -540,7 +546,7 @@ function chooseData(statcontrol,friendscontrol,tabcontrol,globalState,globalUI){
 	data_user = _.uniqBy(data_user,'id')
 
 
-
+	}
 	return {data_user,data_guest}
 }
 
@@ -815,189 +821,197 @@ function useProduceData(){
 		prevVar1.current = friendscontrol.guest;
 		//prevVar2.current = var2;
 
+
 		console.log("useProduceData",statcontrol.stats.name);
 		//console.log("guest",friendscontrol.guest);
 		friendscontrol.guest ? console.log("guest:",friendscontrol.guest.id):{};
 		//console.log("tables",tables);
 
-		//set data pointer based on current tab
-		let  {data_user,data_guest} = chooseData(statcontrol,friendscontrol,tabcontrol,globalState,globalUI)
-
-		//determine incoming data object type (and don't try to check at a value that's not there)
-		var objectType = null;
-		if(data_user.length > 0){
-			objectType = data_user[0].type
-		}else if(data_guest.length > 0){
-			objectType = data_guest[0].type
-		}
-
-		console.log("data object type",objectType);
-		console.log("data source switched | user:",data_user);
-		console.log("data source switched | guest",data_guest);
-
-
-		//based on the type of data coming in,
-		//create a map for pie and bubblechart to unwrap later
-		//todo: in every case, null familyAgg doesn't quite make sense?
-		// think this was a notee to myself that I was getting some nulls that shouldn't be there?
-
-		//todo: can decide to (initally) hide certain series w/ series property: visible
-		//by default, toggleable by clicking on legend item
-		var _genres =[];
-
-
-		let map_user= null;
-		let map_guest= null;
-		if(objectType === 'album' ||objectType === 'track'){
-			let {map_user:map_userr,map_guest:map_guestr} = getFriendsItemMaps(data_user,data_guest)
-			map_user = map_userr;map_guest = map_guestr
-		}else{
-			let {map_user:map_userr,map_guest:map_guestr} = getFriendsMaps(data_user,data_guest)
-			map_user = map_userr;map_guest = map_guestr
-		}
-		// console.log("map_user",map_user);
-		// console.log("map_guest",map_guest);
-		var _tiles = [];
-		//----------------------------------------------------------------------
-
-		//note: setup ... various objects to filter on later
-		//the big idea here is to create the correct overarching datasets and create
-		//tiles, bubbles and pie data from contexts, and then apply filters later.
-		//in the case of friends, we apply the friendscontrols right now to further reduce
-		//the set we're filtering on later
-
-		//todo: feels like this should be combined with switch below
-		//but not sure if object type switch are shared like data producers - if so then combine
-
-		var au = null;var ag = null;
-
-		switch (statcontrol.stats.name) {
-			case "artists_top":
-			case "artists_recent":
-			case "artists_saved":
-			case "artists_friends":
-				//all artists require map => array producer
-				var {artists_user,artists_guest} = getFriendsArtists(map_user,map_guest)
-				au = artists_user;ag = artists_guest;
-				break;
-			case "albums_saved":
-			case "tracks_recent":
-			case "tracks_saved":
-				//this is just the raw track/album data for the user
-				au = data_user; ag = data_guest;break;
-			case "playlists":
-				//this is just the raw playlist data for the user
-				au = data_user; ag = data_guest;break;
-			//todo: broken
-			case "playlists_friends":
-			case "tracks_friends":
-			case "albums_friends":
-			default:
-				const {items_user,items_guest} = getFriendsItems(map_user,map_guest);
-				au = items_user; ag = items_guest;break;
-
-		}
-
-		//console.log("set up data targets:");
-		// console.log("user",au);
-		// console.log("guest",ag);
-
-		//note: use maps to produce pie and bubble data
-		//for friends, change the input to these produce functions based on friendscontrol.compare
-
-
-		switch(statcontrol.stats.name) {
-			case "artists_top":
-			case "artists_recent":
-			case "artists_saved":_tiles = au;break;
-			case "albums_saved":
-			case "tracks_recent":
-			case "tracks_saved":_tiles = au;break;
-			case "playlists":_tiles = data_user;break;
-			case "artists_friends":
-			case "playlists_friends":
-			case "tracks_friends":
-			case "albums_friends":
-				switch (friendscontrol.compare) {
-					case 'all':
-						if(objectType === 'album' ||objectType === 'track'){
-							_tiles = _.uniqBy(data_user.concat(data_guest), 'id')
-						} else {
-							var uniqAll = _.uniqBy(au.concat(ag), 'id')
-							_tiles = uniqAll
-						}
-						break;
-					//	todo:
-					case 'diff':
-						//var uniqAll = _.uniqBy(au.concat(ag),'id')
-						break;
-					case 'shared':
-						if(objectType === 'album' ||objectType === 'track'){
-							_tiles = _.uniqBy(data_user.concat(data_guest), 'id').filter(r => {return r.shared})
-						} else {
-							var _shared = _.uniqBy(au.concat(ag), 'id').filter(r => {return r.shared})
-							_tiles = _shared
-						}
-						break;
-					case 'user':
-						_tiles = au;break;
-					case 'guest':
-						_tiles = ag;break;
-				}
-				break;
-			default:
-				console.warn("skipped stat re-render for: " + statcontrol.stats.name)
-				break;
-		}
-		//-------------------------------------------------------------------------------
-
-		//todo: expand on dynamic stats collection concept?
-		//think this makes more sense in useProduceGraphData
-
-		// var _stats = {};
-		// var max = null
-		// bubbleData.forEach(s =>{
-		// 	max === null ? max = s:{};
-		// 	s.data.length > max.data.length ? max = s:{}
-		// })
+		// if(!globalState[globalUI.user.id + "_artists"]){
+		// 	console.log("useProduceData wasn't ready; skipped update");
 		//
-		// _stats.max = max;
-		// STATS(_stats);
+		// }else{
 
-		//------------------------------------------------------------------------
+			//set data pointer based on current tab
+			let  {data_user,data_guest} = chooseData(statcontrol,friendscontrol,tabcontrol,globalState,globalUI)
 
-		//testing: small amount of tiles
-		//todo: so I can go between user and guest w/ this reduced set
-		//but shared doesn't work, not sure about all
-		//when I take this out though....idfk
-		//_tiles = _tiles.slice(0,10)
+			//determine incoming data object type (and don't try to check at a value that's not there)
+			var objectType = null;
+			if(data_user.length > 0){
+				objectType = data_user[0].type
+			}else if(data_guest.length > 0){
+				objectType = data_guest[0].type
+			}
 
-		//pretty sure this is for initialization?
-
-		if(tiles.length === 0){
-			console.log("tiles init");
-			TILES(_tiles);
-		}else{
-
-			//var test = [1,2,3,4]
-			//var filt = tiles.filter((r,i) =>{return !(test.includes(i))});
-
-			console.log("$util updated tiles",_tiles);
-			//console.log("current tiles",tiles);
-			TILES(_tiles)
-
-			//testing: sanity dupe check
-			// function hasDuplicates(a) {
-			// 	return _.uniq(a).length !== a.length;
-			// }
-			// console.log("dupe?",hasDuplicates(filt));
-
-			// console.log("result",filt);
-			// TILES(filt)
-		}
+			console.log("data object type",objectType);
+			console.log("data source switched | user:",data_user);
+			console.log("data source switched | guest",data_guest);
 
 
-		//return {bubble:bubbleData,pie:tempPieData,genres:_genres}
+			//based on the type of data coming in,
+			//create a map for pie and bubblechart to unwrap later
+			//todo: in every case, null familyAgg doesn't quite make sense?
+			// think this was a notee to myself that I was getting some nulls that shouldn't be there?
+
+			//todo: can decide to (initally) hide certain series w/ series property: visible
+			//by default, toggleable by clicking on legend item
+			var _genres =[];
+
+
+			let map_user= null;
+			let map_guest= null;
+			if(objectType === 'album' ||objectType === 'track'){
+				let {map_user:map_userr,map_guest:map_guestr} = getFriendsItemMaps(data_user,data_guest)
+				map_user = map_userr;map_guest = map_guestr
+			}else{
+				let {map_user:map_userr,map_guest:map_guestr} = getFriendsMaps(data_user,data_guest)
+				map_user = map_userr;map_guest = map_guestr
+			}
+			// console.log("map_user",map_user);
+			// console.log("map_guest",map_guest);
+			var _tiles = [];
+			//----------------------------------------------------------------------
+
+			//note: setup ... various objects to filter on later
+			//the big idea here is to create the correct overarching datasets and create
+			//tiles, bubbles and pie data from contexts, and then apply filters later.
+			//in the case of friends, we apply the friendscontrols right now to further reduce
+			//the set we're filtering on later
+
+			//todo: feels like this should be combined with switch below
+			//but not sure if object type switch are shared like data producers - if so then combine
+
+			var au = null;var ag = null;
+
+			switch (statcontrol.stats.name) {
+				case "artists_top":
+				case "artists_recent":
+				case "artists_saved":
+				case "artists_friends":
+					//all artists require map => array producer
+					var {artists_user,artists_guest} = getFriendsArtists(map_user,map_guest)
+					au = artists_user;ag = artists_guest;
+					break;
+				case "albums_saved":
+				case "tracks_recent":
+				case "tracks_saved":
+					//this is just the raw track/album data for the user
+					au = data_user; ag = data_guest;break;
+				case "playlists":
+					//this is just the raw playlist data for the user
+					au = data_user; ag = data_guest;break;
+				//todo: broken
+				case "playlists_friends":
+				case "tracks_friends":
+				case "albums_friends":
+				default:
+					const {items_user,items_guest} = getFriendsItems(map_user,map_guest);
+					au = items_user; ag = items_guest;break;
+
+			}
+
+			//console.log("set up data targets:");
+			// console.log("user",au);
+			// console.log("guest",ag);
+
+			//note: use maps to produce pie and bubble data
+			//for friends, change the input to these produce functions based on friendscontrol.compare
+
+
+			switch(statcontrol.stats.name) {
+				case "artists_top":
+				case "artists_recent":
+				case "artists_saved":_tiles = au;break;
+				case "albums_saved":
+				case "tracks_recent":
+				case "tracks_saved":_tiles = au;break;
+				case "playlists":_tiles = data_user;break;
+				case "artists_friends":
+				case "playlists_friends":
+				case "tracks_friends":
+				case "albums_friends":
+					switch (friendscontrol.compare) {
+						case 'all':
+							if(objectType === 'album' ||objectType === 'track'){
+								_tiles = _.uniqBy(data_user.concat(data_guest), 'id')
+							} else {
+								var uniqAll = _.uniqBy(au.concat(ag), 'id')
+								_tiles = uniqAll
+							}
+							break;
+						//	todo:
+						case 'diff':
+							//var uniqAll = _.uniqBy(au.concat(ag),'id')
+							break;
+						case 'shared':
+							if(objectType === 'album' ||objectType === 'track'){
+								_tiles = _.uniqBy(data_user.concat(data_guest), 'id').filter(r => {return r.shared})
+							} else {
+								var _shared = _.uniqBy(au.concat(ag), 'id').filter(r => {return r.shared})
+								_tiles = _shared
+							}
+							break;
+						case 'user':
+							_tiles = au;break;
+						case 'guest':
+							_tiles = ag;break;
+					}
+					break;
+				default:
+					console.warn("skipped stat re-render for: " + statcontrol.stats.name)
+					break;
+			}
+			//-------------------------------------------------------------------------------
+
+			//todo: expand on dynamic stats collection concept?
+			//think this makes more sense in useProduceGraphData
+
+			// var _stats = {};
+			// var max = null
+			// bubbleData.forEach(s =>{
+			// 	max === null ? max = s:{};
+			// 	s.data.length > max.data.length ? max = s:{}
+			// })
+			//
+			// _stats.max = max;
+			// STATS(_stats);
+
+			//------------------------------------------------------------------------
+
+			//testing: small amount of tiles
+			//todo: so I can go between user and guest w/ this reduced set
+			//but shared doesn't work, not sure about all
+			//when I take this out though....idfk
+			//_tiles = _tiles.slice(0,10)
+
+			//pretty sure this is for initialization?
+
+			if(tiles.length === 0){
+				console.log("tiles init");
+				TILES(_tiles);
+			}else{
+
+				//var test = [1,2,3,4]
+				//var filt = tiles.filter((r,i) =>{return !(test.includes(i))});
+
+				console.log("$util updated tiles",_tiles);
+				//console.log("current tiles",tiles);
+				TILES(_tiles)
+
+				//testing: sanity dupe check
+				// function hasDuplicates(a) {
+				// 	return _.uniq(a).length !== a.length;
+				// }
+				// console.log("dupe?",hasDuplicates(filt));
+
+				// console.log("result",filt);
+				// TILES(filt)
+			}
+
+
+			//return {bubble:bubbleData,pie:tempPieData,genres:_genres}
+		//}
+
 
 	},[
 		statcontrol.stats.name,statcontrol.mode,
@@ -1018,7 +1032,7 @@ function useProduceData(){
 var lastTab = null;
 var prevBarUsersNum = null;
 function useProduceEvents(){
-	debugger
+
 	let control = Control.useContainer();
 	let statcontrol = StatControl.useContainer();
 	//let highlighter = Highlighter.useContainer();
@@ -1044,28 +1058,35 @@ function useProduceEvents(){
 
 	useEffect(() => {
 			//useProduceEvents
-			function jstr(a){return JSON.parse(JSON.stringify(a))}
-			let  {data_user,data_guest} = chooseData(statcontrol,friendscontrol,tabcontrol,globalState,globalUI)
-			console.log("$data_user",JSON.parse(JSON.stringify(data_user)));
 
-			if(!(statcontrol.mode)){
+		// if(!globalState[globalUI.user.id + "_artists"]){
+		// 	console.log("useProduceEvents wasn't ready; skipped update");
+		// }else{
+
+			function jstr(a) {
+				return JSON.parse(JSON.stringify(a))
+			}
+
+			let {data_user, data_guest} = chooseData(statcontrol, friendscontrol, tabcontrol, globalState, globalUI)
+			console.log("$data_user", JSON.parse(JSON.stringify(data_user)));
+
+			if (!(statcontrol.mode)) {
 				console.log("useProduceEvents skips b/c we're in custom mode");
 			}
 				//testing: what?
 			// || data_guest.length ===0
-			else if(data_user.length ===0 ){
+			else if (data_user.length === 0) {
 				var events = jstr(tables['events']);
-				console.log("$$events init",events.length);
+				console.log("$$events init", events.length);
 				EVENTS_VAR(events)
-			}
-			else{
+			} else {
 				var events = jstr(tables['events']);
 
 				//console.log("$$events previous",events);
-				console.log("$$events previous",events.length);
+				console.log("$$events previous", events.length);
 
 				//todo: filter on this later
-				var cids = control.metro.map( i => i.id);
+				var cids = control.metro.map(i => i.id);
 
 				//note: chooose data based on tab
 				//todo: used above, should combine
@@ -1079,13 +1100,13 @@ function useProduceEvents(){
 				// with valid guest_data from chooseData, use friendscontrol.compare to create dataset
 
 				//testing:
-				var artists_user = data_user; var artists_guest = data_guest;
+				var artists_user = data_user;
+				var artists_guest = data_guest;
 
-				if(data_guest.length === 0){
+				if (data_guest.length === 0) {
 					dataset = data_user
 					console.log("$$dataset is just data_user");
-				}
-				else{
+				} else {
 
 
 					//todo: CHOOSEDATA ALREADY MARKED OWNER/SHARED
@@ -1104,20 +1125,22 @@ function useProduceEvents(){
 					// switch (friendscontrol.compare) {
 					switch ('all') {
 						case 'all':
-							dataset = _.uniqBy(artists_user.concat(artists_guest),'id')
+							dataset = _.uniqBy(artists_user.concat(artists_guest), 'id')
 							break;
 						//	todo:
 						case 'diff':
 							//var uniqAll = _.uniqBy(artists_user.concat(artists_guest),'id')
 							break;
 						case 'shared':
-							dataset = _.uniqBy(artists_user.concat(artists_guest),'id').filter(r =>{return r.shared})
+							dataset = _.uniqBy(artists_user.concat(artists_guest), 'id').filter(r => {
+								return r.shared
+							})
 							break;
 						case 'user':
-							dataset =artists_user
+							dataset = artists_user
 							break;
 						case 'guest':
-							dataset =artists_guest
+							dataset = artists_guest
 							break;
 					}
 					//console.log("$$dataset set for friends",dataset);
@@ -1130,12 +1153,14 @@ function useProduceEvents(){
 				//note: believe above is referring to changes I *started* to make for mutiple guests?
 
 				var userMapStore = {};
-				var chooseDataExOutput =  [{id:globalUI.user.id,artists:artists_user}]
+				var chooseDataExOutput = [{id: globalUI.user.id, artists: artists_user}]
 
-				if(data_guest.length > 0){chooseDataExOutput.push({id:friendscontrol.guest.id,artists:artists_guest})}
+				if (data_guest.length > 0) {
+					chooseDataExOutput.push({id: friendscontrol.guest.id, artists: artists_guest})
+				}
 
-				chooseDataExOutput.forEach(r =>{
-					userMapStore[r.id] = {id:r.id,artists:r.artists}
+				chooseDataExOutput.forEach(r => {
+					userMapStore[r.id] = {id: r.id, artists: r.artists}
 				})
 
 				// var familyArtist = {};
@@ -1163,13 +1188,12 @@ function useProduceEvents(){
 				var allArtist = {};
 				var genres = [];
 
-				const processRelated = (a) =>{
-					if(a.related_artists){
-						a.related_artists.forEach(ra =>{
-							relatedArtist[ra.id] ? relatedArtist[ra.id].push(a):relatedArtist[ra.id]  = [a]
+				const processRelated = (a) => {
+					if (a.related_artists) {
+						a.related_artists.forEach(ra => {
+							relatedArtist[ra.id] ? relatedArtist[ra.id].push(a) : relatedArtist[ra.id] = [a]
 						})
-					}
-					else{
+					} else {
 						// console.log("no related",a)
 					}
 				}
@@ -1183,12 +1207,12 @@ function useProduceEvents(){
 				//dataset is either all (so can be split into users) or just shared
 				//I guess idea is to avoid doing this for each user seperately? but why??
 
-				var produceMaps = (dataset) =>{
+				var produceMaps = (dataset) => {
 					var familyArtist = {};
 					var genreArtist = {};
-					dataset.forEach(r =>{
-						if(r.type === 'artist') {
-							familyArtist[r.familyAgg] ? familyArtist[r.familyAgg].push(r):familyArtist[r.familyAgg] = [r]
+					dataset.forEach(r => {
+						if (r.type === 'artist') {
+							familyArtist[r.familyAgg] ? familyArtist[r.familyAgg].push(r) : familyArtist[r.familyAgg] = [r]
 							// if(r.shared){
 							// 	debugger;
 							// 	targets["user" + "_family"][r.familyAgg] ?	targets["user" + "_family"][r.familyAgg].push(r):	targets["user" + "_family"][r.familyAgg] = [r]
@@ -1198,11 +1222,11 @@ function useProduceEvents(){
 							//
 							// }
 
-							if(!(r.genres)){
+							if (!(r.genres)) {
 								debugger;
 							}
-							r.genres.forEach(g =>{
-								genreArtist[g.name] ? genreArtist[g.name].push(r):genreArtist[g.name] = [r]
+							r.genres.forEach(g => {
+								genreArtist[g.name] ? genreArtist[g.name].push(r) : genreArtist[g.name] = [r]
 								// if(r.shared){
 								// 	targets["user" + "_genre"][g.name] ? 	targets["user" + "_genre"][g.name].push(r):targets["user" + "_genre"][g.name] = [r]
 								// 	targets["guest" + "_genre"][g.name] ? 	targets["guest" + "_genre"][g.name].push(r):targets["guest" + "_genre"][g.name] = [r]
@@ -1221,17 +1245,18 @@ function useProduceEvents(){
 							//processRelated(r)
 						}
 						//testing: add targets
-						else if(r.type === 'playlist' || r.type === 'track' || r.type === 'album'){
+						else if (r.type === 'playlist' || r.type === 'track' || r.type === 'album') {
 							//todo: we're not doing any weighting on the artist's ratio of tracks here
 							//so just one song from one genre from one family get in
-							r.artists.forEach(a =>{
-								familyArtist[a.familyAgg] ? familyArtist[a.familyAgg].push(r):familyArtist[a.familyAgg] = [r]
+							r.artists.forEach(a => {
+								familyArtist[a.familyAgg] ? familyArtist[a.familyAgg].push(r) : familyArtist[a.familyAgg] = [r]
 
 								//todo: someone is coming back without genres:[] when it has none
-								if(!a.genres){console.warn("problem record:",a)}
-								else{
-									a.genres.forEach(g =>{
-										genreArtist[g.name] ? genreArtist[g.name].push(r):genreArtist[g.name] = [r]
+								if (!a.genres) {
+									console.warn("problem record:", a)
+								} else {
+									a.genres.forEach(g => {
+										genreArtist[g.name] ? genreArtist[g.name].push(r) : genreArtist[g.name] = [r]
 										genres.push(g)
 									})
 								}
@@ -1240,7 +1265,7 @@ function useProduceEvents(){
 							})
 						}
 					});
-					return {genreArtist,familyArtist}
+					return {genreArtist, familyArtist}
 				}
 
 				//note: genres, allArtist are needed for events filtering
@@ -1248,42 +1273,42 @@ function useProduceEvents(){
 				//note: while the genre/family maps for graph data are per user (if compare=all)
 
 				var total = []
-				Object.keys(userMapStore).forEach(k =>{
+				Object.keys(userMapStore).forEach(k => {
 					total = total.concat(userMapStore[k].artists)
 
-					var {genreArtist:uga,familyArtist:fga} = produceMaps(userMapStore[k].artists)
+					var {genreArtist: uga, familyArtist: fga} = produceMaps(userMapStore[k].artists)
 					userMapStore[k]['genreArtist'] = uga;
 					userMapStore[k]['familyArtist'] = fga;
 
 				})
 
 				//testing: all together
-				var {genreArtist,familyArtist} = produceMaps(total)
+				var {genreArtist, familyArtist} = produceMaps(total)
 
 
 				//note:REF5: produce various UI abstractions
 
 				//todo: unwind and create rankmap,
-				function makeGenreRank(genres){
+				function makeGenreRank(genres) {
 
 					var _rankGenresMap = {};
 					var rankGenresMap = {};
 					var rankFamiliyMap = {};
-					genres.forEach(gob =>{
+					genres.forEach(gob => {
 
-						if(friendscontrol.families.length > 0){
+						if (friendscontrol.families.length > 0) {
 
 							// var f = friendscontrol.families.find(f =>{return f.id === gob.family_id})
-							if(friendscontrol.families.indexOf(gob.family_name) !== -1){
-								!(_rankGenresMap[gob.id]) ? _rankGenresMap[gob.id] = [1,gob] :_rankGenresMap[gob.id][0]++
-							}else{
+							if (friendscontrol.families.indexOf(gob.family_name) !== -1) {
+								!(_rankGenresMap[gob.id]) ? _rankGenresMap[gob.id] = [1, gob] : _rankGenresMap[gob.id][0]++
+							} else {
 								//skip this genre which is not in the selected family
 							}
 
-						}else{
-							!(_rankGenresMap[gob.id]) ? _rankGenresMap[gob.id] = [1,gob] :_rankGenresMap[gob.id][0]++
+						} else {
+							!(_rankGenresMap[gob.id]) ? _rankGenresMap[gob.id] = [1, gob] : _rankGenresMap[gob.id][0]++
 						}
-						!(rankFamiliyMap[gob.family_name]) ? rankFamiliyMap[gob.family_name] = 1 :rankFamiliyMap[gob.family_name]++
+						!(rankFamiliyMap[gob.family_name]) ? rankFamiliyMap[gob.family_name] = 1 : rankFamiliyMap[gob.family_name]++
 						//!(rankGenresMap[gob.id]) ? rankGenresMap[gob.id] = [1,gob] :rankGenresMap[gob.id][0]++
 					})
 
@@ -1293,7 +1318,7 @@ function useProduceEvents(){
 						//convert map to array and find the max
 						var arr = [];
 						Object.entries(_rankGenresMap).forEach(tup => {
-							var r = { occurred:tup[1][0],genre: tup[1][1]};
+							var r = {occurred: tup[1][0], genre: tup[1][1]};
 							//var r = { occurred:tup[1][0],...tup[1][1]};
 							arr.push(r);
 						});
@@ -1304,44 +1329,47 @@ function useProduceEvents(){
 					if (!(_.isEmpty(rankFamiliyMap))) {
 						//convert map to array and find the max
 						var arr = [];
-						Object.keys(rankFamiliyMap).forEach(k =>{
-							arr.push({family_name:k,occurred:rankFamiliyMap[k]});
+						Object.keys(rankFamiliyMap).forEach(k => {
+							arr.push({family_name: k, occurred: rankFamiliyMap[k]});
 						})
-						arrFamiliesSorted = _.sortBy(arr, function (r) {return r.occurred}).reverse()
+						arrFamiliesSorted = _.sortBy(arr, function (r) {
+							return r.occurred
+						}).reverse()
 					}
 
-					arrGenresSorted.forEach(tuple =>{
+					arrGenresSorted.forEach(tuple => {
 						rankGenresMap[tuple.genre.name] = tuple.occurred
 					})
-					return {arrGenresSorted,arrFamiliesSorted,rankGenresMap,rankFamiliyMap}
+					return {arrGenresSorted, arrFamiliesSorted, rankGenresMap, rankFamiliyMap}
 				};
 
-				let {arrGenresSorted:newRank,arrFamiliesSorted:newFamRank,
-					rankGenresMap:newRankMap,rankFamiliyMap:newFamRankMap} = makeGenreRank(genres)
+				let {
+					arrGenresSorted: newRank, arrFamiliesSorted: newFamRank,
+					rankGenresMap: newRankMap, rankFamiliyMap: newFamRankMap
+				} = makeGenreRank(genres)
 
 
 				//testing: could make CHIPGENRESRANKEDMAP resolve at an object instead of just the #
 				//and then could just unwind that anytime I needed the array ... do I care tho?
-				console.log("makeGenreRank",newRank);
+				console.log("makeGenreRank", newRank);
 				CHIPGENRESRANKED(newRank)
-				console.log("makeFamRank",newFamRank);
+				console.log("makeFamRank", newFamRank);
 				CHIPFAMILIESRANKED(newFamRank)
 
-				console.log("makeRankGenresMap",newRankMap);
+				console.log("makeRankGenresMap", newRankMap);
 				CHIPGENRESRANKEDMAP(newRankMap)
-				console.log("makeRankFamiliyMap",newFamRankMap);
+				console.log("makeRankFamiliyMap", newFamRankMap);
 				CHIPFAMILIESRANKEDMAP(newFamRankMap)
 
 
-
-				genres = _.uniqBy(genres,'id')
-				console.log("CHIPGENRES",genres);
+				genres = _.uniqBy(genres, 'id')
+				console.log("CHIPGENRES", genres);
 				//console.log("CHIPGENRES",genres.length);
 				// console.log(relatedArtist);
 
-				if(friendscontrol.families.length > 0){
+				if (friendscontrol.families.length > 0) {
 					//console.warn("skip CHIPFAMILIES set");
-				}else{
+				} else {
 					CHIPFAMILIES(Object.keys(familyArtist))
 				}
 
@@ -1351,22 +1379,33 @@ function useProduceEvents(){
 				//note:REF6: filter out by date/metro and sort by date
 
 				var debugEvents = false && events.length > 0
-				if(debugEvents){
+				if (debugEvents) {
 					debugger;
 				}
-				function byDate(e){
-					var validStart = new Date(e.start.datetime) >= control.startDate;
-					var validEnd = control.endDate ? (new Date(e.start.datetime) <= control.endDate):true
+
+				function byDate(e) {
+					var validStart = new Date(e.start.datetime) >= control.dateRange.from;
+					var validEnd = control.dateRange.to ? (new Date(e.start.datetime) <= control.dateRange.to) : true
 
 					return validStart && validEnd
 				}
-				events = events.filter(e =>cids.indexOf(e.metro_id) !== -1)
-					 .filter(byDate)
-					.sort((e1,e2) =>{return new Date(e1.start.datetime) - new Date(e2.start.datetime) })
+
+
+				events = events.filter(e => cids.indexOf(e.metro_id) !== -1)
+
+					//testing: no date filter
+				console.warn("turned off date filter!!!");
+
+				// .filter(byDate)
+					// .sort((e1, e2) => {
+					// 	return new Date(e1.start.datetime) - new Date(e2.start.datetime)
+					// })
 
 				//todo: strange error here when ... my date result returns to little of # of results?
 				//noticed when testin large cleveland pull - if my date range was real small it would start to duplicate event entries?
-				events = _.sortedUniqBy(events,e =>{return e.id})
+				events = _.sortedUniqBy(events, e => {
+					return e.id
+				})
 
 				//---------------------------------------------------------------------------------
 				//note: series of different filters to apply to events set
@@ -1378,28 +1417,28 @@ function useProduceEvents(){
 
 				//then later, based on control values, actually apply the filter
 
-				if(debugEvents){
+				if (debugEvents) {
 					debugger;
 				}
-				events.forEach(e =>{
+				events.forEach(e => {
 					e.friends = [];
-					for(var x = 0; x < e.performance.length;x++){
+					for (var x = 0; x < e.performance.length; x++) {
 						var a = e.performance[x].artist;
 
 						//if my input dataset set had a artist defined for a genre
 						//record it and - if asked to later - use that to filter for exactGenreMatch
 						a.genre_match = [];
-						a.genres.forEach(g =>{
+						a.genres.forEach(g => {
 
-							genreArtist[g.name] ?  a.genre_match = a.genre_match.concat(genreArtist[g.name]):{};
+							genreArtist[g.name] ? a.genre_match = a.genre_match.concat(genreArtist[g.name]) : {};
 						})
 						a.related_match = [];
 						// if(relatedArtist[a.id]){
-						relatedArtist[a.id] ? a.related_match.push(relatedArtist[a.id][0]):{};
+						relatedArtist[a.id] ? a.related_match.push(relatedArtist[a.id][0]) : {};
 						// }
 						// relatedArtist[a.id] ? a.related_match.push(a):{};
 
-						allArtist[a.id] ? a.exact_match = allArtist[a.id]:{};
+						allArtist[a.id] ? a.exact_match = allArtist[a.id] : {};
 						//familyArtist[a.familyAgg]
 
 						//testing: good of n^ as any to insert guest avatars in
@@ -1407,28 +1446,36 @@ function useProduceEvents(){
 
 						//for every event > every performance artist > every user that's a friend
 						//if that user's global_state includes the artist, the event gets the friend added to an array
-						globalUI.user.related_users.filter(r =>{return r.friend}).forEach(f =>{
-							if(globalState[f.id + '_artists']){
-								globalState[f.id + '_artists'].forEach(fa =>{
-									fa.id === a.id ? e.friends.push({user:f,reason:"likes artist"}):{}
+						globalUI.user.related_users.filter(r => {
+							return r.friend
+						}).forEach(f => {
+							if (globalState[f.id + '_artists']) {
+								globalState[f.id + '_artists'].forEach(fa => {
+									fa.id === a.id ? e.friends.push({user: f, reason: "likes artist"}) : {}
 								})
 							}
 							//testing: object type priority short circuit
 							//besides keeping the same artist from being tagged multiple times,
 							//this will also stop any artist in an event from being tagged after the first
 
-							if(e.friends.length === 0 && globalState[f.id + '_albums']){
-								globalState[f.id + '_albums'].forEach(falb =>{
-									falb.artists.forEach(falba =>{
-										falba.id === a.id ? e.friends.push({user:f,reason:"likes artist's album"}):{}
+							if (e.friends.length === 0 && globalState[f.id + '_albums']) {
+								globalState[f.id + '_albums'].forEach(falb => {
+									falb.artists.forEach(falba => {
+										falba.id === a.id ? e.friends.push({
+											user: f,
+											reason: "likes artist's album"
+										}) : {}
 									})
 
 								})
 							}
-							if(e.friends.length === 0 && globalState[f.id + '_tracks']){
-								globalState[f.id + '_tracks'].forEach(ftrack =>{
-									ftrack.artists.forEach(ftracka =>{
-										ftracka.id === a.id ? e.friends.push({user:f,reason:"likes artist's track"}):{}
+							if (e.friends.length === 0 && globalState[f.id + '_tracks']) {
+								globalState[f.id + '_tracks'].forEach(ftrack => {
+									ftrack.artists.forEach(ftracka => {
+										ftracka.id === a.id ? e.friends.push({
+											user: f,
+											reason: "likes artist's track"
+										}) : {}
 									})
 								})
 							}
@@ -1448,12 +1495,14 @@ function useProduceEvents(){
 				//todo: change packages from tinycolor to color (tinycolor didn't have alpha adjustments)
 				//todo: what am I talking about lol? I don't see any other color library around anywhere....?
 
-				var getDrilldownData = (fmap,gmap) =>{
-					var drilldown = {series:[]};
-					Object.keys(fmap).forEach((fname,i) =>{
+				var getDrilldownData = (fmap, gmap) => {
+					var drilldown = {series: []};
+					Object.keys(fmap).forEach((fname, i) => {
 
 						//todo: this is from masterlist of genres
-						var gs = genres.filter(gOb =>{return gOb.family_name === fname});
+						var gs = genres.filter(gOb => {
+							return gOb.family_name === fname
+						});
 						var d = []
 						//var tempColorMap = {};
 						var mult = 3;
@@ -1462,18 +1511,17 @@ function useProduceEvents(){
 						//note: to go from darkest to lightest, we have to lighten 1st half and darken 2nd half
 						//higher lighten value = lighter color, so we need to start with lightest color and adjust down
 						//for darken, just keep adding since > # = darker color
-						var lightest = (gs.length/2)*mult + offset; //largest I
+						var lightest = (gs.length / 2) * mult + offset; //largest I
 						var adjust = null;
-						gs.forEach((g,i) =>{
-							adjust = (i*mult)+offset
-							if(i <= gs.length/2){
+						gs.forEach((g, i) => {
+							adjust = (i * mult) + offset
+							if (i <= gs.length / 2) {
 								tempColorMap[g.name] = tinycolor(familyColors[fname]).lighten(lightest - adjust).toString()
-							}
-							else{
+							} else {
 								//could have just broke this into 2 loops
 								//instead we'll just set (i) to inc like it did in lighten clause
-								var asi = i-gs.length/2
-								adjust = (asi*mult)+offset
+								var asi = i - gs.length / 2
+								adjust = (asi * mult) + offset
 								tempColorMap[g.name] = tinycolor(familyColors[fname]).darken(adjust).toString()
 							}
 							// console.log(tempColorMap[g.name] );
@@ -1484,7 +1532,7 @@ function useProduceEvents(){
 						//console.log("$tempColorMap",tempColorMap);
 
 
-						gs.forEach((gOb,gi) =>{
+						gs.forEach((gOb, gi) => {
 							//because genres is the entire list for both users, it's possible
 							//the inputed user's map doesn't have an entry for it
 							//testing: array format instead of normal objects?? why tho
@@ -1493,30 +1541,44 @@ function useProduceEvents(){
 							//todo: set real colors on families, then use tinyColor to set genres based on family color
 							//https://github.com/bgrins/TinyColor
 
-							gmap[gOb.name] ? d.push({name:gOb.name,y:Object.keys(gmap[gOb.name]).length,color:tempColorMap[gOb.name]}):{}
+							gmap[gOb.name] ? d.push({
+								name: gOb.name,
+								y: Object.keys(gmap[gOb.name]).length,
+								color: tempColorMap[gOb.name]
+							}) : {}
 
 						})
-						d.sort((a,b) =>{return  b[1] - a[1]})
+						d.sort((a, b) => {
+							return b[1] - a[1]
+						})
 
 						//todo: bandaid (1) (null shouldn't be here)
 						//testing: prevent 0 length families
-						if(fname !== 'null' && d.length !== 0){
-							drilldown.series.push({name:fname,id:fname,data:d})
+						if (fname !== 'null' && d.length !== 0) {
+							drilldown.series.push({name: fname, id: fname, data: d})
 						}
 
 					})
 					return drilldown;
 				}
 
-				var producePieData = function(map){
+				var producePieData = function (map) {
 					var destArr = [];
-					Object.keys(map).forEach((fam,i) =>{
+					Object.keys(map).forEach((fam, i) => {
 						//todo: bandaid (2) (null shouldn't be here)
-						if(fam !== 'null'){
-							destArr.push({name:fam,drilldown:fam,id:familyIdMap[fam],y:map[fam].length,color:familyColors[fam]})
+						if (fam !== 'null') {
+							destArr.push({
+								name: fam,
+								drilldown: fam,
+								id: familyIdMap[fam],
+								y: map[fam].length,
+								color: familyColors[fam]
+							})
 						}
 					});
-					destArr.sort((a,b) =>{return  b.y - a.y})
+					destArr.sort((a, b) => {
+						return b.y - a.y
+					})
 					return destArr;
 				}
 
@@ -1526,16 +1588,16 @@ function useProduceEvents(){
 				//testing:
 				var genreFamilyMap = {};
 
-				genres.forEach(gOb =>{
+				genres.forEach(gOb => {
 					genreFamilyMap[gOb.name] = gOb.family_name
 				})
-				Object.keys(userMapStore).forEach(k =>{
+				Object.keys(userMapStore).forEach(k => {
 					var u = userMapStore[k];
 
 					/** Clean up graph displays by removing low-impact genres from overpopulated family sets
 					 * @method abbreviateGenres
 					 * */
-					function abbreviateGenres(){
+					function abbreviateGenres() {
 
 						//if the # of genres for a family is over a minimum limit,
 						//remove from bottom until n = 10
@@ -1545,54 +1607,62 @@ function useProduceEvents(){
 						//for every genre key, increase count for fam on famGenreMap
 						var famGenreMap = {}
 						//also init famGenreHitMap
-						var famGenreHitMap= {}
-						Object.keys(u.genreArtist).forEach(k =>{
+						var famGenreHitMap = {}
+						Object.keys(u.genreArtist).forEach(k => {
 							//var localFam = u.genreArtist[k][0].familyAgg
 							var localFam = genreFamilyMap[k]
-							if(!(famGenreMap[localFam])){famGenreMap[localFam] = 0}
-							if(!(famGenreHitMap[localFam])){famGenreHitMap[localFam] = []}
+							if (!(famGenreMap[localFam])) {
+								famGenreMap[localFam] = 0
+							}
+							if (!(famGenreHitMap[localFam])) {
+								famGenreHitMap[localFam] = []
+							}
 							famGenreMap[localFam]++
 						})
 
 						//determine which families need adjusted
-						Object.keys(u.genreArtist).forEach(k =>{
+						Object.keys(u.genreArtist).forEach(k => {
 							var localFam = genreFamilyMap[k]
-							if(famGenreMap[localFam] > max){
+							if (famGenreMap[localFam] > max) {
 								//record all lengths
-								famGenreHitMap[localFam].push({genre:k,family:localFam,hits:u.genreArtist[k].length});
+								famGenreHitMap[localFam].push({
+									genre: k,
+									family: localFam,
+									hits: u.genreArtist[k].length
+								});
 							}
 						})
 						//turn famGenreHitMap into sorted arrays w/ max length
 						//debugger
-						Object.keys(famGenreHitMap).forEach(fam =>{
-							if(famGenreHitMap[fam].length > 0){
-								famGenreHitMap[fam] = famGenreHitMap[fam].sort((a,b) =>{return b.hits - a.hits }).slice(10,famGenreHitMap[fam].length)
-							}else{
+						Object.keys(famGenreHitMap).forEach(fam => {
+							if (famGenreHitMap[fam].length > 0) {
+								famGenreHitMap[fam] = famGenreHitMap[fam].sort((a, b) => {
+									return b.hits - a.hits
+								}).slice(10, famGenreHitMap[fam].length)
+							} else {
 								//debugger
 							}
 
 						})
 						var unwound = []
-						Object.keys(famGenreHitMap).forEach(fam =>{
+						Object.keys(famGenreHitMap).forEach(fam => {
 							unwound = unwound.concat(famGenreHitMap[fam])
 						})
 						//console.log(unwound);
 
-						genres = genres.filter(gOb =>{
+						genres = genres.filter(gOb => {
 							//note: DO NOT SIMPLIFY ASSHOLE
-							return  _.find(unwound, {genre: gOb.name}) ? false:true
+							return _.find(unwound, {genre: gOb.name}) ? false : true
 						})
 					}
 
 					abbreviateGenres()
 
-					var drilldown = getDrilldownData(u.familyArtist,u.genreArtist)
+					var drilldown = getDrilldownData(u.familyArtist, u.genreArtist)
 					var pieData = producePieData(u.familyArtist)
 					userMapStore[k]['drilldown'] = drilldown;
 					userMapStore[k]['pieData'] = pieData;
 				})
-
-
 
 
 				// var tempPieDataDrilldown = {series: []}
@@ -1612,11 +1682,11 @@ function useProduceEvents(){
 				// getDrilldownData(familyArtistGuest,genreArtistGuest,tempPieDataDrilldownGuest)
 				//====================================================================
 
-				var tempPieData  = [];
-				var tempBarData  = [];
-				var tempPieDataGuest  = [];
+				var tempPieData = [];
+				var tempBarData = [];
+				var tempPieDataGuest = [];
 
-				var produceBarData = function(pieDatas){
+				var produceBarData = function (pieDatas) {
 					//console.log("produceBarData",pieDatas);
 					var tempBarData = []
 					//testing: really need to stop getting so ahead of myself when making prototypes!
@@ -1631,14 +1701,14 @@ function useProduceEvents(){
 
 					//testing: going to produce a member for each known family, regardless of whether data is present
 					var point = {}
-					systemFamilies.forEach(fam =>{
-						point = {name:fam,color:familyColors[fam],data:[]};
+					systemFamilies.forEach(fam => {
+						point = {name: fam, color: familyColors[fam], data: []};
 						var u = {};
 						var y = null;
-						pieDatas.forEach(pieDob =>{
-							var _y = pieDob.data.filter(r =>r.name === fam)[0]?.y;
-							y = _y? _y:0
-							u = {id:pieDob.id,drilldown:true,y:y}
+						pieDatas.forEach(pieDob => {
+							var _y = pieDob.data.filter(r => r.name === fam)[0]?.y;
+							y = _y ? _y : 0
+							u = {id: pieDob.id, drilldown: true, y: y}
 							point.data.push(u)
 
 						})
@@ -1649,7 +1719,9 @@ function useProduceEvents(){
 					//todo: it has come to my attention that there really CAN'T have a different order (between two users)
 					//not how the series is layed out - it's like designed to be in tandem...
 
-					tempBarData.sort((r1,r2) =>{return r1.data[0].y - r2.data[0].y})
+					tempBarData.sort((r1, r2) => {
+						return r1.data[0].y - r2.data[0].y
+					})
 					return tempBarData
 				}
 
@@ -1668,10 +1740,10 @@ function useProduceEvents(){
 
 				var temp = [];
 
-				Object.keys(userMapStore).forEach(k =>{
+				Object.keys(userMapStore).forEach(k => {
 					var u = userMapStore[k];
 					//userMapStore[k].barData =[];
-					temp.push({id:u.id,data:u.pieData})
+					temp.push({id: u.id, data: u.pieData})
 				})
 
 				//todo: might be destroying this pieData within produceBarData
@@ -1683,33 +1755,45 @@ function useProduceEvents(){
 				//====================================================================
 
 
-				const produceBarDrillData = (drilldatas,barDrillMap) =>{
+				const produceBarDrillData = (drilldatas, barDrillMap) => {
 					//testing: like families above, we'll define for both users any existing genre
-					systemFamilies.forEach(fam =>{
+					systemFamilies.forEach(fam => {
 						barDrillMap[fam] = [];
 						// point = {name:fam,color:familyColors[fam],data:[]};
-						var gSet = genres.filter(r =>{return r.family_name === fam})
-						gSet.forEach(g =>{
+						var gSet = genres.filter(r => {
+							return r.family_name === fam
+						})
+						gSet.forEach(g => {
 							//todo: don't know shit about colors yet
-							var gPoint = {name:g.name,color:tempColorMap[g.name],dataLabels:
-									{formatter: function() {return g.name.slice(0,5)}},data:[]}
+							var gPoint = {
+								name: g.name, color: tempColorMap[g.name], dataLabels:
+									{
+										formatter: function () {
+											return g.name.slice(0, 5)
+										}
+									}, data: []
+							}
 							var ugPoint = null;
-							drilldatas.forEach(userDrillOb =>{
+							drilldatas.forEach(userDrillOb => {
 
-								ugPoint= {label:g.name,y:0}
+								ugPoint = {label: g.name, y: 0}
 								ugPoint.name = userDrillOb.id;
 								//look for this fam's series
 								var fData = userDrillOb.data.series.filter(r => r.name === fam)[0]
-								if(fData?.data){
+								if (fData?.data) {
 									var _g = fData.data.filter(r => r.name === g.name)[0]
-									if(_g){ugPoint.y = _g.y;}
+									if (_g) {
+										ugPoint.y = _g.y;
+									}
 								}
 								gPoint.data.push(ugPoint)
 							})
 							barDrillMap[fam].push(gPoint)
 						})
 						//testing: (see above sort in produceBarData)
-						barDrillMap[fam].sort((r1,r2) =>{return r1.data[0].y - r2.data[0].y})
+						barDrillMap[fam].sort((r1, r2) => {
+							return r1.data[0].y - r2.data[0].y
+						})
 					})
 				}
 
@@ -1720,13 +1804,13 @@ function useProduceEvents(){
 
 				var temp2 = [];
 
-				Object.keys(userMapStore).forEach(k =>{
+				Object.keys(userMapStore).forEach(k => {
 					var u = userMapStore[k];
 					//userMapStore[k].barData =[];
-					temp2.push({id:u.id,data:u.drilldown})
+					temp2.push({id: u.id, data: u.drilldown})
 				})
 
-				produceBarDrillData(temp2,tempBarDrillMap)
+				produceBarDrillData(temp2, tempBarDrillMap)
 
 				//====================================================================
 
@@ -1735,41 +1819,42 @@ function useProduceEvents(){
 
 				//debugger
 				//testing: stop setting when I don't need to
-				if(tempBarData[0]?.data.length !== prevBarUsersNum){
+				if (tempBarData[0]?.data.length !== prevBarUsersNum) {
 
 					prevBarUsersNum = tempBarData[0]?.data.length
-					console.log("$tempBarData",JSON.parse(JSON.stringify(tempBarData)));
+					console.log("$tempBarData", JSON.parse(JSON.stringify(tempBarData)));
 					BARDATA(tempBarData)
-					console.log("$tempBarDrillMap",tempBarDrillMap);
+					console.log("$tempBarDrillMap", tempBarDrillMap);
 					BARDRILLDOWNMAP(tempBarDrillMap)
 
-				}else{
-					debugger
+				} else {
+
 					console.log("skipped bar data update");
 
 				}
-				prevBarUsersNum === null? prevBarUsersNum = tempBarData[0]?.data.length:{};
+				prevBarUsersNum === null ? prevBarUsersNum = tempBarData[0]?.data.length : {};
 
 				//todo: why am I not producing this above?
 				//like genres, allArtist
 
-				var temp_combined_genreArtist  = {};
+				var temp_combined_genreArtist = {};
 
-				if(Object.keys(userMapStore).length === 1){
+				if (Object.keys(userMapStore).length === 1) {
 					temp_combined_genreArtist = userMapStore[Object.keys(userMapStore)[0]].genreArtist;
-				}
-				else{
-					Object.keys(userMapStore).forEach(k =>{
+				} else {
+					Object.keys(userMapStore).forEach(k => {
 						var u = userMapStore[k];
 						//for every user
-						Object.keys(u.genreArtist).forEach(gName =>{
+						Object.keys(u.genreArtist).forEach(gName => {
 							//if our combined object doesn't have an entry, make an empty 1
-							if(!(temp_combined_genreArtist[gName])){temp_combined_genreArtist[gName] = []}
+							if (!(temp_combined_genreArtist[gName])) {
+								temp_combined_genreArtist[gName] = []
+							}
 
 							//for every artist @ key = gName
-							u.genreArtist[gName].forEach(a =>{
-								var foundArtist =_.find(temp_combined_genreArtist[gName], {id:a.id});
-								!(foundArtist)? temp_combined_genreArtist[gName].push(a):{};
+							u.genreArtist[gName].forEach(a => {
+								var foundArtist = _.find(temp_combined_genreArtist[gName], {id: a.id});
+								!(foundArtist) ? temp_combined_genreArtist[gName].push(a) : {};
 							})
 						})
 
@@ -1790,8 +1875,20 @@ function useProduceEvents(){
 					// temp_combined_genreArtist = temp_user
 				}
 
-				console.log("$temp_combined_genreArtist",temp_combined_genreArtist);
+				console.log("$temp_combined_genreArtist", temp_combined_genreArtist);
 				CHIPGENRESCOMBINEDMAP(temp_combined_genreArtist)
+
+
+				//testing:
+
+				Object.keys(userMapStore).forEach((k, i) => {
+					if (i === 0) {
+						PIEDATA(userMapStore[k].pieData)
+					} else {
+						PIEDATAGUEST(userMapStore[k].pieData)
+					}
+					console.log("set " + k + " $piedata", userMapStore[k].pieData);
+				})
 
 
 				//todo: looks like I've set the state correctly but it fucks up
@@ -1846,7 +1943,6 @@ function useProduceEvents(){
 				// }
 
 
-
 				//todo: probably b/c of this timeout i'd imagine
 				//testing: then back to normal render-ignoring state
 				// setTimeout(e =>{
@@ -1885,15 +1981,15 @@ function useProduceEvents(){
 				//when we've selected a genre OR FAMILY to filter on
 
 
-				if(debugEvents){
+				if (debugEvents) {
 					debugger;
 				}
 
-				if(friendscontrol.genres.length > 0){
-					console.log("$$friendscontrol.genres overrides genreSens",friendscontrol.genres);
-					events = events.filter(e =>{
+				if (friendscontrol.genres.length > 0) {
+					console.log("$$friendscontrol.genres overrides genreSens", friendscontrol.genres);
+					events = events.filter(e => {
 						var some = false;
-						for(var x = 0; x < e.performance.length;x++) {
+						for (var x = 0; x < e.performance.length; x++) {
 							var a = e.performance[x].artist;
 							for (var y = 0; y < a.genres.length; y++) {
 								//testing: indexOf works?
@@ -1903,7 +1999,9 @@ function useProduceEvents(){
 								// if (friendscontrol.genres.indexOf(a.genres[y]) !== -1) {
 								// _.find returns the FIRST element predicate returns truthy for
 								//this is okay here where we just need to make sure at least one is found
-								var f = _.find(friendscontrol.genres, function(o) { return o.id === a.genres[y].id });
+								var f = _.find(friendscontrol.genres, function (o) {
+									return o.id === a.genres[y].id
+								});
 								if (f) {
 									// console.log(a.genres[y].name);
 									a.useSelectedGenreMatch = true;
@@ -1911,17 +2009,19 @@ function useProduceEvents(){
 									break;
 								}
 							}
-							if (some === true) {break;}
+							if (some === true) {
+								break;
+							}
 						}
 
 						return some;
 					})
 				}
-				else if(friendscontrol.families.length > 0){
-					console.log("$$friendscontrol.families overrides genreSens",friendscontrol.families);
-					events = events.filter(e =>{
+				else if (friendscontrol.families.length > 0) {
+					console.log("$$friendscontrol.families overrides genreSens", friendscontrol.families);
+					events = events.filter(e => {
 						var some = false;
-						for(var x = 0; x < e.performance.length;x++) {
+						for (var x = 0; x < e.performance.length; x++) {
 							var a = e.performance[x].artist;
 							if (friendscontrol.families.indexOf(a.familyAgg) !== -1) {
 								//todo: where am I using this flag? is it just here for completeness
@@ -1930,34 +2030,39 @@ function useProduceEvents(){
 								some = true;
 								break;
 							}
-							if (some === true) {break;}
+							if (some === true) {
+								break;
+							}
 						}
 
 						return some;
 					})
-				}else{
-					if(debugEvents){
+				} else {
+					if (debugEvents) {
 						debugger;
 					}
-					events = events.filter(e =>{
+					events = events.filter(e => {
 						var some = false;
-						for(var x = 0; x < e.performance.length;x++) {
+						for (var x = 0; x < e.performance.length; x++) {
 							var a = e.performance[x].artist;
 
 							//todo: disabled sensitivity selection for now (defaults to 'related')
-							if(control.genreSens === 'exact'){
-								if(a.genre_match.length > 0){
+							if (control.genreSens === 'exact') {
+								if (a.genre_match.length > 0) {
 									a.useExactGenreMatch = true;
-									some = true;break;
+									some = true;
+									break;
 								}
-							}else if(control.genreSens === 'related'){
+							} else if (control.genreSens === 'related') {
 								//if the familyAgg of any of the performances has been alluded to in familyArtist, we keep it
-								if(Object.keys(familyArtist).indexOf(a.familyAgg) !== -1) {
+								if (Object.keys(familyArtist).indexOf(a.familyAgg) !== -1) {
 									a.useRelatedGenreMatch = true;
 									some = true;
 									break;
-								}else{
-									if(debugEvents){console.log("no fam match",a);}
+								} else {
+									if (debugEvents) {
+										console.log("no fam match", a);
+									}
 								}
 							}
 						}
@@ -1965,25 +2070,29 @@ function useProduceEvents(){
 					})
 				}
 
-				if(debugEvents){
+				if (debugEvents) {
 					debugger;
 				}
 				//note: control.artistSens
-				events = events.filter(e =>{
+				events = events.filter(e => {
+
 					var some = false;
-					for(var x = 0; x < e.performance.length;x++) {
+					for (var x = 0; x < e.performance.length; x++) {
 						var a = e.performance[x].artist;
 
-						if(control.artistSens === 'exact'){
-							if(a.exact_match){
+						if (control.artistSens === 'exact') {
+							if (a.exact_match) {
 								a.useExactArtistMatch = true;
-								some = true;break;
+								some = true;
+								break;
 							}
-						}else{return true}
+						} else {
+							return true
+						}
 					}
 					return some
 				})
-				if(debugEvents){
+				if (debugEvents) {
 					debugger;
 				}
 
@@ -1991,14 +2100,14 @@ function useProduceEvents(){
 
 				//console.log("$$events",jstr(events));
 				// console.log("$$events updated",events);
-				console.log("$$events updated",events.length);
+				console.log("$$events updated", events.length);
 				EVENTS_VAR(events)
 
 			}//else in context mode
 		},
 		[statcontrol.stats.name,statcontrol.mode,
 			friendscontrol.compare,friendscontrol.families,friendscontrol.genres,friendscontrol.selectedTabIndex,friendscontrol.sourceFilter,friendscontrol.checkboxes,friendscontrol.query,
-			friendscontrol.guest,control.metro,control.startDate,control.endDate,control.genreSens,control.artistSens,control.dataLoaded
+			friendscontrol.guest,control.metro,control.dateRange,control.genreSens,control.artistSens,control.dataLoaded
 		]
 	)
 

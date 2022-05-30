@@ -348,7 +348,7 @@ function StackedBarDrill(props) {
 
 	return(
 		<div id={'StackedBarDrill'}>
-			<div >
+			<div>
 				{/*<button onClick={() =>{test(true)}}>setTest</button>*/}
 				{/*<button onClick={() =>{addTest()}}>Add User {allowUpdate.toString()}</button>*/}
 				<HighchartsReact   highcharts={Highcharts}

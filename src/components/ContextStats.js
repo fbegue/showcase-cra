@@ -46,6 +46,7 @@ import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
 import Badge from "@material-ui/core/Badge";
 import EventIcon from "@material-ui/icons/Event";
 import AnimatedHeightDrawer from './utility/AnimatedHeightDrawer'
+
 import BottomSheet from './utility/BottomSheet'
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
@@ -53,6 +54,7 @@ import {makeStyles} from "@material-ui/core/styles";
 import Dot from './chips/Dot'
 import Switch from "@material-ui/core/Switch";
 import {animated, useSpring} from "@react-spring/web";
+
 //todo: for some wild reason, after c/p customScroll.css",firstComp.scss  out to above FirstComp for gen use
 //that don't work - but importing them from another comp that uses them...works?
 //import {FirstComp} from './utility/CustomScroll/FirstComp/FirstComp'
@@ -114,6 +116,8 @@ function ContextStats(props) {
 	let tileSelectControl = TileSelectControl.useContainer();
 	const barData = useReactiveVar(BARDATA);
 	const barDrillMap = useReactiveVar(BARDRILLDOWNMAP);
+	// const pieData = useReactiveVar(PIEDATA);
+	// const pieDataGuest = useReactiveVar(PIEDATAGUEST);
 
 	// const [globalState, globalDispatch] = useContext(Context);
 	const globalUI = useReactiveVar(GLOBAL_UI_VAR);
@@ -398,34 +402,66 @@ function ContextStats(props) {
 	const [fstate, toggle] = useState(true)
 
 
+	//todo: repeated in masonry simple as map
 	var userContextDropdownOps = [
 		{value:'artists_saved',title:'Saved Artists',style:null},
 		{value:'artists_top',title:'Top Artists',style:null},
 		{value:'tracks_recent',title:'Recent Tracks',style:null},
-		{value:'tracks_top',title:<span style={{paddingRight:".5em"}}>Top Tracks</span>,style:null},
+		{value:'tracks_saved',title:<span style={{paddingRight:".5em"}}>Saved Tracks</span>,style:null},
+		{value:'albums_saved',title:'Saved Albums',style:null},
 	]
 
 	var sharedContextDropdownOps = [
 		{value:'artists_friends',title:'Shared Artists',style:null},
 		{value:'tracks_friends',title:'Shared Tracks',style:null},
+		{value:'albums_friends',title:'Shared Albums',style:null},
 	]
 
+
+	// var init = null;
+	// if(tabcontrol.section === 1){init ='artists_saved'}else{init ='artists_friends'}
+	//const [selectVal,setSelectVal] = useState(statcontrol.stats.name === "artists_saved" ? "artists_saved":"artists_friends")
+	//const [selectVal,setSelectVal] = useState('artists_saved')
 	const [selectVal,setSelectVal] = useState("")
-	useEffect(() => {
-		console.log("setting default context selection value for section" + tabcontrol.section);
-		if(tabcontrol.section === 1){
-			setSelectVal('artists_saved')
-		}else{
-			setSelectVal('artists_friends')
-		}
-	},[tabcontrol.section ]);
+
+	//testing: was based on section changes
+
+	// useEffect(() => {
+	// 	console.log("setting default context selection value for section" + tabcontrol.section);
+	// 	if(tabcontrol.section === 1){
+	// 		setSelectVal('artists_saved')
+	// 		statcontrol.setStats({name:'artists_saved'})
+	// 	}else{
+	// 		setSelectVal('artists_friends')
+	// 		statcontrol.setStats({name:'artists_friends'})
+	// 	}
+	// },[tabcontrol.section ]);
+
+
+	//todo: combine selectVal and stats.name (instead of maintaining 2 of same thing like this)
+	// useEffect(() => {
+	// 	console.log("sync statcontrol.stats w/ setSelectVal",statcontrol.stats.name);
+	// 	setSelectVal(statcontrol.stats.name)
+	// },[statcontrol.stats]);
+
+	//todo: handleMoreClick
+
+	// useEffect(() => {
+	// 	console.log("setting for handleMoreClick result" + tabcontrol.section);
+	// 	if(tabcontrol.section === 1){
+	// 		setSelectVal('artists_saved')
+	// 	}else{
+	// 		setSelectVal('artists_friends')
+	// 	}
+	// },[tabcontrol.section ]);
 
 	//testing: thought about binding this to localstorage
 	//but just doesn't make sense regarding friends (who you *have* to repick)
 
 	const handleChange = (event) =>{
 
-		setSelectVal(event.target.value);
+		//setSelectVal(event.target.value);
+		debugger
 		statcontrol.setStats({name:event.target.value})
 	}
 
@@ -554,7 +590,7 @@ function ContextStats(props) {
 								classes={{ root: classes.rootFirstSelect }}
 								labelId="demo-simple-select-label"
 								id="demo-simple-select"
-								value={selectVal}
+								value={statcontrol.stats.name}
 								onChange={handleChange}
 								MenuProps={{
 									elevation:3,
@@ -707,6 +743,10 @@ function ContextStats(props) {
 					{/*	<FilterListIcon/>*/}
 					{/*</button>*/}
 					<div className={'filterItems'} style={{display:"flex",flexDirection:"column",marginTop:".5em"}}>
+
+						{/*testing:*/}
+
+
 						<div style={{display:"flex",flexDirection:"row"}}>
 
 							{/*testing: bit to much space left here*/}

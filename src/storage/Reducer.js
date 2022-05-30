@@ -440,6 +440,21 @@ const Reducer = (state, action) => {
 				node:  getJoin(Object.assign({},action,{type:"node"})),
 				events:  getJoin(Object.assign({},action,{type:"events"})),
 			}
+
+			//todo: realized that all these 'init's are also updates, but everything is an update b/c of table initialization, soooo..
+			//but my point I think still stands in that none of those 'init's every update AGAIN, so something dynamic like this
+			//should be separated out
+		case 'updateUser':
+			tables["users"][action.user.id][action.context] = tables["users"][action.user.id][action.context].concat(action.payload)
+			var key = action.user.id + '_' + action.context;
+			console.log("stated",key);
+			return {
+				...state,
+				[key]: tables["users"][action.user.id][action.context]
+				//node:  getJoin({type:"node"}),
+			};
+
+
 		//todo: why is it that I'm not recalcing node on these inits?
 		case 'init':
 			//console.log('action', action);

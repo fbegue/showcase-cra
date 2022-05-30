@@ -19,6 +19,7 @@ function FriendsDisplay(props) {
 	// const [query, setQuery] = React.useState("Dan");
 	const [query, setQuery] = React.useState("");
 	const [items, set] = useState(props.users)
+	const [localGuest, setLocalGuest] = React.useState({id:null});
 
 	//testing:
 	let t1 = {
@@ -118,16 +119,21 @@ function FriendsDisplay(props) {
 
 	const [globalState, globalDispatch] = useContext(Context);
 
+	const selectUser = (item) =>{
+		props.onClick(item)
+		setLocalGuest(item)
+	}
 	return(
 		<div>
 			{props.users.length === 0 && <div>So lonely ...</div> }
 		<div className={styles.list} style={{ height: Math.max(...heights) }}>
 			{/*<div className={styles.list} style={{ height:"20em" }}>*/}
 			{transitions((style, item) => (
-				<a.div style={style} onClick={() =>{props.onClick(item)}}>
+				//,outline:localGuest.id === item.id ? '1px solid blue':'1px solid red'
+				<a.div style={{...style}} onClick={() =>{selectUser(item)}}>
 					{/*todo: just looking at artists rn*/}
 					{/*{!(globalState[item.id + "_artists"]) && <PulseSpinnerSpring fontSize={'50px'}/>}*/}
-					<UserTile loaded={globalState[item.id + "_artists"]} item={item}/>
+					<UserTile loaded={globalState[item.id + "_artists"]} item={item} selectedUser={localGuest}/>
 				</a.div>
 			))}
 		</div>

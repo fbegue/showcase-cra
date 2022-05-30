@@ -3,13 +3,19 @@ import Highcharts from 'highcharts'
 import HighchartsReact from 'highcharts-react-official'
 import HC_more from 'highcharts/highcharts-more'
 import './PieChart.css'
-import {FriendsControl} from "../../index";
+//import {FriendsControl} from "../../index";
 import _ from "lodash";
+
 HC_more(Highcharts)
 
 function PieChart(props) {
 
+	var comp = "PieChart"
 	let chart = null;
+	// if(props.data.series[0].data.length >0){
+	// 	debugger
+	// }
+	//console.log(comp + " | render");
 
 
 	//todo: keep looking to minmize extra space as much as possible
@@ -34,9 +40,27 @@ function PieChart(props) {
 	//in react, need to create a ref to the element in order to interact with the chart via setData, etc.
 	//https://stackoverflow.com/questions/46805086/change-series-data-dynamically-in-react-highcharts-without-re-render-of-the-char
 
-	let friendscontrol = FriendsControl.useContainer()
+	//let friendscontrol = FriendsControl.useContainer()
 
-	const pieOptions = {
+	var exPieData = [
+		{
+			"name": "rock",
+			"drilldown": "rock",
+			"id": "3",
+			"y": 2,
+			"color": "#cf9e2a"
+		},
+		{
+			"name": "world",
+			"drilldown": "world",
+			"id": "12",
+			"y": 1,
+			"color": "#FFF"
+		}
+	];
+
+	let [pieOptions,setPieOptions] = React.useState(
+	 {
 		chart: {
 			plotBackgroundColor: null,
 			plotBorderWidth: null,
@@ -86,108 +110,71 @@ function PieChart(props) {
 				// },
 				point: {
 					events: {
-						click: function (event) {
-							var sel = event.point.name;
-							friendscontrol.setFamilies((prevState => {
-								//console.log("prev",prevState);
-								if(!(prevState.includes(sel))){
-
-									event.point.select(true,true)
-									return [...prevState,sel]}
-								else{
-
-									event.point.select(false,true)
-									return prevState.filter(r =>{return r !== sel})}
-							}));
-						}
+						// click: function (event) {
+						// 	var sel = event.point.name;
+						// 	friendscontrol.setFamilies((prevState => {
+						// 		//console.log("prev",prevState);
+						// 		if(!(prevState.includes(sel))){
+						//
+						// 			event.point.select(true,true)
+						// 			return [...prevState,sel]}
+						// 		else{
+						//
+						// 			event.point.select(false,true)
+						// 			return prevState.filter(r =>{return r !== sel})}
+						// 	}));
+						// }
 					}
 				}
 			}
 		},
-		credits: {enabled: false}
-	}
+		credits: {enabled: false},
+		 series: props.data.series
+		 //series:[{data:exPieData}]
+	})
 
-	// const handleChange = () =>{
-	// 	//setUpdate(true)
-	// 	console.log("handleChange",chart);
-	// 	console.log(chart.chart.series[0]);
-	// 	var d = chart.chart.series[0].data;
-	// 	chart.chart.series[0].setData(chart.chart.series[0].data.slice(0,d.length-1))
-	// 	//setUpdate(false)
-	// }
-
-
-	//note: deprecated? idk what the whole idea was here
-
-	// useEffect(() => {
-	// 	//console.log("$! set data...",props.data.series);
-	// 	if(props.data.series.data[0] !== undefined){
-	// 		console.log("$! set data",props.data.series);
-	// 		chart.chart.series[0].setData(props.data.series.data);
-	//
-	// 		//programatically select/deselect points to account for family chip removal from tiles area
-	//
-	// 		chart.chart.series[0].points.forEach((p,i)=>{
-	// 			//console.log(friendscontrol.families);
-	// 			var f = _.find(friendscontrol.families, function(o) { return o === p.name });
-	// 			//if the family isn't in friendscontrol, deselect in chart
-	//
-	// 			//todo: no idea why select false never works?
-	// 			//https://api.highcharts.com/class-reference/Highcharts.Point#select
-	//
-	// 			 if(f === undefined) {
-	// 				 debugger;
-	// 			 	chart.chart.series[0].data[i].select(false);
-	//
-	// 				}
-	// 			 else{
-	// 				 debugger;
-	// 			 	chart.chart.series[0].data[i].select(true)}
-	// 		})
-	// 	}
-	//
-	// },[props.data.series]);
+	//console.log("$pieOptions init",pieOptions);
 
 	useEffect(() => {
-
-		if(props.data.series.data[0] !== undefined){
-			// console.log("$! set data",props.data.series);
-			// chart.chart.series[0].setData(props.data.series.data);
-
-			//note: there is currently no case in which you click on a family chip in ContextStats but aren't removing
-			//programatically deselect points to account for family chip removal from tiles area
-
-			chart.chart.series[0].points.forEach((p,i)=>{
-				var f = _.find(friendscontrol.families, function(o) { return o === p.name });
-				if(f === undefined) {
-					chart.chart.series[0].data[i].select(false,true);
-				}
-			})
+		//console.log("$! set data...",props.data.series);
+		if(props.data.series[0].data[0] !== undefined){
+				setPieOptions(prev =>{
+					return {...prev,series:props.data.series}
+				})
 		}
-	},[friendscontrol.families]);
+	},[props.data.series]);
 
+	function change(){
+		setPieOptions(prev =>{
+			var newVal = prev.series[0].data.slice(1)
+			// console.log("prev",prev);
+			// console.log("newVal",newVal);
+			var wrap = [{data:newVal}]
+			// return {...prev,series:[...prev.series[0].data.slice(1)]}
+			return {...prev,series:wrap}
+
+		})
+	}
 	// useEffect(() => {
-	// 	//console.log("$! set data...",props.data.series);
-	// 	if(props.data.series.data[0] !== undefined){
-	// 		console.log("$! set data",props.data.series);
-	// 		chart.chart.series[0].setData(props.data.series.data);
-	// 	}
-	// },[props.data.series]);
-
-
-
-
-
+	// 	const myInterval = setInterval(() =>{
+	// 		if(pieOptions?.series?.[0].data.length >0){
+	// 			change()
+	// 		}
+	// 	}, 2000);
+	// },[]);
 
 	return(
 		<div>
 			{/*<button style={{zIndex:1000,position:"absolute"}} onClick={() =>{handleChange()}}>change</button>*/}
 			{/*setChart(a)*/}
 			<div >
+
 				<HighchartsReact  ref={a => chart = a} highcharts={Highcharts}
 								  allowChartUpdate={true}
-								  options={{...pieOptions,series:props.data.series}} />
+								  // options={{...pieOptions,series:props.data.series}} />
+								  options={pieOptions} />
 			</div>
+
 
 	</div>)
 

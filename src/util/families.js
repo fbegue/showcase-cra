@@ -1,71 +1,71 @@
 import all_genres from "../storage/all_genres";
 var tinycolor = require("tinycolor2");
 
+var musicMapColorsMap = require('./colors/groups').colors
 let familyColors= {};
 
-familyColors["pop"] = tinycolor('rgba(255,246,134,1)').darken(10).toString()
-familyColors["pop2"] ='rgba(255,246,134,1)'
-//familyColors["pop2"] = 'rgba(255,246,134,.6)';
-// familyColors["popclicked"] = 'rgba(255,246,134,.6)';
+// familyColors["pop"] = tinycolor('rgba(255,246,134,1)').darken(10).toString()
+// familyColors["pop2"] ='rgba(255,246,134,1)'
+
+familyColors["pop"] = tinycolor(musicMapColorsMap["pop"]).darken(10).toString()
+familyColors["pop2"] =musicMapColorsMap["pop"]
 
 //EDM / DANCE
 //#d52633
-familyColors["electro house"] = tinycolor('rgb(213,38,51,1)').darken(10).toString()
-familyColors["electro house2"] = 'rgb(213,38,51,1)';
+familyColors["electro house"] = tinycolor(musicMapColorsMap["breakbeat"]).darken(10).toString()
+familyColors["electro house2"] = musicMapColorsMap["breakbeat"];
 
 //todo: monkeypatch (see EventsList @ getFamilyClass)
-familyColors["electrohouse"] = tinycolor('rgb(213,38,51,1)').darken(10).toString()
-familyColors["electrohouse2"] = 'rgb(213,38,51,1)';
+familyColors["electrohouse"] = tinycolor(musicMapColorsMap["breakbeat"]).darken(10).toString()
+familyColors["electrohouse2"] = musicMapColorsMap["breakbeat"];
 
-//ROCK
-//#dcb250
-familyColors["rock"] = tinycolor('rgba(220,178,80,1)').darken(10).toString()
-familyColors["rock2"] = 'rgba(220,178,80,1)';
-//familyColors["rock2"]  = tinycolor(familyColors["rock"]).darken(10).toString()
-//HARDCORE
-familyColors["punk"] = tinycolor('rgba(220,178,80,1)').darken(10).toString();
-familyColors["punk2"] = 'rgba(220,178,80,1)';
-//GOLDEN AGE
-familyColors["folk"]  = tinycolor('rgba(220,178,80,1)').darken(10).toString();
-familyColors["folk2"] = 'rgba(220,178,80,1)';
+//todo:?
+//note: rock/punk have same color values
+familyColors["rock"] = tinycolor(musicMapColorsMap["rocknroll"]).darken(10).toString()
+familyColors["rock2"] = musicMapColorsMap["rocknroll"];
 
-//#6c9
-familyColors["r&b"] = tinycolor('rgba(102,204,153,1)').darken(10).toString();
-familyColors["r&b2"] = 'rgba(102,204,153,1)';
-//#bdcc66
-familyColors["country"] = tinycolor('rgba(189,204,102,1)').darken(10).toString();
-familyColors["country2"] = 'rgba(189,204,102,1)';
-//#d8802f
-familyColors["metal"] = tinycolor('rgba(216,128,47,1)').darken(10).toString();
-familyColors["metal2"] = 'rgba(216,128,47,1)';
+familyColors["punk"] = tinycolor(musicMapColorsMap["hardcore-punk"]).darken(10).toString();
+familyColors["punk2"] = musicMapColorsMap["hardcore-punk"];
 
-//BLUE NOTE
-//#4364b3
-familyColors["blues"] = tinycolor('rgba(67,100,179,1)').darken(10).toString();
-familyColors["blues2"] = 'rgba(67,100,179,1)';
-familyColors["jazz"] = tinycolor('rgba(67,100,179,1)').darken(10).toString();
-familyColors["jazz2"] = 'rgba(67,100,179,1)';
+familyColors["folk"]  = tinycolor(musicMapColorsMap["folk-outer-circle"]).darken(10).toString();
+familyColors["folk2"] = musicMapColorsMap["folk-outer-circle"];
 
-//#8e3761
-familyColors["hip hop"] = tinycolor('rgb(142,55,97,1)').darken(10).toString();
-familyColors["hip hop2"] = 'rgb(142,55,97,1)';
+familyColors["r&b"] = tinycolor(musicMapColorsMap["rnb"]).darken(10).toString();
+familyColors["r&b2"] = musicMapColorsMap["rnb"];
+
+//todo?
+//note: blues/jazz have same color
+familyColors["blues"] = tinycolor(musicMapColorsMap["blues"]).darken(10).toString();
+familyColors["blues2"] = musicMapColorsMap["blues"];
+
+familyColors["jazz"] = tinycolor(musicMapColorsMap["jazz"]).darken(10).toString();
+familyColors["jazz2"] = musicMapColorsMap["jazz"];
+
+familyColors["country"] = tinycolor(musicMapColorsMap["country"]).darken(10).toString();
+familyColors["country2"] = musicMapColorsMap["country"];
+
+familyColors["metal"] = tinycolor(musicMapColorsMap["metal"]).darken(10).toString();
+familyColors["metal2"] = musicMapColorsMap["metal"];
+
+familyColors["hip hop"] = tinycolor(musicMapColorsMap["rap"]).darken(10).toString();
+familyColors["hip hop2"] = musicMapColorsMap["rap"];
 
 //todo: monkeypatch (see EventsList @ getFamilyClass)
-familyColors["hiphop"] =  tinycolor('rgb(142,55,97,1)').darken(10).toString();
-familyColors["hiphop2"] = 'rgb(142,55,97,1)';
+familyColors["hiphop"] =  tinycolor(musicMapColorsMap["rap"]).darken(10).toString();
+familyColors["hiphop2"] = musicMapColorsMap["rap"];
 
+familyColors["reggae"] = musicMapColorsMap["jamaican"]
+familyColors["reggae2"] = musicMapColorsMap["jamaican"];
 
+//todo?
+//note: latin/world share same color
+familyColors["latin"] =  musicMapColorsMap["latin"];
+familyColors["latin2"] =  musicMapColorsMap["latin"];
+familyColors["world"] =  musicMapColorsMap["world"];
+familyColors["world2"] =  musicMapColorsMap["world"];
 
-//#6e48af
-familyColors["reggae"] = 'rgb(110,72,175,1)'
-familyColors["reggae2"] = 'rgb(110,72,175,1)';
-
-familyColors["latin"] = '#008000';
-familyColors["latin2"] = '#008000';
-familyColors["world"] = '#ffc0cb';
-familyColors["world2"] = '#ffc0cb';
-familyColors["classical"] = '#808080';
-familyColors["classical2"] = '#808080';
+familyColors["classical"] = musicMapColorsMap["classical-inner-circle"];
+familyColors["classical2"] = musicMapColorsMap["classical-inner-circle"];
 familyColors["unknown"] =  '#00000036';
 familyColors["unknown2"] =  '#00000036';
 

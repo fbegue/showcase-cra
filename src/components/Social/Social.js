@@ -5,6 +5,7 @@ import api from "../../api/api";
 import {Context, initUser} from "../../storage/Store";
 import {StatControl, Control, FriendsControl, PaneControl, TabControl} from "../../index";
 import {useReactiveVar} from "@apollo/react-hooks";
+import Spinner from '../utility/Spinner';
 import {
 	CHIPFAMILIES,
 	CHIPFAMILIESRANKED,
@@ -16,7 +17,7 @@ import { makeStyles,withStyles} from '@material-ui/core/styles';
 import styles from './Social.tiles.module.css'
 import './Social.css'
 import CustomizedInputBase from "../utility/CustomizedInputBase";
-import MasonrySimple from  '../Masonry/MasonrySimple'
+//import MasonrySimple from  '../Masonry/MasonrySimple'
 import UserTile from "../utility/UserTile";
 import FriendsDisplay from "./FriendsDisplay";
 import InputIcon from '@material-ui/icons/Input';
@@ -47,9 +48,8 @@ import {tabMap} from "../../Tabify";
 import FilterListIcon from "@material-ui/icons/FilterList";
 // import StackedBarDrill from "../Charts/StackedBarDrill/StackedBarDrill";
 import {BARDATA,BARDRILLDOWNMAP} from "../../storage/withApolloProvider";
-import GenreChipsCompact from "../chips/GenreChipsCompact";
-import Avatar from "./Avatar";
-//import util from '../../util/util'
+import UserProfile from './UserProfile'
+import FaderToggle from '../springs/FaderToggle'
 
 import  DisconnectIcon from '../../assets/disconnect-svgrepo-com.svg';
 
@@ -288,6 +288,7 @@ function Social(props) {
 			var newFriend = globalUI.user.related_users.filter(r =>{return r.id === item.id})[0]
 			newFriend.friend = true;
 
+			//send to server
 			//note: updating server can be async
 			//todo: but pretty lazy just leaving it to fail here
 			api.modifyFriends(({auth:globalUI,friend:item}))
@@ -295,8 +296,6 @@ function Social(props) {
 				},e =>{console.error("addFriend failure",e);})
 
 		}
-
-		//send to server
 
 		statcontrol.setStats({name:"friends",user:item});
 		//setSelectedUser(item);
@@ -325,14 +324,12 @@ function Social(props) {
 
 	const handleToggleDrawer = () => {
 		tabcontrol.setDrawerShowing(!tabcontrol.isDrawerShowing);
-		setTimeout(e =>{
-			if(!tabcontrol.isDrawerShowing){
-				friendscontrol.setGuest(false)
-				friendscontrol.setGuest(false)
-			}
-		},1000)
-
-
+		// setTimeout(e =>{
+		// 	if(!tabcontrol.isDrawerShowing){
+		// 		friendscontrol.setGuest(false)
+		// 		friendscontrol.setGuest(false)
+		// 	}
+		// },100)
 
 		// tabcontrol.setDrawerShowing(prev =>{
 		// 	if(!prev){
@@ -361,19 +358,31 @@ function Social(props) {
 		// 	// { opacity: 0, color: 'rgb(14,26,19)' },
 		// ],
 		// from: { opacity: 0, color: 'red' },
-		opacity:  tabcontrol.isDrawerShowing ? 1 : .6,
+		opacity:  tabcontrol.section === 1 ? 0:(tabcontrol.isDrawerShowing ? 1 : .6),
+		 //testing: things starting to get weird (fitting UserProfile in Social, but under the drawer...)
+		 display: tabcontrol.section === 1 ? 'none':'block',
 		// "filter": isDrawerShowing ? "brightness(.5)" : "brightness(1)",
 		width: tabcontrol.isDrawerShowing ? "22.5em" : "2.2em"
 		// width: isDrawerShowing ? "2.2em":"22.5em"
 	});
 
+	function getOpacity(){
+		if(tabcontrol.section === 2){
+			return friendscontrol.guest ? 1:0
+		}
+		else{
+			return 0
+		}
+	}
 	const drawerToggleStyle = useSpring({
 		position:"absolute",
 		right:tabcontrol.isDrawerShowing ? 0 :-5,
 		top:2,zIndex:"3",margin:".2em",
-		opacity:  friendscontrol.guest ?
-			tabcontrol.isDrawerShowing ? 1 : 1
-			:0
+		// opacity:  friendscontrol.guest ?
+		// 	tabcontrol.isDrawerShowing ? 1 : 1
+		// 	:0
+		opacity: getOpacity(),
+		// display: getOpacity() === 0 ? 'none':'block'
 		// "filter": isDrawerShowing ? "brightness(.5)" : "brightness(1)",
 		// width: isDrawerShowing ? "22.5em" : "2.2em"
 		// width: isDrawerShowing ? "2.2em":"22.5em"
@@ -445,7 +454,8 @@ function Social(props) {
 				 style={{
 					 //todo: have to set explcit height here?
 					 //not undertstanding why it just doesn't adjust to content
-					 height: "21.5em",
+					 // height: "21.5em",
+					 height: "25.5em",
 					 outline: "2px solid orange",
 					 position: "relative"
 				 }}
@@ -475,7 +485,6 @@ function Social(props) {
 								{/*<button onClick={changeData}>changeData</button>*/}
 								{/*<button onClick={st}>trigger</button>*/}
 
-
 								{/*todo: I thiiiink the backdrop is preventing me from auto pushing / assigning a width that works to anything inside it?
 				simply b/c I can modify it here... still an issue b/c then I have to go modify width of everything else .... :/ */}
 								<div>
@@ -492,17 +501,17 @@ function Social(props) {
 										{/*<div> <button onClick={() =>{setShowBackdrop(false)}}>return</button></div>*/}
 										<div style={{display:"flex",flexDirection:"row"}}>
 											{/*	//	todo: why was this 480px? it covers stats panel beside it*/}
+
 											<div style={{display:"flex", flexWrap:"wrap",width:"13em"}}>
 												<FriendsDisplay onClick={selectUser} users={globalUI.user?.related_users?.filter(r =>{return r.friend}) || []}/>
 											</div>
 										</div>
 									</div>
 
-									{/*{globalState['spotifyusers'].length > 0 &&*/}
+									{/*note: this is the floating user-finder */}
 									{items.length > 0 &&
 									//style={{marginTop:"1em"}}
 									<div>
-
 										<Popper
 											id={id}
 											open={open}
@@ -535,84 +544,28 @@ function Social(props) {
 						</div>
 					</div>
 				</animated.div>
-
-				{friendscontrol.guest && !(tabcontrol.isDrawerShowing) &&
-
-				//	todo: not sure why I can't get this UserTile and guestStats to flex correctly
-
-				<div style={{display:"flex",flexDirection:"column",width:"20em"}}>
-					{/*<div><UserTile item={selectedUser} single={true} size={["200px","200px"]} /> </div>*/}
-					{/* style={{"position":"absolute","zIndex":"1"}}*/}
-
-					{/*testing: trying to just take up as little space as possible*/}
-					{/*<div><UserTile item={selectedUser} single={true} size={["auto","16em"]} /> </div>*/}
-
-					{/*note: set height to let Avatar overflow*/}
-					<div style={{display:"flex",flexDirection:"row",marginTop:"1em",height:"2em",marginRight:".5em"}}>
-
-						<div style={{color:"white",height:"20px",marginBottom:"1em",width:"fit-content"}}>
-							<Paper elevation={3}>
-								<Typography style={{padding:"1px 4px"}} variant="subtitle1">
-									Top Shared Genres
-								</Typography>
-							</Paper>
-						</div>
-						<div style={{flexGrow:1}}></div>
-						{/*<Avatar rec={{user:globalUI.user}}/>*/}
-						<div  style={{display:"flex",flexDirection:"row",marginTop:"-.8em",marginRight:"1em"}}>
-							<div style={{"fontSize":"1.5em","color":"white","WebkitTextStrokeWidth":"1px","WebkitTextStrokeColor":"black",
-								"marginRight":"-0.5em","marginTop":"1em","zIndex":"1"}}>x</div>
-							<div><Avatar rec={{user:friendscontrol.guest}}/> </div>
-						</div>
-
-					</div>
-
-					<div style={{"zIndex":"2",display:"flex",marginTop:".5em"}} id={'guestStats'}>
-
-						{/*todo: not sure why BubbleFamilyGenreChips is creeping up here*/}
-						{/*<div style={{color:"white",height:"20px",marginBottom:"1em",width:"fit-content"}}>*/}
-						{/*	<Paper elevation={3}>*/}
-						{/*		<Typography style={{padding:"1px 4px"}} variant="subtitle1">*/}
-						{/*			Genres*/}
-						{/*		</Typography>*/}
-						{/*	</Paper>*/}
-						{/*</div>*/}
-						<div>
-							<BubbleFamilyGenreChips families={[]} familyDisabled={true} showOccurred={false} occurred={true}
-													clearable={false} genres={chipGenresRanked} flexDirection={'row'}/>
-						</div>
-
-					</div>
-					{/*,marginLeft:"11.5em"*/}
-					<div style={{display:"flex",flexDirection:"column",width:"17.5em",marginTop:".5em"}}>
-						<div style={{display:"flex"}}>
-							<div style={{color:"white",height:"20px",marginBottom:"1em",width:"fit-content"}}>
-								<Paper elevation={3}>
-									<Typography style={{padding:"1px 4px"}} variant="subtitle1">
-										Top Shared Artists
-									</Typography>
-								</Paper>
-							</div>
-							<Button style={{marginLeft:".5em",maxWidth: '30px', maxHeight: '30px', minWidth: '30px', minHeight: '30px',background:"white"}}>
-								{/*,filter:"invert(1)"*/}
-								{/*<img style={{height:"1.5em",marginLeft:"-3em"}} src={PlusOutlinedIconImg}/>*/}
-								<div style={{height:"1.5em",marginLeft:"0em"}} >
-									<LibraryMusicIcon/>
-								</div>
-								{/*<div>*/}
-								{/*	<img style={{height:"1.5em",transform:"rotate(95deg)",marginTop:"-.7em",marginLeft:"0em"}} src={MoreIconImg}/>*/}
-								{/*</div>*/}
-							</Button>
-						</div>
+				{/*{*/}
+				{/*	!control.dataLoaded ?*/}
+				{/*		<Spinner style={{"transform":"scale(1.5)","position":"relative","top":"16.5em","left":"3.8em","margin":"0 auto"}}/>*/}
+				{/*: <UserProfile/>*/}
+				{/*}*/}
 
 
-						<div style={{marginLeft:".5em"}}><MasonrySimple data={getTopSharedArtists()}/></div>
-					</div>
-
-
-				</div>
-					// </Paper>
+				{/*note: FaderToggle, b/c it's actually re-rendering, flickers the content that's not changed
+				 but I wanted to keep Top Genres title solid thru transition, so put a Fader on only the chips within UserProfile
+				  didn't spend time to fix it, just thru below together*/}
+				{
+					!control.dataLoaded &&
+					<FaderToggle toggle={!control.dataLoaded} set={control.setDataLoaded} pre={
+						//todo: having weird time positioning this (top/left)
+						<Spinner style={{"transform":"scale(1.5)","position":"relative","top":"16.5em","left":"14.8em","margin":"0 auto"}}/>
+					}
+								 post={<UserProfile/>}/>
 				}
+				{control.dataLoaded && <UserProfile/>}
+
+
+
 			</div>
 
 			{/*testing: liked this near social, but gotta move it I think*/}

@@ -1,4 +1,4 @@
-import React, {useContext} from "react";
+import React, {useContext, useEffect} from "react";
 import Ohio from '../../data/maps/Ohio'
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -16,11 +16,15 @@ import LuxonUtils from '@date-io/luxon';
 import {Context} from "../../storage/Store";
 import Typography from "@material-ui/core/Typography";
 import PopoverDatePicker from "./PopoverDatePicker";
+import {useReactiveVar} from "@apollo/react-hooks";
+import {EVENTS_VAR} from "../../storage/withApolloProvider";
 
 function Map(props) {
 	let control = Control.useContainer();
 	const [globalState, globalDispatch] = useContext(Context);
+	const events= useReactiveVar(EVENTS_VAR);
 	console.log("$map",control);
+
 
 
 	//testing: just Ohio rn
@@ -31,20 +35,26 @@ function Map(props) {
 	// 		// {"displayName":"Dayton", "id":3673},
 	// 		{"displayName":"Toledo", "id":5649,abbr:"TDO"}
 	// 	]};
+	//{"displayName": "Salt Lake City", "id":13560}
+	//{"displayName":"SF Bay Area", "id":26330}
+
 	var toggleMap = {};
 
-	globalState['metros'].forEach(s =>{
-		toggleMap[s.id] = 'default'
-		if(props.default.id === s.id){
-			toggleMap[s.id] = 'selected'
-		}
-	})
-
-//{"displayName": "Salt Lake City", "id":13560}
-//{"displayName":"SF Bay Area", "id":26330}
-
-
 	const [color, setColor] = React.useState(toggleMap);
+
+	useEffect(e =>{
+		if(	globalState['metros']){
+			globalState['metros'].forEach(s =>{
+				toggleMap[s.id] = 'default'
+				if(props.default.id === s.id){
+					toggleMap[s.id] = 'selected'
+				}
+			})
+			setColor(toggleMap)
+		}
+
+	},[])
+
 
 	const setSelect = (e,metro) => {
 		console.log("setSelect",metro);
@@ -110,21 +120,21 @@ function Map(props) {
 		},
 	}));
 
-	const handleDateChange = (date,which) => {
-		//console.log("handleDateChange");
-		if(which === 'start'){
-			control.setStartDate(date)
-		}else{
-			control.setEndDate(date)
-		}
-	};
+	// var venues = {};
+	// const getVenues = () =>{
+	// 	events.forEach(e =>{
+	//
+	// 	})
+	// }
+	// getVenues()
+
 
 	return (
 		<div style={{display:"flex",flexDirection:"column"}}>
 			<div style={{display:"flex"}}>
 				<div style={{"position":"relative","left":"-10px"}}>
 					<List>
-						{globalState['metros'].map((metro, index) => (
+						{globalState['metros'] && globalState['metros'].map((metro, index) => (
 							<StyledListItem key={index} color={color[metro.id]} metro={metro}></StyledListItem>
 						))}
 					</List>

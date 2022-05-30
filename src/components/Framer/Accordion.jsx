@@ -8,7 +8,7 @@ import Avatar from "../Social/Avatar";
 import FilterListIcon from "@material-ui/icons/FilterList";
 import InputIcon from "@material-ui/icons/Input";
 import {FriendsControl, TabControl} from "../../index";
-const Accordion = ({infoBound,collapse, setCollapse,content }) => {
+const Accordion = ({collapse, setCollapse,content }) => {
     // const i = 0;
     // const isOpen = i === collapse;
     // let isOpen = collapse;

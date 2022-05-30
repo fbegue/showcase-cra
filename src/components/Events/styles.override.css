@@ -1,0 +1,23 @@
+:root {
+    /*--rdp-accent-color: #0000ff;*/
+    --rdp-accent-color: #2196f3 !important;
+    /*background: rgb(100,181,246);*/
+    /*--rdp-accent-color: linear-gradient(0deg, rgba(100,181,246,1) 0%, rgba(25,118,210,1) 48%) !important;*/
+}
+
+/*.rdp-day_selected:not([disabled]) {*/
+/*    color: white;*/
+/*    background-color: #2196f3 !important;*/
+/*    !*note: tried to make a gradient for background-color but that's not how gradients work (must be background/background-image)*!*/
+/*    !*background:  linear-gradient(0deg, rgba(100,181,246,1) 0%, rgba(25,118,210,1) 48%) !important;*!*/
+/*}*/
+
+.rdp-day_range_start{
+    background-color: #64b5f6 !important;
+    /*background-color: orange !important;*/
+}
+
+.rdp-day_range_end{
+    background-color: #1976d2 !important;
+    /*background-color: red !important;*/
+}

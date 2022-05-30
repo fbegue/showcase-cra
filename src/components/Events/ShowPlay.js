@@ -39,7 +39,7 @@ function ShowPlay(props){
 	}
 	//console.log("$showPlay",props.sub);
 	var iconProps = {
-		fontSize:'inherit',style:{fontSize:"40px",opacity:"80%",marginLeft:"-6px",marginTop:"-6px"},color:'secondary'
+		fontSize:'inherit',style:{fontSize:"40px",opacity:"80%",marginLeft:"-5px",marginTop:"22px"},color:'secondary',display:"block !important"
 	}
 	return <div>
 		<div >
@@ -53,13 +53,13 @@ function ShowPlay(props){
 				{/*</div>*/}
 				{(props.sub.artist.genres.length >0 ?
 						<div style={{display:"flex"}}>
-							<div>
+							<div className={'inner-skip'}>
 								{control.play && control.playArtist === props.sub.artist.id ?
 									// <div  onClick={() => handlePlay(props.sub.artist)} style={{marginTop:"2em"}}>
 									// 	<AnimatedPlayBars/>
 									// </div>
 
-									<div onClick={() => handlePlay(props.sub.artist)}>
+									<div  id={'pause-icon'} onClick={() => handlePlay(props.sub.artist)}>
 									<PauseCircleOutlineIcon {...iconProps } />
 									</div>
 
@@ -68,7 +68,10 @@ function ShowPlay(props){
 									// 	<PauseCircleOutlineIcon fontSize={'inherit'} style={{fontSize:"30px"}} color={'secondary'} onClick={() => handlePlay(props.sub.artist)}></PauseCircleOutlineIcon>
 									// }/>
 									:
-									<PlayCircleOutlineIcon {...iconProps } onClick={() => handlePlay(props.sub.artist)}></PlayCircleOutlineIcon>
+									<div id={'play-icon'}>
+										<PlayCircleOutlineIcon {...iconProps } onClick={() => handlePlay(props.sub.artist)}></PlayCircleOutlineIcon>
+									</div>
+
 									// <ApplyPulse target={
 									// 	<PlayCircleOutlineIcon fontSize={'inherit'} style={{fontSize:"30px"}} color={'secondary'} onClick={() => handlePlay(props.sub.artist)}></PlayCircleOutlineIcon>
 									// }/>

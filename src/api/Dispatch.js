@@ -6,7 +6,8 @@ import {GLOBAL_UI_VAR} from "../storage/withApolloProvider";
 import {Context, initUser} from "../storage/Store";
 import {Control, StatControl, TabControl} from "../index";
 import exampleFetchEvents from '../data/example/fetchEvents'
-import {tabMap} from "../Tabify";
+import tables from "../storage/tables";
+//import {tabMap} from "../Tabify";
 // import dan2_example from '../data/example/DanielNiemiec#2'
 
 function Dispatch(props) {
@@ -29,6 +30,7 @@ function Dispatch(props) {
 			//figure out if we've seen this user before - if so this'll do a quick fetch, if not we're going to resolve and then store
 			//note: param name = friend, b/c mostly used to fetch them
 			var me = await api.fetchStaticUser({auth:globalUI,friend: globalUI.user})
+
 			globalUI.user.related_users = me.related_users
 
 			//todo go thru init user process (debug in Reducer.js to see other bits laying about)
@@ -38,15 +40,24 @@ function Dispatch(props) {
 			// var artistsPay = [];
 			// artistsPay = artistsPay.concat(r[0]).concat(r[1].artists);
 
+			//testing: (1) replace with actual playlists call
+			globalDispatch({type: 'init', payload:{playlists:[]},user: globalUI.user,context:'playlists'});
+
+			globalDispatch({type: 'updateUser', payload:me.playlistsTracked,user: globalUI.user,context:'playlistsTracked'});
+
 			globalDispatch({type: 'init', payload:me.tracks,user: globalUI.user,context:'tracks'});
 
 			globalDispatch({type: 'init', payload:{artists:me.artists.artists,stats:null},user: globalUI.user,context:'artists'});
 
+
+
 			//testing: as soon as artists is here, set it as default
-			statcontrol.setStats(tabcontrol.section === 2 ? 'artists_friends':'artists_saved')
+			statcontrol.setStats(tabcontrol.section === 2 ? {name:'artists_friends'}:{name:'artists_saved'})
 
 			globalDispatch({type: 'init', payload:me.albums,user: globalUI.user,context:'albums'});
 
+			//testing: moved this to just after the (hopefully) quick loading stuff
+			control.setDataLoaded(true)
 			//note: to keep init payload signatures consistent, I reconstruct it below
 			//followedArtists: 			{stats:null,artists:[]}
 			//getTopArtists : 			[]
@@ -109,8 +120,7 @@ function Dispatch(props) {
 			var defaultMetro = {"displayName":"Columbus", "id":9480,abbr:"CBUS"}
 			control.selectMetro(defaultMetro)
 
-			//testing:
-			control.setDataLoaded(true)
+
 
 			// var NEVER =  function(){
 			// 	return new Promise(function(done, fail) {
@@ -164,6 +174,10 @@ function Dispatch(props) {
 				globalDispatch({type: 'init', user:{id:r.id},payload:r.artists,context:'artists'});
 				globalDispatch({type: 'init', user:{id:r.id},payload:r.tracks,context:'tracks'});
 				globalDispatch({type: 'init', user:{id:r.id},payload:r.albums,context:'albums'});
+
+
+				//testing: (1) replace with actual playlists call
+				globalDispatch({type: 'init', payload:{playlists:[]},user:{id:r.id},context:'playlists'});
 			})
 
 			console.log("setStatic users",users.length);

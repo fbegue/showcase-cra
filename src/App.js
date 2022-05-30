@@ -22,7 +22,7 @@ import {useQuery,useReactiveVar} from "@apollo/react-hooks";
 //import SplitPane from "react-split-pane";
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import {makeStyles, withStyles} from '@material-ui/core/styles';
-import { createMuiTheme } from '@material-ui/core/styles';
+import { createTheme } from '@material-ui/core/styles';
 import SwipeRight from './assets/swipe-right.png'
 // import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
 import { ThemeProvider as MuiThemeProvider } from '@material-ui/core/styles';
@@ -180,7 +180,18 @@ function App(props) {
     //configing theme
     //https://material-ui.com/customization/typography/
 
-    const muiTheme = createMuiTheme({
+    //note: palette colors (just using defaults for now)
+    //https://v4.mui.com/customization/default-theme/?expand-path=$.palette
+    //[this link is wrong somehow?] https://v4.mui.com/customization/palette/#palette-colors
+    const muiTheme = createTheme({
+        palette: {
+            primary:{
+                main: '#3f51b5'
+            },
+            secondary: {
+                main: '#f50057'
+            }
+        },
         typography: {
             fontFamily: [
                 // '-apple-system',
@@ -362,7 +373,8 @@ function App(props) {
                             {/*    </div>*/}
                             {/*</div>*/}
 
-                            <div  style={{position: "fixed",bottom:0,right:0,paddingRight:"1em",paddingLeft:"1em",zIndex:20}}>
+                            {/*note: zIndex:1400 is 100 > 1300 (automatic popover zIndex)*/}
+                            <div  style={{position: "fixed",bottom:0,right:0,paddingRight:"1em",paddingLeft:"1em",zIndex:1400}}>
                                 {/*transform: "scaleX(-1)"*/}
                                 <div><img style={{height:"3em",opacity:.5,marginTop:"2em",zIndex:25,marginLeft:"1.5em"}} src={SwipeRight}/></div>
                                 <div style={{zIndex:20}}>
@@ -382,7 +394,7 @@ function App(props) {
                             </div>
 
                             <div  style={{position: "sticky",top: "0px", "paddingTop":"0.5em","paddingBottom":"0.5em",
-                                borderBottom: "1px solid black", zIndex: "20",display:'flex',background:"#f0f0f0"}}>
+                                borderBottom: "1px solid black",zIndex:1400,display:'flex',background:"#f0f0f0"}}>
                                 <div>
                                     {/* scrollTop={isVisible}*/}
                                     <Profile version={pjson.version}/>

@@ -1,28 +1,18 @@
 import React, {useEffect, useState} from 'react'
 import { useSpring, animated } from '@react-spring/web'
-import styles from './RotateSpring.module.css'
 
-export default function OpacityPulse(props) {
+export default function Fader(props) {
 
-
-	const [flip, set] = useState(true)
-	const [dur, setDur] = useState(2000)
-	const fader = useSpring({
-		// to: { opacity: 1,x:10 }, from: { opacity: .4,x:0 },
-		to: { opacity: .2,x:30 }, from: { opacity: .5,x:-5 },
-		config: {duration: dur },
-		reverse: flip, onRest: () => set(!flip)})
-
-useEffect(e =>{
-	setDur((prev)=>{return prev === 1000 ? 2000:1000})
-},[flip])
-
+	const fadeStyles = useSpring({
+		// config: { ...config.stiff },
+		from: { opacity: 0 },
+		to: {
+			opacity: props.show ? 1 : 0
+		}
+	});
 	return (
-
-		<div className={styles.container} style={{"position":"relative","top":props.top,"left":props.left}}>
-			<animated.div style={fader}>
-				{props.target}
+			<animated.div style={fadeStyles}>
+				{props.content}
 			</animated.div>
-		</div>
 	)
 }

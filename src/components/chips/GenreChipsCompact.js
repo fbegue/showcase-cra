@@ -55,7 +55,7 @@ function GenreChipsCompact(props) {
 	const chipGenresSharedMap= useReactiveVar(CHIPGENRESCOMBINEDMAP)
 	const chipGenresRankedMap = useReactiveVar(CHIPGENRESRANKEDMAP)
 	const chipFamiliesRankedMap= useReactiveVar(CHIPFAMILIESRANKEDMAP)
-	console.log(comp + "chipGenresRankedMap",chipGenresRankedMap);
+	//console.log(comp + "chipGenresRankedMap",chipGenresRankedMap);
 
 	//console.log("$PieChips | props",props);
 	//testing:

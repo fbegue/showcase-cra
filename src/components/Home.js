@@ -1,7 +1,6 @@
 /* eslint-disable no-unused-expressions */
 import React, {useState, useEffect, useMemo, useContext} from 'react';
 import {familyColors,familyGenre_map,genreFam_map} from "../util/families";
-import DiscreteSlider from "./utility/Slider";
 import useMedia from './Masonry/useMedia'
 //import useMeasure from './Masonry/useMeasure'
 import data from './Masonry/data'

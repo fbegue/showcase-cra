@@ -23,7 +23,7 @@ import {families as systemFamilies,familyColors} from '../util/families'
 import {Control, TabControl, StatControl, GridControl, TileSelectControl} from "../index";
 import util from "../util/util";
 //import PieGenreChips from "./chips/PieGenreChips";
-import PieChart from "./Charts/PieChart";
+import PieChartAPIControlled from "./Charts/PieChart";
 import SocialPairPie from "./Charts/PieChart3D/SocialPairPie";
 import HorizontalTransition from './springs/HorizontalTransition'
 

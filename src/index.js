@@ -37,11 +37,15 @@ function useControl(initialState = 0) {
     };
 
     // let [startDate, setStartDate] = useState(new Date());
-    let [startDate, setStartDate] = useState(DateTime.now());
-    //testing:
-    //let [endDate, setEndDate] = useState(null);
-    var thirty = DateTime.fromJSDate( new Date().addDays(30))
-    let [endDate, setEndDate] = useState(thirty);
+    //let [dateRange, setStartDate] = useState(DateTime.now());
+    // //testing:
+    // //let [endDate, setEndDate] = useState(null);
+    // var thirty = DateTime.fromJSDate( new Date().addDays(30))
+
+
+    var thirty = new Date().addDays(30)
+    const lastDayThisMonth = DateTime.local().endOf('month').toJSDate()
+    let [dateRange, setDateRange] = useState({from:new Date(),to:lastDayThisMonth});
 
     let togglePlay = (play) => _togglePlay(play)
     let setId = (id) => _setId(id);
@@ -73,7 +77,7 @@ function useControl(initialState = 0) {
     let mapArtist = {0:"exact",1:"off",2:"related"}
     let rmapArtist = {"exact":0,"off":1,"related":2}
     return { play,id, togglePlay, setId,metro,selectMetro,playArtist,setPlayArtist,
-        startDate,endDate,setStartDate,setEndDate,setPlayerVisible,playerVisible,
+        dateRange,setDateRange,setPlayerVisible,playerVisible,
         genreSens,setGenreSens, artistSens, setArtistSens,map,rmap,mapArtist,rmapArtist,
         dataLoaded,setDataLoaded}
 }
@@ -123,7 +127,13 @@ function useStats(initialState = 0) {
     //todo: needs to set artists_saved on login - not page load = triggers util to soon
     //let [stats, setStats] = useState({name:"Home"});
     // let [stats, setStats] = useState({name:"artists_saved"});
-    let [stats, setStats] = useState({name:"Home"});
+
+    var prevSection = GSSI('get','section')
+    // eslint-disable-next-line no-unused-expressions
+    prevSection = prevSection ? console.log("active section set from localStorage",parseInt(prevSection)):{}
+    var init = prevSection === 1 ? "artists_saved":"artists_friends"
+
+    let [stats, setStats] = useState({name:init});
     //the default true is context
     const [mode, setMode] = useState(true);
     //the default true is pie
@@ -152,7 +162,7 @@ function useTabs(initialState = 0) {
     //note: artists, songs, etc.
     const [tab, setActiveTab] = useState(0);
     //default Pager.jsx page
-    const [page, setPage] = useState(1);
+    const [page, setPage] = useState(2);
     const [isDrawerShowing, setDrawerShowing] = useState(true);
     const [selectedUser, setSelectedUser] = React.useState(null);
     return { tab,setActiveTab,section,setActiveSection,page, setPage,setDrawerShowing,isDrawerShowing,setSelectedUser,selectedUser }

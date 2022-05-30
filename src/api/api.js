@@ -33,6 +33,7 @@ const fakeDatabase = {
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
+
 var myJSONFetch =  function(req,path){
     return new Promise(function(done, fail) {
 
@@ -51,6 +52,25 @@ var myJSONFetch =  function(req,path){
                 fail(err)
         })
     })
+}
+
+var createArtistsPlaylist =  async function(req){
+    try{
+        return await myJSONFetch(req,"/createArtistsPlaylist")
+    }catch(e){
+        debugger
+    }
+}
+
+
+const unfollowPlaylist = async function(req){
+    try{
+        return await myJSONFetch(req,"/unfollowPlaylist")
+    } catch(e){
+        console.error(e)
+        debugger
+        throw(e)
+    }
 }
 
 var myFetch =  async function(route,req){
@@ -519,24 +539,25 @@ var fetchMetros =  function(){
 
 //methods
 
-var createPlaylist =  function(req){
-    return new Promise(function(done, fail) {
-
-        fetch(api_address + '/createPlaylist', {
-            method: 'POST', // *GET, POST, PUT, DELETE, etc.
-            mode: 'cors', // no-cors, *cors, same-origin
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(req)
-        })
-            .then(res => res.json())
-            .then(function(res){
-                console.log("playlist created",res);
-                done(res)
-            })
-    })
-}
+//todo: deprecated
+//var createPlaylist =  function(req){
+//     return new Promise(function(done, fail) {
+//
+//         fetch(api_address + '/createPlaylist', {
+//             method: 'POST', // *GET, POST, PUT, DELETE, etc.
+//             mode: 'cors', // no-cors, *cors, same-origin
+//             headers: {
+//                 'Content-Type': 'application/json'
+//             },
+//             body: JSON.stringify(req)
+//         })
+//             .then(res => res.json())
+//             .then(function(res){
+//                 console.log("playlist created",res);
+//                 done(res)
+//             })
+//     })
+// }
 
 var getAuth =  function(code){
     return new Promise(function(done, fail) {
@@ -644,6 +665,8 @@ var getArtistTopTracks =  function(req){
 }
 
 
+
+
 var completeArtist =  function(param){
     return new Promise(function(done, fail) {
         //todo: replace with fetch
@@ -728,6 +751,8 @@ const deleteTodo = (id) =>
     });
 
 export default {
+    createArtistsPlaylist,
+    unfollowPlaylist,
     myJSONFetch,
     getArtistInfo,
     postInfo,
@@ -754,7 +779,7 @@ export default {
     fetchSpotifyUsers,
     getAuth,
     refreshAuth,
-    createPlaylist,
+    //createPlaylist,
     getRecentlyPlayedTracks,
     modifyFriends,
     fetchMetros

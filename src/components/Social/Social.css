@@ -49,4 +49,18 @@
     padding-left:0px !important;
 }
 
+/*.shared{*/
+/*    text-transform: uppercase;*/
+/*    background:lightgray;*/
 
+/*}*/
+
+.highlight-on{
+    transition: background 1s;
+    background:#0000002e;
+}
+
+.highlight-off{
+    transition: background 1s;
+    background:initial;
+}

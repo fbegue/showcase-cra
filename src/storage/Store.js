@@ -7,9 +7,6 @@ import tables from './tables'
 
 let initialState = {
 	posts: [],
-	artists:[],
-	events:[],
-	artistSearchSelection:[],
 	// node:[{id:1,name:"agg",data:[]}],
 	node:[
 		{
@@ -43,25 +40,21 @@ let initialState = {
 			"data": []
 		}
 	],
-	//testing:
-	// dacandyman01_artists:[],
-	// dacandyman01_playlists:[],
-	// dacandyman01_tracks:[],
-	// dacandyman01_albums:[],
-	// dacandyman01_playlists_stats:null,
-	users:[],
-	spotifyusers:[],
 	error: null
 };
 
-var types = ["artists","playlists","tracks","albums"]
+//todo: not remembering what the whole idea was here
+//like why did I recently remove types loop to init initialState?
+//and why does only the globalUI.user get 'playlistsTracked' (assuming b/c initialState only works for me?)
+
+var types = ["artists","playlists","tracks","albums","playlistsTracked"]
 export function initUser(user){
-	// debugger
-	tables['users'][user.id] = {artists:[],playlists:[],tracks:[],albums:[]};
+
+	//note: setting these up so user record stores can load instantly (empty)
+	tables['users'][user.id] = {artists:[],playlists:[],tracks:[],albums:[],playlistsTracked:[]};
 	types.forEach(t =>{
 		initialState[user.id + "_" + t] = []
 	})
-	//console.log("$initUser",tables['users']);
 }
 
 const Store = ({children}) => {
