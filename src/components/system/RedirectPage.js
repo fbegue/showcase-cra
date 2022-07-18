@@ -33,7 +33,10 @@ export const getParamValues = (url) => {
 // };
 
 export default class RedirectPage extends React.Component {
+
+
 	componentDidMount() {
+
 		const { setExpiryTime, history, location } = this.props;
 		try {
 			const params = getParamValues(location.search);

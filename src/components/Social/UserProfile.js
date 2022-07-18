@@ -5,6 +5,7 @@ import BubbleFamilyGenreChips from "../chips/BubbleFamilyGenreChips";
 import Button from "@material-ui/core/Button";
 import LibraryMusicIcon from "@material-ui/icons/LibraryMusic";
 import MasonrySimple from "../Masonry/MasonrySimple";
+import MasonrySimpleCycle from "../Masonry/MasonrySimpleCycle";
 import React, {useContext,useEffect,useState} from "react";
 import {FriendsControl, TabControl} from "../../index";
 import _ from "lodash";
@@ -13,7 +14,7 @@ import {useReactiveVar} from "@apollo/react-hooks";
 import {CHIPGENRESRANKED, GLOBAL_UI_VAR, PIEDATA} from "../../storage/withApolloProvider";
 import { makeStyles } from '@material-ui/core/styles';
 import Fader from "../springs/Fader";
-
+import LibSVG from "../../assets/lib-transparent.svg"
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import AppBar from "@material-ui/core/AppBar";
@@ -347,6 +348,10 @@ function UserProfile(props){
 								</div> }
 							</div>
 
+							{/*<MasonrySimpleCycle  data={*/}
+							{/*	(databind === 'user' ? globalState[globalUI.user.id + "_artists"]: localSharedMap[0])*/}
+							{/*}/>*/}
+							{/*<img src={LibSVG} alt="SVG as an image"/>*/}
 							<MasonrySimple type={type + 1 } databind={databind} data={
 								{
 									0: (databind === 'user' ? globalState[globalUI.user.id + "_artists"]: localSharedMap[0])  || [],

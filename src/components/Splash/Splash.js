@@ -303,19 +303,19 @@ export default function App() {
 	})
 
 	return (
-		<div style={{ position: 'relative', height: '500px', width: '350px' }}>
-			<div style={{ position: 'absolute', zIndex: 10, top: '-1.5em', width: '100%' }}>
+		<div style={{ position: 'relative'}}>
+			<div style={{ zIndex: 10, top: '-1.5em',outline:"1px solid orange" }}>
 				<div style={{ display: 'flex', flexDirection: 'column' }}>
 					<div id="logo" style={{ display: 'flex', justifyContent: 'center' }}>
 						{/* <div style={{ color: 'white', fontSize: '2em' }}>SOUNDFOUND</div> */}
-						<div>
+						<div style={{position:"relative",width:"16em"}}>
 							<img style={{ height: '4em' }} src={Logo} />
 						</div>
 					</div>
-					<div id="items" style={{ marginTop: '5em', display: 'relative', zIndex: 100, color: 'white' }}>
+					<div id="items" style={{ marginTop: '5em', zIndex: 100, color: 'white' }}>
 						{msgs}
 					</div>
-					<div id="login" style={{ display: 'flex', justifyContent: 'center', marginTop: '4em' }}>
+					<div id="login" style={{ display: 'flex', justifyContent: 'center', marginTop: '4em',bottom:"0px" }}>
 						<button id="login-button">
 							<div className="ButtonInner">
 								<p> Log In</p>
@@ -327,12 +327,8 @@ export default function App() {
 			<div
 				id="background-trail"
 				className={styles.container}
-				style={{
-					position: 'relative',
-					zIndex: 1,
-					// outline: '1px solid blue',
-					overflowY: 'hidden',
-				}}
+				style={{"position":"relative","zIndex":"1","height":"32em",
+					"overflowY":"hidden","width":"22em","top":"-20em","outline":"1px solid blue"}}
 				onClick={() => set(state => !state)}>
 				<div style={{ paddingTop: '1em' }}>
 					<Trail open={open}></Trail>

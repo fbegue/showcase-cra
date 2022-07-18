@@ -30,6 +30,7 @@ import EventIcon from '@material-ui/icons/Event';
 import Badge from '@material-ui/core/Badge';
 import logo from './assets/sound_found.png'
 import { useDrag } from 'react-use-gesture'
+import Splash from './components/Splash/Splash'
 import {useSpring,animated} from "react-spring";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
@@ -37,8 +38,6 @@ import AppBar from "@material-ui/core/AppBar";
 import 'fontsource-roboto';
 import './App.css'
 import './components/tiles/Tiles.css'
-
-
 
 
 //testing: viewpager
@@ -362,9 +361,12 @@ function App(props) {
                     </BrowserRouter>
                     {/* style={{overflow:"scroll"}} onScroll={getScrollData}*/}
                     <link href="https://fonts.cdnfonts.com/css/gotham" rel="stylesheet"/>
-                    <div>
+                    {/*testing:*/}
+                    <div style={{"display":"flex","justifyContent":"center"}}>
 
-                        {!isTabletOrMobile && <div className={'app'} >
+                        {!globalUI.access_token && <Splash/>}
+
+                        {( globalUI.access_token && !isTabletOrMobile) && <div className={'app'} >
 
                             {/*<div  style={{position: "sticky",bottom: "0px", "paddingTop":"0.5em","paddingBottom":"0.5em",*/}
                             {/*    borderBottom: "1px solid black", zIndex: "20",display:'flex',background:"#f0f0f0"}}>*/}
@@ -457,11 +459,13 @@ function App(props) {
                                     {/*</div>*/}
 
                                 </div>
-                                : <div>splash</div>
+                                : <div>
+                                    Desktop No Access
+                                </div>
 
                             }
                         </div>}
-                        {isTabletOrMobile && <animated.div className={'app'} >
+                        {( globalUI.access_token && isTabletOrMobile) && <animated.div className={'app'} >
 
                             {/*<div  style={{position: "sticky",bottom: "0px", "paddingTop":"0.5em","paddingBottom":"0.5em",*/}
                             {/*    borderBottom: "1px solid black", zIndex: "20",display:'flex',background:"#f0f0f0"}}>*/}
@@ -581,8 +585,7 @@ function App(props) {
 
 
                                 </div>
-                                : <div>splash</div>
-
+                                : <div>Mobile No Access</div>
                             }
 
                         </animated.div>}
